@@ -42,6 +42,20 @@ cobb::Window::Window(const std::string &title) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     getGameDimensions();
+
+    const GLubyte* version = glGetString(GL_VERSION);
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    const GLubyte* vendor = glGetString(GL_VENDOR);
+    const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+    if (version && renderer && vendor && glslVersion) {
+        std::cout << "OpenGL Version: " << version << std::endl;
+        std::cout << "Renderer: " << renderer << std::endl;
+        std::cout << "Vendor: " << vendor << std::endl;
+        std::cout << "GLSL Version: " << glslVersion << std::endl;
+    } else {
+        std::cerr << "Failed to query OpenGL version info!" << std::endl;
+    }
 }
 
 float cobb::Window::update() {
@@ -161,6 +175,10 @@ void cobb::Window::getGameDimensions() {
 void cobb::Window::setTime(double time) {
     glfwSetTime(time);
     _timeOffset = time;
+}
+
+void cobb::Window::setWindowTitle(const std::string& title) {
+    _title = title;
 }
 
 

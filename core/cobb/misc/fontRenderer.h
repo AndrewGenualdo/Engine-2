@@ -24,6 +24,7 @@ public:
     FontRenderer() = default;
     explicit FontRenderer(const std::string& fontTexture);
 
+    void setColor(vec3 color);
     void setColor(vec4 color);
     void draw(const std::string& text, float x, float y, float scale);
     static void loadShader();

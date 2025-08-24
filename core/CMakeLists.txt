@@ -33,6 +33,14 @@ add_library(core STATIC ${CORE_SRC} ${CORE_INC}
         cobb/core/scene.h
         cobb/misc/fontRenderer.cpp
         cobb/misc/fontRenderer.h
+        cobb/misc/multiTexture2d.cpp
+        cobb/misc/multiTexture2d.h
+        cobb/shapes/line2d.cpp
+        cobb/shapes/line2d.h
+        cobb/shapes/circle2d.cpp
+        cobb/shapes/circle2d.h
+        cobb/shapes/spline2d.cpp
+        cobb/shapes/spline2d.h
 )
 
 add_custom_target(copyAssetsLine ALL

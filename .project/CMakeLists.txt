@@ -16,20 +16,39 @@ add_custom_target(copyAssetsProject ALL COMMAND ${CMAKE_COMMAND} -E copy_directo
 
 install(FILES ${PROJECT_INC} DESTINATION include/project)
 add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
-        player.h
-        level.h
-        platform.h
-        player.cpp
-        client.h
-        server.h
-        client.cpp
-        server.cpp
-        menu.h
-        game.h
-        menu.cpp
-        hitbox.h
-        hitbox.cpp
-        chatBox.h)
+        scenes/game/player.h
+        scenes/game/level.h
+        scenes/game/platform.h
+        scenes/game/player.cpp
+        scenes/game/client.h
+        scenes/game/server.h
+        scenes/game/client.cpp
+        scenes/game/server.cpp
+        scenes/game/game.h
+        scenes/game/hitbox.h
+        scenes/game/hitbox.cpp
+        scenes/game/chatBox.h
+        scenes/comic/comic.cpp
+        scenes/comic/comic.h
+        scenes/comic/comic.h
+        scenes/factory/factory.cpp
+        scenes/factory/factory.h
+        scenes/factory/items/item.cpp
+        scenes/factory/items/item.h
+        scenes/factory/structures/structure.cpp
+        scenes/factory/structures/structure.h
+        scenes/factory/structures/miner.cpp
+        scenes/factory/structures/miner.h
+        scenes/factory/structures/collector.cpp
+        scenes/factory/structures/collector.h
+        scenes/factory/items/rock.cpp
+        scenes/factory/items/rock.h
+        scenes/factory/structures/bouncer.cpp
+        scenes/factory/structures/bouncer.h
+        scenes/factory/structures/wall.cpp
+        scenes/factory/structures/wall.h
+        scenes/factory/structures/track.cpp
+        scenes/factory/structures/track.h)
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)
 target_include_directories(project PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
 

@@ -12,6 +12,7 @@
 #include "../core/shader.h"
 #include "../core/object.h"
 #include "../core/window.h"
+#include "gameCamera.h"
 
 using namespace glm;
 
@@ -24,11 +25,12 @@ namespace cobb {
 
 
     static Shader *texture2dShader;
+    static Shader *partialTexture2dShader;
 
 
     class Texture2d
     {
-    private:
+    protected:
         unsigned int m_id;
 
         int m_width, m_height;
@@ -39,20 +41,22 @@ namespace cobb {
 
         static mat4 orthoProj;
         static Window *window;
+        static GameCamera gameCamera;
 
         //unsigned int VBO, EBO;
         float vertices[36];
         Texture2d();
         explicit Texture2d(const std::string &path);
+        Texture2d(const std::string &path, bool flip);
         Texture2d(const std::string &path, float positions[8]);
         Texture2d(const std::string &path, int filterMode, int wrapMode, float positions[8]);
         ~Texture2d();
-        void bind() const;
+        virtual void bind() const;
 
 
         void loadVertices(const float positions[]);
 
-        [[nodiscard]] float getWidth() const;
+        [[nodiscard]] virtual float getWidth() const;
         [[nodiscard]] float getHeight() const;
         [[nodiscard]] std::string getPath() const;
 
@@ -62,7 +66,8 @@ namespace cobb {
         static unsigned int* getEBO();
         static unsigned int* getVBO();
 
-        void load();
+        void load(bool flip);
+        bool isLoaded() const;
 
         void draw(float x, float y, float scale, bool shouldBind = true) const;
         void draw(float x, float y, float width, float height, bool shouldBind = true) const;
@@ -70,8 +75,12 @@ namespace cobb {
         void drawRaw(float x, float y, float width, float height, float rotation, bool shouldBind = true) const;
         void drawRaw(float x, float y, float width, float height, bool shouldBind = true) const;
 
+        void drawPartial(float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, bool shouldBind = true) const;
+        void drawPartialRaw(float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, bool shouldBind = true) const;
+
         static void loadShader();
         static void setOrtho(mat4 ortho);
+        static void setColor(vec3 color);
         static void setColor(vec4 color);
 
 

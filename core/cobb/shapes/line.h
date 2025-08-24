@@ -11,7 +11,6 @@
 #include <string>
 #include <filesystem>
 #include "../../ew/external/glad.h"
-#include "../../ew/external/stb_image.h"
 #include "../core/shader.h"
 #include "glm/detail/type_vec3.hpp"
 #include "glm/detail/type_vec4.hpp"
@@ -22,7 +21,7 @@ namespace cobb {
 
     static unsigned int LINE_VAO = -1, LINE_VBO = -1;
 
-    const static float VERTICES_LINE[] = {
+    constexpr static float VERTICES_LINE[] = {
             0, 0, 0,
             1, 1, 1,
     };

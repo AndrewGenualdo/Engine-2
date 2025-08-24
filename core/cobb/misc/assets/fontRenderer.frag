@@ -14,5 +14,5 @@ const float COLUMNS = 9.0f;
 void main() {
     float column = mod(index, COLUMNS); //x
     float row = COLUMNS - (index / int(COLUMNS)) - 1.0f; //y
-    FragColor = texture(tex, vec2(TexCoords.x / COLUMNS + (column / COLUMNS), TexCoords.y / ROWS + (row / ROWS))) * color;
+    FragColor = texture(tex, vec2((TexCoords.x + column) / COLUMNS, (TexCoords.y + row) / ROWS)) * color;
 }

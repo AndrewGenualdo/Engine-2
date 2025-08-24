@@ -4,7 +4,7 @@
 
 #include "line.h"
 
-unsigned int *cobb::Line::getVAO()
+unsigned int *Line::getVAO()
 {
     if (LINE_VAO == -1) {
         glGenVertexArrays(1, &LINE_VAO);
@@ -13,7 +13,7 @@ unsigned int *cobb::Line::getVAO()
     return &LINE_VAO;
 }
 
-unsigned int *cobb::Line::getVBO()
+unsigned int *Line::getVBO()
 {
     if (LINE_VBO == -1) {
         glGenBuffers(1, &LINE_VBO);

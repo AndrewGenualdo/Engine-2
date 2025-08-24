@@ -14,6 +14,7 @@
 #include "glm/vec2.hpp"
 #include <iostream>
 
+
 namespace cobb {
 
 
@@ -24,6 +25,8 @@ namespace cobb {
 
         static constexpr float GAME_WIDTH = 1920;
         static constexpr float GAME_HEIGHT = 1080;
+        //static constexpr float GAME_WIDTH = 500;
+        //static constexpr float GAME_HEIGHT = 1440;
 
         GLFWwindow *window;
 
@@ -70,6 +73,8 @@ namespace cobb {
         void setTime(double time);
 
         static void setVsync(bool vsync);
+
+        void setWindowTitle(const std::string& title);
 
     private:
         std::string _title;

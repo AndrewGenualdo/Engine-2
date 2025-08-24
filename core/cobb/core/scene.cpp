@@ -14,7 +14,12 @@ void Scene::draw()
 
 }
 
-void Scene::keyPress(int key, int action)
+void Scene::cleanup()
+{
+
+}
+
+void Scene::keyPress(int key, int action, int mods)
 {
 
 }
@@ -22,4 +27,11 @@ void Scene::keyPress(int key, int action)
 void Scene::mouseMove(float x, float y)
 {
 
+}
+
+Scene::Scene(Window *window) {
+
+}
+
+Scene::~Scene() {
 }

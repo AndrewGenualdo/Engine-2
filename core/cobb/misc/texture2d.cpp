@@ -6,6 +6,11 @@
 
 mat4 cobb::Texture2d::orthoProj = mat4(1);
 cobb::Window *cobb::Texture2d::window = nullptr;
+cobb::GameCamera cobb::Texture2d::gameCamera = GameCamera();
+
+cobb::Texture2d::Texture2d() {
+    m_path = "";
+}
 
 cobb::Texture2d::Texture2d(const std::string &path) {
     float vertices[8] = {1, 1, 1, -1, -1, -1, -1, 1};
@@ -13,7 +18,16 @@ cobb::Texture2d::Texture2d(const std::string &path) {
     m_path = path.c_str();
     m_filterMode = GL_NEAREST;
     m_wrapMode = GL_REPEAT;
-    load();
+    load(true);
+}
+
+cobb::Texture2d::Texture2d(const std::string &path, bool flip) {
+    float vertices[8] = {1, 1, 1, -1, -1, -1, -1, 1};
+    loadVertices(vertices);
+    m_path = path.c_str();
+    m_filterMode = GL_NEAREST;
+    m_wrapMode = GL_REPEAT;
+    load(!flip);
 }
 
 cobb::Texture2d::Texture2d(const std::string &path, float positions[8]) {
@@ -21,7 +35,7 @@ cobb::Texture2d::Texture2d(const std::string &path, float positions[8]) {
     m_path = path.c_str();
     m_filterMode = GL_NEAREST;
     m_wrapMode = GL_REPEAT;
-    load();
+    load(true);
 }
 
 cobb::Texture2d::Texture2d(const std::string &path, int filterMode, int wrapMode, float positions[8]) {
@@ -29,10 +43,10 @@ cobb::Texture2d::Texture2d(const std::string &path, int filterMode, int wrapMode
     m_path = path.c_str();
     m_filterMode = filterMode;
     m_wrapMode = wrapMode;
-    load();
+    load(true);
 }
 
-void cobb::Texture2d::load() {
+void cobb::Texture2d::load(bool flip) {
     glBindVertexArray(*getVAO());
     glBindBuffer(GL_ARRAY_BUFFER, *getVBO());
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -68,18 +82,25 @@ void cobb::Texture2d::load() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_filterMode);
 
     int nrChannels;
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flip);
     unsigned char *data = stbi_load(m_path, &m_width, &m_height, &nrChannels, 0);
     int colorType = nrChannels == 3 ? GL_RGB : GL_RGBA;
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, colorType, m_width, m_height, 0, colorType, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
     } else {
         std::cout << "Failed to load texture: " << m_path << std::endl;
+        stbi_image_free(data);
+        return;
     }
 
-    stbi_image_free(data);
+
     std::cout << "Successfully loaded texture: " << m_path << std::endl;
+}
+
+bool cobb::Texture2d::isLoaded() const {
+    return m_path == "";
 }
 
 cobb::Texture2d::~Texture2d() {
@@ -93,11 +114,11 @@ void cobb::Texture2d::bind() const {
 }
 
 float cobb::Texture2d::getWidth() const {
-    return m_width;
+    return static_cast<float>(m_width);
 }
 
 float cobb::Texture2d::getHeight() const {
-    return m_height;
+    return static_cast<float>(m_height);
 }
 
 
@@ -181,6 +202,13 @@ void cobb::Texture2d::loadShader() {
         glBindVertexArray(*getVAO());
         std::cout << "Loaded texture2d shader!" << std::endl;
     }
+    if (partialTexture2dShader == nullptr) {
+        partialTexture2dShader = new Shader("assets/partialTexture2d");
+        partialTexture2dShader->use();
+        partialTexture2dShader->setVec4("color", vec4(1));
+        glBindVertexArray(*getVAO());
+        std::cout << "Loaded partialTexture2d shader!" << std::endl;
+    }
 }
 
 void cobb::Texture2d::setOrtho(mat4 ortho) {
@@ -227,25 +255,55 @@ void cobb::Texture2d::drawRaw(float x, float y, float width, float height, float
     glEnable(GL_DEPTH_TEST);
 }
 
+//NOTE: this assumes the gameCamera has the same aspect ratio of Window::GAME_WIDTH / Window::GAME_HEIGHT
 void cobb::Texture2d::draw(float x, float y, float width, float height, bool shouldBind) const {
-    float scale = window->gw / Window::GAME_WIDTH;
 
-    float nx = window->sX(x) + (window->sX(0) * (x / Window::GAME_WIDTH));
-    float ny = window->sY(y) + (window->sY(0) * (y / Window::GAME_HEIGHT));
-    float nw = width * scale;
-    float nh = height * scale;
+    //translates from world coordinates to game camera coordinates
+    gameCamera.adjustToAspectRatio(Window::GAME_WIDTH / Window::GAME_HEIGHT);
+    gameCamera.setMinWidth(100);
+    float gsw = Window::GAME_WIDTH / gameCamera.w;
+    float gsh = Window::GAME_HEIGHT / gameCamera.h;
+    float gx = (x - gameCamera.x) * gsw;
+    float gy = (y - gameCamera.y) * gsh;
+    float gw = width * gsw;
+    float gh = height * gsh;
+
+    //translates from game camera coordinates to screen coordinates
+    float scale = window->gw / Window::GAME_WIDTH;
+    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH);
+    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT);
+    float nw = gw * scale;
+    float nh = gh * scale;
+
+
+
     drawRaw(nx, ny, nw, nh, shouldBind);
 }
 
+//NOTE: this assumes the gameCamera has the same aspect ratio of Window::GAME_WIDTH / Window::GAME_HEIGHT
 void cobb::Texture2d::draw(float x, float y, float width, float height, float rotation, bool shouldBind) const {
-    float scale = window->gw / Window::GAME_WIDTH;
+    //translates from world coordinates to game camera coordinates
+    float gsw = Window::GAME_WIDTH / gameCamera.w;
+    float gsh = Window::GAME_HEIGHT / gameCamera.h;
+    float gx = (x - gameCamera.x) * gsw;
+    float gy = (y - gameCamera.y) * gsh;
+    float gw = width * gsw;
+    float gh = height * gsh;
 
-    float nx = window->sX(x) + (window->sX(0) * (x / Window::GAME_WIDTH));
-    float ny = window->sY(y) + (window->sY(0) * (y / Window::GAME_HEIGHT));
-    float nw = width * scale;
-    float nh = height * scale;
+    //translates from game camera coordinates to screen coordinates
+    float scale = window->gw / Window::GAME_WIDTH;
+    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH);
+    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT);
+    float nw = gw * scale;
+    float nh = gh * scale;
     drawRaw(nx, ny, nw, nh, rotation, shouldBind);
 }
+
+void cobb::Texture2d::setColor(vec3 col) {
+    texture2dShader->use();
+    texture2dShader->setVec4("color", vec4(col, 1.0f));
+}
+
 
 void cobb::Texture2d::setColor(vec4 col) {
     texture2dShader->use();
@@ -256,6 +314,50 @@ std::string cobb::Texture2d::getPath() const {
     return m_path;
 }
 
-cobb::Texture2d::Texture2d() {
-    m_path = "";
+void cobb::Texture2d::drawPartial(float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, bool shouldBind) const {
+    //translates from world coordinates to game camera coordinates
+    float gsw = Window::GAME_WIDTH / gameCamera.w;
+    float gsh = Window::GAME_HEIGHT / gameCamera.h;
+    float gx = (x - gameCamera.x) * gsw;
+    float gy = (y - gameCamera.y) * gsh;
+    float gw = width * gsw;
+    float gh = height * gsh;
+
+    //translates from game camera coordinates to screen coordinates
+    float scale = window->gw / Window::GAME_WIDTH;
+    float nx = window->sX(gx) + (window->sX(0) * (gx / Window::GAME_WIDTH));
+    float ny = window->sY(gy) + (window->sY(0) * (gy / Window::GAME_HEIGHT));
+    float nw = gw * scale;
+    float nh = gh * scale;
+
+    drawPartialRaw(nx, ny, u / width, v / height, nw, nh, width / textureWidth, height / textureHeight);
 }
+
+/**
+ *
+ * @param x x on screen
+ * @param y y on screen
+ * @param u 0.0 -> 1.0 (how far horizontally you want the partial texture to start)
+ * @param v 0.0 -> 1.0 (how far vertically you want the partial texture to start)
+ * @param width width on screen
+ * @param height height on screen
+ * @param textureWidth 0.0 -> 1.0 (how much of the texture you want to draw, 0.5f is half)
+ * @param textureHeight 0.0 -> 1.0 (how much of the texture you want to draw, 0.5f is half)
+ * @param shouldBind false = doesn't actually bind a texture
+ */
+void cobb::Texture2d::drawPartialRaw(float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight, bool shouldBind) const {
+    float w = width * 0.5f;
+    float h = height * 0.5f;
+    loadShader();
+    glDisable(GL_DEPTH_TEST);
+    if (shouldBind) bind();
+    partialTexture2dShader->use();
+    glBindVertexArray(*getVAO());
+    partialTexture2dShader->setVec4("partial", vec4(u, v, 1.0f / textureWidth, 1.0f / textureHeight));
+    partialTexture2dShader->setMat4("proj", orthoProj);
+    partialTexture2dShader->setMat4("model", Object::translate(x + w / getWidth() * 0.5f + w * 0.5f, y + h / getHeight(), 0) * Object::scale(w, h, 1));
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glEnable(GL_DEPTH_TEST);
+}
+
+

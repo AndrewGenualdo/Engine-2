@@ -14,9 +14,15 @@ using namespace glm;
 
 class Scene {
 public:
+
+    explicit Scene() = default;
+    explicit Scene(Window *window);
+    virtual ~Scene();
+
     virtual void load();
     virtual void draw();
-    virtual void keyPress(int key, int action);
+    virtual void cleanup();
+    virtual void keyPress(int key, int action, int mods);
     virtual void mouseMove(float x, float y);
 };
 

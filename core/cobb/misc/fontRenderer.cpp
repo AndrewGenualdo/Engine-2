@@ -167,15 +167,22 @@ void FontRenderer::loadShader() {
 }
 
 float FontRenderer::getWidth(const std::string &text) {
+    int longestLine = 0;
     std::string s = text;
     std::transform(s.begin(), s.end(), s.begin(), ::toupper);
     float width = 0;
     for (int i = 0; i < s.length(); i++) {
+        if(s[i] == '\n') {
+            if(width > longestLine) longestLine = width;
+            width = 0;
+            continue;
+        }
         int index = getIndex(s[i]);
         if (index == -1) width += 7;
         else width += ws[index] + (i == s.length() - 1 ? 0 : characterSpacing);
     }
-    return width;
+    if(width > longestLine) longestLine = width;
+    return longestLine;
 }
 
 int FontRenderer::getIndex(char c) {
@@ -186,6 +193,10 @@ int FontRenderer::getIndex(char c) {
 
 float FontRenderer::getHeight() const {
     return height;
+}
+
+void FontRenderer::setColor(vec3 c) {
+    color = vec4(c, 1);
 }
 
 void FontRenderer::setColor(vec4 c) {
