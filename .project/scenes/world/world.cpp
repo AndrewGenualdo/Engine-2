@@ -104,9 +104,9 @@ void WorldScene::load() {
 
     railPaths.clear();
     railPaths[NORTH * NORTH] = RailTypeData(vec3(-1, 0, 0), vec3(-1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, 0.125f)});
-    railPaths[NORTH * EAST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, -1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * EAST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, -1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
     railPaths[NORTH * SOUTH] = RailTypeData(vec3(-1, 0, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f)});
-    railPaths[NORTH * EAST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, 1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
+    railPaths[NORTH * WEST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, 1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
     railPaths[EAST * EAST] = RailTypeData(vec3(0, 0, -1), vec3(0, 0, -1), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
     railPaths[EAST * SOUTH] = RailTypeData(vec3(0, 0, -1), vec3(1, 0, 0), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
     railPaths[EAST * WEST] = RailTypeData(vec3(0, 0, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f), vec2(-0.25f, -0.125f)});
