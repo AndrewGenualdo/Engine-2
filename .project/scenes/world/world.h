@@ -68,7 +68,23 @@ public:
     constexpr static int WORLD_SIZE = 10;
     static std::map<int, Texture2d> blocks;
     static std::map<int, int*> blockVariants;
-    static std::map<int, std::pair<vec2, vec2>> railPaths;
+
+    struct RailTypeData {
+        std::vector<vec2> pathPoints;
+        vec3 railBefore;
+        vec3 railAfter;
+
+        RailTypeData() = default;
+
+        RailTypeData(vec3 railBefore, vec3 railAfter,std::initializer_list<vec2> pathPoints) {
+            this->pathPoints = std::vector<vec2>();
+            for(vec2 point : pathPoints) this->pathPoints.push_back(point);
+            this->railBefore = railBefore;
+            this->railAfter = railAfter;
+        }
+    };
+
+    static std::map<int, RailTypeData> railPaths;
 
     struct Block {
         int type = 0;
@@ -112,6 +128,7 @@ public:
     struct Cart {
         Block* block = nullptr;
         vec3 blockPos = vec3(0);
+        bool backwards = false;
         float speed = 0.0f;
         float progress = 0.0f; //0.0 -> 1.0 based on how far along the current track it is
 
@@ -121,24 +138,89 @@ public:
             else this->block = &world[static_cast<int>(blockPos.y)][static_cast<int>(blockPos.x)][static_cast<int>(blockPos.z)];
         }
 
-        explicit Cart(vec3 blockPos = vec3(-1), float speed = 1.0f, float progress = 0.0f) {
+        explicit Cart(vec3 blockPos = vec3(-1), bool backwards = false, float speed = 1.0f, float progress = 0.0f) {
             this->setBlock(blockPos);
+            this->backwards = false;
             this->speed = speed;
             this->progress = progress;
         }
 
         void update(float dt) {
-            progress += speed * dt;
-            if(progress > 1.0f) progress = 0.0f;
-            if(progress < 0.0f) progress = 1.0f;
+            if(block == nullptr) return;
+            //
+            if(railPaths.find(block->data) == railPaths.end()) return;
+            progress += speed * dt * (backwards ? -1 : 1);
+            /*if(progress > 1.0f) progress -= 1.0f;
+            if(progress < 0.0f) progress += 1.0f;*/
+            RailTypeData* currRailTypeData = &railPaths[block->data];
+            if(progress > 1.0f) {
+                float diff = progress - 1.0f;
+                vec3 nextRailBlockPos = blockPos + currRailTypeData->railAfter;
+                Block* nextRail = &world[static_cast<int>(nextRailBlockPos.y)][static_cast<int>(nextRailBlockPos.x)][static_cast<int>(nextRailBlockPos.z)];
+                RailTypeData* nextRailTypeData = &railPaths[nextRail->data];
+
+                bool startAtEnd = false;
+                //how do I determine if it should startAtEnd?
+                if(nextRailTypeData->railBefore == -currRailTypeData->railAfter) startAtEnd = false;
+                else if(nextRailTypeData->railAfter == -currRailTypeData->railAfter) startAtEnd = true;
+                else {
+                    //no connection
+                    speed = 0.0f;
+                    progress = 0.5f;
+                }
+
+                backwards = startAtEnd;
+                progress = startAtEnd ? 1.0f - diff : diff;
+                blockPos = nextRailBlockPos;
+                block = nextRail;
+            } else if(progress < 0.0f) {
+                float diff = -progress; // how far past 0 we went
+                vec3 nextRailBlockPos = blockPos + currRailTypeData->railBefore;
+                Block* nextRail = &world[static_cast<int>(nextRailBlockPos.y)][static_cast<int>(nextRailBlockPos.x)][static_cast<int>(nextRailBlockPos.z)];
+                RailTypeData* nextRailType = &railPaths[nextRail->data];
+
+                bool startAtEnd = false;
+                if(nextRailType->railAfter == -currRailTypeData->railBefore) startAtEnd = false;
+                else if(nextRailType->railBefore == -currRailTypeData->railBefore) startAtEnd = true;
+                else {
+                    //no connection
+                    speed = 0.0f;
+                    progress = 0.5f;
+                }
+
+                backwards = startAtEnd;
+                progress = startAtEnd ? 1.0f - diff : diff;
+                blockPos = nextRailBlockPos;
+                block = nextRail;
+            }
         }
 
         void draw(float w, float h) const {
             if(block != nullptr && block->type == RAIL) {
+                if(railPaths.find(block->data) == railPaths.end()) return;
+
                 vec2 pos = vec2(blockPos.z * -50 + blockPos.x * 50, blockPos.z * -25 + blockPos.x * -25 + blockPos.y * 50) + screenOffset + tempScreenOffset;
+                float totalDist = 0.0f;
+                RailTypeData *railData = &railPaths[block->data];
+                for(int i = 0; i < railData->pathPoints.size() - 1; i++) {
+                    totalDist += distance(railData->pathPoints[i], railData->pathPoints[i+1]);
+                }
+                vec2 delta = vec2(-1);
+                float progress = this->progress;
+                for(int i = 0; i < railData->pathPoints.size() - 1; i++) {
+                    float dist = distance(railData->pathPoints[i], railData->pathPoints[i+1]);
+                    float percOfRail = dist / totalDist;
 
-                if(railPaths.find(block->data) != railPaths.end()) pos += vec2(ew::lerp(railPaths[block->data].first.x, railPaths[block->data].second.x, progress), ew::lerp(railPaths[block->data].first.y, railPaths[block->data].second.y, progress)) * (w + h) * 0.5f;
+                    if(progress > percOfRail) progress -= percOfRail;
+                    else {
+                        float lerpValue = progress / dist;
+                        delta = ew::lerp(railData->pathPoints[i], railData->pathPoints[i+1], lerpValue);
+                    }
+                }
+                if(delta == vec2(-1)) delta = railData->pathPoints[railData->pathPoints.size()-1];
 
+
+                pos += delta;
                 blocks[CART_OFFSET + block->data].draw(pos.x, pos.y, w, h);
             }
         }

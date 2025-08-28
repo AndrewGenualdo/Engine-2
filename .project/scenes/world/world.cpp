@@ -16,7 +16,7 @@ Texture2d WorldScene::blank = Texture2d();
 WorldScene::Block ***WorldScene::world = nullptr;
 vec2 WorldScene::screenOffset = vec2(500);
 vec2 WorldScene::tempScreenOffset = vec2(0);
-std::map<int, std::pair<vec2, vec2>> WorldScene::railPaths = std::map<int, std::pair<vec2, vec2>>();
+std::map<int, WorldScene::RailTypeData> WorldScene::railPaths = std::map<int, RailTypeData>();
 
 WorldScene::WorldScene(Window *w) {
     window = w;
@@ -102,9 +102,21 @@ void WorldScene::load() {
     blocks[CART_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST + UP_FIRST) + ".png"); //49*
     blocks[CART_OFFSET + EAST * WEST + UP_SECOND] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST + UP_SECOND) + ".png");//51*
 
-    railPaths[NORTH * SOUTH] = std::pair(vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f));
-    railPaths[EAST * WEST] = std::pair(vec2(-0.25f, -0.125f), vec2(0.25f, 0.125f));
-
+    railPaths.clear();
+    railPaths[NORTH * NORTH] = RailTypeData(vec3(-1, 0, 0), vec3(-1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, 0.125f)});
+    railPaths[NORTH * EAST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, -1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * SOUTH] = RailTypeData(vec3(-1, 0, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * EAST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, 1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
+    railPaths[EAST * EAST] = RailTypeData(vec3(0, 0, -1), vec3(0, 0, -1), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
+    railPaths[EAST * SOUTH] = RailTypeData(vec3(0, 0, -1), vec3(1, 0, 0), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
+    railPaths[EAST * WEST] = RailTypeData(vec3(0, 0, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f), vec2(-0.25f, -0.125f)});
+    railPaths[SOUTH * SOUTH] = RailTypeData(vec3(1, 0, 0), vec3(1, 0, 0), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
+    railPaths[SOUTH * WEST] = RailTypeData(vec3(1, 0, 0), vec3(0, 0, 1), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
+    railPaths[WEST * WEST] = RailTypeData(vec3(0, 0, 1), vec3(0, 0, 1), {vec2(-0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
+    railPaths[NORTH * SOUTH + UP_FIRST] = RailTypeData(vec3(-1, 1, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f + 1.0f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * SOUTH + UP_SECOND] = RailTypeData(vec3(-1, 0, 0), vec3(1, 1, 0), {vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f + 1.0f)});
+    railPaths[EAST * WEST + UP_FIRST] = RailTypeData(vec3(0, 1, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f + 1.0f), vec2(-0.25f, -0.125f)});
+    railPaths[EAST * WEST + UP_SECOND] = RailTypeData(vec3(0, 0, -1), vec3(0, 1, 1), {vec2(0.25f, 0.125f), vec2(-0.25f, -0.125f + 1.0f)});
 
     if(world == nullptr) {
         world = new Block**[WORLD_SIZE];
@@ -181,6 +193,7 @@ void WorldScene::draw() {
 
     if(isMiddleMouseClick) mouseStart = vec2(mx, my);
     if(isMiddleMouseDown) tempScreenOffset = vec2(mx, my) - mouseStart;
+    else tempScreenOffset = vec2(0);
     if(isMiddleMouseRelease) screenOffset += vec2(mx, my) - mouseStart;
 
     vec3 hoverBlock = vec3(-1);
@@ -211,7 +224,7 @@ void WorldScene::draw() {
         blocks[TEMPLATE].draw(pos.x, pos.y, 100.0f, 100.0f);
         Texture2d::setColor(vec4(1));
         fontRenderer.setColor(vec4(1));
-        fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
+        fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data) + "\n" + std::to_string(static_cast<int>(hoverBlock.x)) + ", " + std::to_string(static_cast<int>(hoverBlock.y)) + ", " + std::to_string(static_cast<int>(hoverBlock.z)), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
         if(isLeftMouseClick) {
             block->type++;
             if(block->type >= BLOCK_TYPES) block->type = 1;
@@ -281,7 +294,13 @@ void WorldScene::draw() {
         }
     }
 
-
+    fontRenderer.setColor(vec4(1, 0.5f, 1, 1));
+    fontRenderer.draw(
+        "\n\nCart:\n" +
+        std::to_string(cart.blockPos.x) + ", " + std::to_string(cart.blockPos.y) + ", " + std::to_string(cart.blockPos.z) + "\n" +
+        std::to_string(cart.progress) +"\n" +
+        (cart.backwards ? "backwards" : "forwards"),
+        10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 3 * fontScale, fontScale);
 
 
     bool isPDown = glfwGetKey(window->window, GLFW_KEY_P);
