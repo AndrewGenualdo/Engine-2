@@ -1,0 +1,273 @@
+//
+// Created by cobble on 8/19/2025.
+//
+
+#include "world.h"
+
+#include "ew/ewMath/ewMath.h"
+
+Camera WorldScene::camera = Camera();
+Window *WorldScene::window = nullptr;
+FontRenderer WorldScene::fontRenderer = FontRenderer();
+bool WorldScene::debugMode = false;
+std::map<int, Texture2d> WorldScene::blocks = std::map<int, Texture2d>();
+Texture2d WorldScene::blank = Texture2d();
+
+WorldScene::WorldScene(Window *w) {
+    window = w;
+}
+
+WorldScene::~WorldScene() {
+    cleanup();
+}
+
+void WorldScene::load() {
+    window->setWindowTitle("World");
+    camera = Camera(vec3(), vec3(), 60.0f, vec2(window->getWidth(), window->getHeight()));
+    fontRenderer = FontRenderer("assets/textures/font/font.png");
+    blank = Texture2d("assets/textures/ui/blank.png");
+
+
+    blocks.clear();
+    blocks[TEMPLATE] = Texture2d("assets/textures/blocks/template.png");
+    blocks[AIR] = Texture2d("assets/textures/blocks/air.png");
+    blocks[GRASS] = Texture2d("assets/textures/blocks/grass.png");
+    blocks[DIRT] = Texture2d("assets/textures/blocks/dirt.png");
+    blocks[STONE] = Texture2d("assets/textures/blocks/stone.png");
+    blocks[LOG] = Texture2d("assets/textures/blocks/log.png");
+    blocks[BELT] = Texture2d("assets/textures/blocks/belt/default.png");
+    blocks[RAIL] = Texture2d("assets/textures/blocks/rail/7.png");
+
+    blocks[BELT_OFFSET + 00] = Texture2d("assets/textures/blocks/belt/default.png");
+    blocks[BELT_OFFSET + 01] = Texture2d("assets/textures/blocks/belt/default_to_north.png");
+    blocks[BELT_OFFSET + 02] = Texture2d("assets/textures/blocks/belt/default_to_east.png");
+    blocks[BELT_OFFSET + 03] = Texture2d("assets/textures/blocks/belt/default_to_south.png");
+    blocks[BELT_OFFSET + 04] = Texture2d("assets/textures/blocks/belt/default_to_west.png");
+    blocks[BELT_OFFSET + 10] = Texture2d("assets/textures/blocks/belt/north_to_default.png");
+    blocks[BELT_OFFSET + 12] = Texture2d("assets/textures/blocks/belt/north_to_east.png");
+    blocks[BELT_OFFSET + 13] = Texture2d("assets/textures/blocks/belt/north_to_south.png");
+    blocks[BELT_OFFSET + 14] = Texture2d("assets/textures/blocks/belt/north_to_west.png");
+    blocks[BELT_OFFSET + 20] = Texture2d("assets/textures/blocks/belt/east_to_default.png");
+    blocks[BELT_OFFSET + 21] = Texture2d("assets/textures/blocks/belt/east_to_north.png");
+    blocks[BELT_OFFSET + 23] = Texture2d("assets/textures/blocks/belt/east_to_south.png");
+    blocks[BELT_OFFSET + 24] = Texture2d("assets/textures/blocks/belt/east_to_west.png");
+    blocks[BELT_OFFSET + 30] = Texture2d("assets/textures/blocks/belt/south_to_default.png");
+    blocks[BELT_OFFSET + 31] = Texture2d("assets/textures/blocks/belt/south_to_north.png");
+    blocks[BELT_OFFSET + 32] = Texture2d("assets/textures/blocks/belt/south_to_east.png");
+    blocks[BELT_OFFSET + 34] = Texture2d("assets/textures/blocks/belt/south_to_west.png");
+    blocks[BELT_OFFSET + 40] = Texture2d("assets/textures/blocks/belt/west_to_default.png");
+    blocks[BELT_OFFSET + 41] = Texture2d("assets/textures/blocks/belt/west_to_north.png");
+    blocks[BELT_OFFSET + 42] = Texture2d("assets/textures/blocks/belt/west_to_east.png");
+    blocks[BELT_OFFSET + 43] = Texture2d("assets/textures/blocks/belt/west_to_south.png");
+
+    blocks[RAIL_OFFSET + NORTH * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH) + ".png");
+    blocks[RAIL_OFFSET + EAST * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST) + ".png");
+    blocks[RAIL_OFFSET + NORTH * SOUTH + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH + UP_FIRST) + ".png");
+    blocks[RAIL_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_FIRST) + ".png");
+    blocks[RAIL_OFFSET + NORTH * SOUTH + UP_SECOND] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH + UP_SECOND) + ".png");
+    blocks[RAIL_OFFSET + EAST * WEST + UP_SECOND] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_SECOND) + ".png");
+    //blocks[RAIL_OFFSET + NORTH * SOUTH]
+
+
+    if(world == nullptr) {
+        world = new Block**[WORLD_SIZE];
+        for(int i = 0; i < WORLD_SIZE; i++) {
+            world[i] = new Block*[WORLD_SIZE];
+            for(int j = 0; j < WORLD_SIZE; j++) {
+                world[i][j] = new Block[WORLD_SIZE];
+            }
+        }
+        for(int y = 0; y < WORLD_SIZE; y++) {
+            for(int x = 0; x < WORLD_SIZE; x++) {
+                for(int z = 0; z < WORLD_SIZE; z++) {
+                    world[y][x][z] = Block();
+
+                    if(y == WORLD_SIZE - 3 && x == 0) world[y][x][z].type = LOG;
+                    else if(y > WORLD_SIZE - 4) world[y][x][z].type = AIR;
+                    /*if(y == WORLD_SIZE - 3 && x == WORLD_SIZE - 1) {
+                        world[y][x][z].type = BELT;
+                        if(z == WORLD_SIZE - 1) world[y][x][z].data = 20;
+                        else if(z == 0) world[y][x][z].data = 04;
+                        else world[y][x][z].data = 24;
+                    }
+                    else if(y == WORLD_SIZE - 3 && x == WORLD_SIZE - 3) {
+                        world[y][x][z].type = BELT;
+                        if(z == WORLD_SIZE - 1) world[y][x][z].data = 02;
+                        else if(z == 0) world[y][x][z].data = 40;
+                        else world[y][x][z].data = 42;
+                    }*/
+                    else if(y == WORLD_SIZE - 4) world[y][x][z].type = GRASS;
+                    else if(y < WORLD_SIZE - 4 && y > WORLD_SIZE - ew::RandomRange(5, 9)) world[y][x][z].type = DIRT;
+                    else if(y < WORLD_SIZE - 4) world[y][x][z].type = STONE;
+                }
+            }
+        }
+    }
+
+
+}
+
+bool wasPDown = false;
+void WorldScene::draw() {
+    float deltaTime = window->update();
+    camera.update(window->window, deltaTime);
+    float fontScale = 3.0f;
+
+    //do background stuff here
+    Texture2d::setColor(vec4(0, 0, 0, 1));
+    blank.drawRaw(window->gx, window->gy, window->gw, window->gh, true);
+
+    Texture2d::gameCamera.reset();
+    Texture2d::gameCamera.expandToInclude(0, 0);
+    Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
+
+    bool isLeftMouseDown = glfwGetMouseButton(window->window, GLFW_MOUSE_BUTTON_LEFT);
+    bool isLeftMouseClick = isLeftMouseDown && !wasLeftMouseDown;
+    bool isLeftMouseRelease = !isLeftMouseDown && wasLeftMouseDown;
+    wasLeftMouseDown = isLeftMouseDown;
+
+    bool isMiddleMouseDown = glfwGetMouseButton(window->window, GLFW_MOUSE_BUTTON_MIDDLE);
+    bool isMiddleMouseClick = isMiddleMouseDown && !wasMiddleMouseDown;
+    bool isMiddleMouseRelease = !isMiddleMouseDown && wasMiddleMouseDown;
+    wasMiddleMouseDown = isMiddleMouseDown;
+
+    bool isRightMouseDown = glfwGetMouseButton(window->window, GLFW_MOUSE_BUTTON_RIGHT);
+    bool isRightMouseClick = isRightMouseDown && !wasRightMouseDown;
+    bool isRightMouseRelease = !isRightMouseDown && wasRightMouseDown;
+    wasRightMouseDown = isRightMouseDown;
+    float mx = window->mousePos.x;
+    float my = window->mousePos.y;
+
+    //Texture2d::setColor(vec4(1.0f, 0.5f, 0.5f, 1.0f));
+    //block.draw(500, 500, 100, 100.0f); //z = x + 50, y + 25   |   x = x - 50, y + 25   |   y = y + 50
+    //block.draw((int) mx, (int) my, 100.0f, 100.0f);
+
+    vec2 tempOffset = vec2(0);
+    if(isMiddleMouseClick) mouseStart = vec2(mx, my);
+    if(isMiddleMouseDown) tempOffset = vec2(mx, my) - mouseStart;
+    if(isMiddleMouseRelease) screenOffset += vec2(mx, my) - mouseStart;
+
+    vec3 hoverBlock = vec3(-1);
+
+    Texture2d::setColor(vec4(1));
+    for(int y = 0; y < WORLD_SIZE; y++) {
+        for(int x = 0; x < WORLD_SIZE; x++) {
+            for(int z = 0; z < WORLD_SIZE; z++) {
+                vec3 wPos = vec3(x, y, z) + 0.5f;
+                vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempOffset;
+                if(pos.x < 0 || pos.y < 0 || pos.x > Window::GAME_WIDTH || pos.y > Window::GAME_HEIGHT) continue;
+
+                if(world[y][x][z].type != AIR && mx > pos.x && my > pos.y && mx < pos.x + 100 && my < pos.y + 100) hoverBlock = vec3(x, y, z);
+                world[y][x][z].draw(pos.x, pos.y, 100.0f, 100.0f);
+            }
+        }
+    }
+    bool newHoverBlock = lastHoverBlock != hoverBlock;
+    lastHoverBlock = hoverBlock;
+    if(hoverBlock != vec3(-1)) {
+        Block* block = &world[static_cast<int>(hoverBlock.y)][static_cast<int>(hoverBlock.x)][static_cast<int>(hoverBlock.z)];
+        Texture2d::setColor(vec4(vec3(1), 0.4f));
+        vec3 wPos = vec3(hoverBlock.x, hoverBlock.y, hoverBlock.z) + 0.5f;
+        vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempOffset;
+        blocks[TEMPLATE].draw(pos.x, pos.y, 100.0f, 100.0f);
+        fontRenderer.setColor(vec4(1));
+        fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
+        if(isLeftMouseClick) {
+            block->type++;
+            if(block->type >= BLOCK_TYPES) block->type = 1;
+            block->data = 0;
+        }
+        if((isRightMouseDown && newHoverBlock) || isRightMouseClick) {
+            Block* lastBlock = nullptr;
+            /*block->data++;
+            if(block->data % 10 == 5) block->data += 5;
+            if(block->data >= 44) block->data = 0;*/
+            block->type = BELT;
+            if(lastBelt == vec3(-1)) {
+                block->setBeltFrom(DEFAULT);
+                block->setBeltTo(DEFAULT);
+            } else {
+                lastBlock = &world[static_cast<int>(lastBelt.y)][static_cast<int>(lastBelt.x)][static_cast<int>(lastBelt.z)];
+            }
+            if(lastBlock != nullptr) {
+                if(hoverBlock.x > lastBelt.x) {
+                    block->setBeltFrom(NORTH);
+                    lastBlock->setBeltTo(SOUTH);
+                } else if(hoverBlock.x < lastBelt.x) {
+                    block->setBeltFrom(SOUTH);
+                    lastBlock->setBeltTo(NORTH);
+                } else if(hoverBlock.z > lastBelt.z) {
+                    block->setBeltFrom(EAST);
+                    lastBlock->setBeltTo(WEST);
+                } else if(hoverBlock.z < lastBelt.z) {
+                    block->setBeltFrom(WEST);
+                    lastBlock->setBeltTo(EAST);
+                }
+            }
+
+            lastBelt = hoverBlock;
+        }
+    }
+
+
+
+    bool isPDown = glfwGetKey(window->window, GLFW_KEY_P);
+    if(isPDown && !wasPDown) {
+        for(int y = 0; y < WORLD_SIZE; y++) {
+            for(int x = 0; x < WORLD_SIZE; x++) {
+                for(int z = 0; z < WORLD_SIZE; z++) {
+                    std::cout << world[y][x][z].type << ";" << world[y][x][z].data << " ";
+                }
+                std::cout << "| ";
+            }
+            std::cout << "* ";
+        }
+        std::cout << std::endl;
+    }
+    wasPDown = isPDown;
+}
+
+void WorldScene::cleanup() {
+    /*if(world != nullptr) {
+        for(int i = 0; i < WORLD_SIZE; i++) {
+            for(int j = 0; j < WORLD_SIZE; j++) {
+                delete [] world[i][j];
+            }
+            delete [] world[i];
+        }
+        delete [] world;
+        world = nullptr;
+    }*/
+
+}
+
+void WorldScene::keyPress(int key, int action, int mods) {
+    if (action == GLFW_PRESS) {
+        if(key == GLFW_KEY_SPACE) {
+            /*if(coins >= GUY_MURDER_COST) {
+                coins -= GUY_MURDER_COST;
+                float speed = 9999999.0f;
+                int unit = -1;
+                for(int i = 0; i < MAX_GUYS; i++) {
+                    if(guys[i].exists) {
+                        if(length(guys[i].getSpeed()) < speed) {
+                            unit = i;
+                            speed = length(guys[i].getSpeed());
+                        }
+                    }
+                }
+                if(unit != -1) guys[unit].exists = false;
+            }*/
+        } else if(key == GLFW_KEY_R) {
+            cleanup();
+            load();
+        } else if(key == GLFW_KEY_F8) {
+            debugMode = !debugMode;
+        }
+    }
+}
+
+void WorldScene::mouseMove(float x, float y) {
+    window->mousePos.x = (x - window->gx) * Window::GAME_WIDTH / window->gw;
+    window->mousePos.y = Window::GAME_HEIGHT - ((y - window->gy) * Window::GAME_HEIGHT / window->gh);
+}

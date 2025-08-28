@@ -50,6 +50,7 @@ namespace cobb {
         Texture2d(const std::string &path, bool flip);
         Texture2d(const std::string &path, float positions[8]);
         Texture2d(const std::string &path, int filterMode, int wrapMode, float positions[8]);
+        Texture2d(const std::string &path, int filterMode, int wrapMode);
         ~Texture2d();
         virtual void bind() const;
 

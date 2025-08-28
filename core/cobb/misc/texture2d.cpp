@@ -16,8 +16,8 @@ cobb::Texture2d::Texture2d(const std::string &path) {
     float vertices[8] = {1, 1, 1, -1, -1, -1, -1, 1};
     loadVertices(vertices);
     m_path = path.c_str();
-    m_filterMode = GL_NEAREST;
-    m_wrapMode = GL_REPEAT;
+    m_filterMode = GL_NEAREST_MIPMAP_NEAREST;
+    m_wrapMode = GL_CLAMP_TO_EDGE;
     load(true);
 }
 
@@ -25,21 +25,30 @@ cobb::Texture2d::Texture2d(const std::string &path, bool flip) {
     float vertices[8] = {1, 1, 1, -1, -1, -1, -1, 1};
     loadVertices(vertices);
     m_path = path.c_str();
-    m_filterMode = GL_NEAREST;
-    m_wrapMode = GL_REPEAT;
+    m_filterMode = GL_NEAREST_MIPMAP_NEAREST;
+    m_wrapMode = GL_CLAMP_TO_EDGE;
     load(!flip);
 }
 
 cobb::Texture2d::Texture2d(const std::string &path, float positions[8]) {
     loadVertices(positions);
     m_path = path.c_str();
-    m_filterMode = GL_NEAREST;
-    m_wrapMode = GL_REPEAT;
+    m_filterMode = GL_NEAREST_MIPMAP_NEAREST;
+    m_wrapMode = GL_CLAMP_TO_EDGE;
     load(true);
 }
 
 cobb::Texture2d::Texture2d(const std::string &path, int filterMode, int wrapMode, float positions[8]) {
     loadVertices(positions);
+    m_path = path.c_str();
+    m_filterMode = filterMode;
+    m_wrapMode = wrapMode;
+    load(true);
+}
+
+cobb::Texture2d::Texture2d(const std::string &path, int filterMode, int wrapMode) {
+    float vertices[8] = {1, 1, 1, -1, -1, -1, -1, 1};
+    loadVertices(vertices);
     m_path = path.c_str();
     m_filterMode = filterMode;
     m_wrapMode = wrapMode;

@@ -6,7 +6,7 @@
 #include "fontRenderer.h"
 
 FontRenderer::FontRenderer(const std::string &fontTexture) {
-    font = Texture2d(fontTexture);
+    font = Texture2d(fontTexture, GL_NEAREST, GL_REPEAT);
     characterSpacing = 1.0f;
     maxWidth = 7.0f;
     height = 7.0f;

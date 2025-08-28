@@ -9,14 +9,13 @@
 #include "cobb/misc/animation.h"
 
 #include "cobb/misc/fontRenderer.h"
-#include "scenes/simulation/simulation.h"
+#include "scenes/world/world.h"
 
 #include <thread>
 
 #include "cobb/shapes/circle2d.h"
 #include "cobb/shapes/line2d.h"
 #include "scenes/game/client.h"
-#include "scenes/pathing/pathing.h"
 
 using namespace cobb;
 
@@ -68,7 +67,7 @@ int main() {
     Circle2d::circle2dShader->setMat4("projection", Texture2d::orthoProj);
 
 
-    activeScene = new SimulationScene(&window);
+    activeScene = new WorldScene(&window);
     activeScene->load();
 
     //std::thread serv = std::thread(Server::run);
