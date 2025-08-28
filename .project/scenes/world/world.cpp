@@ -13,6 +13,10 @@ bool WorldScene::debugMode = false;
 std::map<int, Texture2d> WorldScene::blocks = std::map<int, Texture2d>();
 std::map<int, int*> WorldScene::blockVariants = std::map<int, int*>();
 Texture2d WorldScene::blank = Texture2d();
+WorldScene::Block ***WorldScene::world = nullptr;
+vec2 WorldScene::screenOffset = vec2(500);
+vec2 WorldScene::tempScreenOffset = vec2(0);
+std::map<int, std::pair<vec2, vec2>> WorldScene::railPaths = std::map<int, std::pair<vec2, vec2>>();
 
 WorldScene::WorldScene(Window *w) {
     window = w;
@@ -82,6 +86,25 @@ void WorldScene::load() {
     blocks[RAIL_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_FIRST) + ".png"); //49*
     blocks[RAIL_OFFSET + EAST * WEST + UP_SECOND] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_SECOND) + ".png");//51*
     blockVariants[RAIL] = new int[]{1, 2, 6, 24, 4, 12, 48, 36, 144, 576, 7, 9, 49, 51};
+
+    blocks[CART_OFFSET + NORTH * NORTH] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * SOUTH) + ".png");
+    blocks[CART_OFFSET + NORTH * EAST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * EAST) + ".png"); //2*
+    blocks[CART_OFFSET + NORTH * SOUTH] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * SOUTH) + ".png");
+    blocks[CART_OFFSET + NORTH * WEST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * WEST) + ".png"); //24*
+    blocks[CART_OFFSET + EAST * EAST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST) + ".png");
+    blocks[CART_OFFSET + EAST * SOUTH] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * SOUTH) + ".png"); //12*
+    blocks[CART_OFFSET + EAST * WEST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST) + ".png");
+    blocks[CART_OFFSET + SOUTH * SOUTH] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * SOUTH) + ".png");
+    blocks[CART_OFFSET + SOUTH * WEST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(SOUTH * WEST) + ".png"); //144*
+    blocks[CART_OFFSET + WEST * WEST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST) + ".png");
+    blocks[CART_OFFSET + NORTH * SOUTH + UP_FIRST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * SOUTH + UP_FIRST) + ".png"); //7*
+    blocks[CART_OFFSET + NORTH * SOUTH + UP_SECOND] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(NORTH * SOUTH + UP_SECOND) + ".png"); //9*
+    blocks[CART_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST + UP_FIRST) + ".png"); //49*
+    blocks[CART_OFFSET + EAST * WEST + UP_SECOND] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST + UP_SECOND) + ".png");//51*
+
+    railPaths[NORTH * SOUTH] = std::pair(vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f));
+    railPaths[EAST * WEST] = std::pair(vec2(-0.25f, -0.125f), vec2(0.25f, 0.125f));
+
 
     if(world == nullptr) {
         world = new Block**[WORLD_SIZE];
@@ -156,9 +179,8 @@ void WorldScene::draw() {
     //block.draw(500, 500, 100, 100.0f); //z = x + 50, y + 25   |   x = x - 50, y + 25   |   y = y + 50
     //block.draw((int) mx, (int) my, 100.0f, 100.0f);
 
-    vec2 tempOffset = vec2(0);
     if(isMiddleMouseClick) mouseStart = vec2(mx, my);
-    if(isMiddleMouseDown) tempOffset = vec2(mx, my) - mouseStart;
+    if(isMiddleMouseDown) tempScreenOffset = vec2(mx, my) - mouseStart;
     if(isMiddleMouseRelease) screenOffset += vec2(mx, my) - mouseStart;
 
     vec3 hoverBlock = vec3(-1);
@@ -168,7 +190,7 @@ void WorldScene::draw() {
         for(int x = 0; x < WORLD_SIZE; x++) {
             for(int z = 0; z < WORLD_SIZE; z++) {
                 vec3 wPos = vec3(x, y, z) + 0.5f;
-                vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempOffset;
+                vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
                 if(pos.x < 0 || pos.y < 0 || pos.x > Window::GAME_WIDTH || pos.y > Window::GAME_HEIGHT) continue;
 
                 if(world[y][x][z].type != AIR && mx > pos.x && my > pos.y && mx < pos.x + 100 && my < pos.y + 100) hoverBlock = vec3(x, y, z);
@@ -176,14 +198,18 @@ void WorldScene::draw() {
             }
         }
     }
+    cart.update(deltaTime);
+    cart.draw(100.0f, 100.0f);
     bool newHoverBlock = lastHoverBlock != hoverBlock;
     lastHoverBlock = hoverBlock;
     if(hoverBlock != vec3(-1)) {
         Block* block = &world[static_cast<int>(hoverBlock.y)][static_cast<int>(hoverBlock.x)][static_cast<int>(hoverBlock.z)];
-        Texture2d::setColor(vec4(vec3(1), 0.4f));
+
         vec3 wPos = vec3(hoverBlock.x, hoverBlock.y, hoverBlock.z) + 0.5f;
-        vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempOffset;
+        vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
+        Texture2d::setColor(vec4(vec3(1), 0.4f));
         blocks[TEMPLATE].draw(pos.x, pos.y, 100.0f, 100.0f);
+        Texture2d::setColor(vec4(1));
         fontRenderer.setColor(vec4(1));
         fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
         if(isLeftMouseClick) {
@@ -227,6 +253,7 @@ void WorldScene::draw() {
                 }
             }
             if(!found) block->data = blockVariants[RAIL][0];
+            cart.setBlock(hoverBlock);
             /*if(lastBelt == vec3(-1)) {
                 block->setRailType(NORTH * NORTH);
             } else {
@@ -256,6 +283,7 @@ void WorldScene::draw() {
 
 
 
+
     bool isPDown = glfwGetKey(window->window, GLFW_KEY_P);
     if(isPDown && !wasPDown) {
         for(int y = 0; y < WORLD_SIZE; y++) {
@@ -273,7 +301,7 @@ void WorldScene::draw() {
 }
 
 void WorldScene::cleanup() {
-    /*if(world != nullptr) {
+    if(world != nullptr) {
         for(int i = 0; i < WORLD_SIZE; i++) {
             for(int j = 0; j < WORLD_SIZE; j++) {
                 delete [] world[i][j];
@@ -282,8 +310,10 @@ void WorldScene::cleanup() {
         }
         delete [] world;
         world = nullptr;
-    }*/
+    }
 
+    for(const auto&[fst, snd] : blockVariants) delete [] snd;
+    blockVariants.clear();
 }
 
 void WorldScene::keyPress(int key, int action, int mods) {

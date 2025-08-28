@@ -14,6 +14,9 @@ namespace ew {
 		float t = (float)rand() / RAND_MAX;
 		return min + (max - min) * t;
 	}
+	inline float lerp(float a, float b, float t) {
+		return a + t * (b - a);
+	}
 
 	inline glm::vec2 closestPointOnLine(const glm::vec2& A, const glm::vec2& B, const glm::vec2& P) {
 		glm::vec2 AB = B - A;

@@ -10,6 +10,7 @@
 #include "cobb/core/scene.h"
 #include "cobb/misc/fontRenderer.h"
 #include "cobb/misc/texture2d.h"
+#include "ew/ewMath/ewMath.h"
 
 #define TEMPLATE -1
 #define AIR 0
@@ -24,6 +25,7 @@
 
 #define BELT_OFFSET 1000
 #define RAIL_OFFSET 2000
+#define CART_OFFSET 3000
 
 #define DEFAULT 0
 #define NORTH 1
@@ -59,12 +61,14 @@ public:
     bool wasMiddleMouseDown = false;
     bool wasRightMouseDown = false;
     vec2 mouseStart = vec2(0);
-    vec2 screenOffset = vec2(500);
+    static vec2 screenOffset;
+    static vec2 tempScreenOffset;
     vec3 lastBelt = vec3(-1);
     vec3 lastHoverBlock = vec3(-1);
     constexpr static int WORLD_SIZE = 10;
     static std::map<int, Texture2d> blocks;
     static std::map<int, int*> blockVariants;
+    static std::map<int, std::pair<vec2, vec2>> railPaths;
 
     struct Block {
         int type = 0;
@@ -103,7 +107,46 @@ public:
 
     };
 
-    Block ***world = nullptr;
+    static Block ***world;
+
+    struct Cart {
+        Block* block = nullptr;
+        vec3 blockPos = vec3(0);
+        float speed = 0.0f;
+        float progress = 0.0f; //0.0 -> 1.0 based on how far along the current track it is
+
+        void setBlock(vec3 blockPos) {
+            this->blockPos = blockPos;
+            if(blockPos == vec3(-1)) this->block = nullptr;
+            else this->block = &world[static_cast<int>(blockPos.y)][static_cast<int>(blockPos.x)][static_cast<int>(blockPos.z)];
+        }
+
+        explicit Cart(vec3 blockPos = vec3(-1), float speed = 1.0f, float progress = 0.0f) {
+            this->setBlock(blockPos);
+            this->speed = speed;
+            this->progress = progress;
+        }
+
+        void update(float dt) {
+            progress += speed * dt;
+            if(progress > 1.0f) progress = 0.0f;
+            if(progress < 0.0f) progress = 1.0f;
+        }
+
+        void draw(float w, float h) const {
+            if(block != nullptr && block->type == RAIL) {
+                vec2 pos = vec2(blockPos.z * -50 + blockPos.x * 50, blockPos.z * -25 + blockPos.x * -25 + blockPos.y * 50) + screenOffset + tempScreenOffset;
+
+                if(railPaths.find(block->data) != railPaths.end()) pos += vec2(ew::lerp(railPaths[block->data].first.x, railPaths[block->data].second.x, progress), ew::lerp(railPaths[block->data].first.y, railPaths[block->data].second.y, progress)) * (w + h) * 0.5f;
+
+                blocks[CART_OFFSET + block->data].draw(pos.x, pos.y, w, h);
+            }
+        }
+    };
+
+
+    Cart cart = Cart();
+
 };
 
 
