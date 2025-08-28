@@ -11,6 +11,7 @@ Window *WorldScene::window = nullptr;
 FontRenderer WorldScene::fontRenderer = FontRenderer();
 bool WorldScene::debugMode = false;
 std::map<int, Texture2d> WorldScene::blocks = std::map<int, Texture2d>();
+std::map<int, int*> WorldScene::blockVariants = std::map<int, int*>();
 Texture2d WorldScene::blank = Texture2d();
 
 WorldScene::WorldScene(Window *w) {
@@ -35,9 +36,12 @@ void WorldScene::load() {
     blocks[DIRT] = Texture2d("assets/textures/blocks/dirt.png");
     blocks[STONE] = Texture2d("assets/textures/blocks/stone.png");
     blocks[LOG] = Texture2d("assets/textures/blocks/log.png");
-    blocks[BELT] = Texture2d("assets/textures/blocks/belt/default.png");
-    blocks[RAIL] = Texture2d("assets/textures/blocks/rail/7.png");
 
+
+
+    for(int i = 0; i < BELT; i++) blockVariants[i] = new int[]{0};
+
+    blocks[BELT] = Texture2d("assets/textures/blocks/belt/default.png");
     blocks[BELT_OFFSET + 00] = Texture2d("assets/textures/blocks/belt/default.png");
     blocks[BELT_OFFSET + 01] = Texture2d("assets/textures/blocks/belt/default_to_north.png");
     blocks[BELT_OFFSET + 02] = Texture2d("assets/textures/blocks/belt/default_to_east.png");
@@ -59,7 +63,10 @@ void WorldScene::load() {
     blocks[BELT_OFFSET + 41] = Texture2d("assets/textures/blocks/belt/west_to_north.png");
     blocks[BELT_OFFSET + 42] = Texture2d("assets/textures/blocks/belt/west_to_east.png");
     blocks[BELT_OFFSET + 43] = Texture2d("assets/textures/blocks/belt/west_to_south.png");
+    blockVariants[BELT] = new int[]{00, 01, 02, 03, 04, 10, 12, 13, 14, 20, 21, 23, 24, 30, 31, 32, 34, 40, 41, 42, 43};
 
+
+    blocks[RAIL] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH) + ".png");
     blocks[RAIL_OFFSET + NORTH * NORTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * NORTH) + ".png"); //1
     blocks[RAIL_OFFSET + NORTH * EAST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * EAST) + ".png"); //2*
     blocks[RAIL_OFFSET + NORTH * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH) + ".png"); //6*
@@ -70,13 +77,11 @@ void WorldScene::load() {
     blocks[RAIL_OFFSET + SOUTH * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(SOUTH * SOUTH) + ".png"); //36
     blocks[RAIL_OFFSET + SOUTH * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(SOUTH * WEST) + ".png"); //144*
     blocks[RAIL_OFFSET + WEST * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(WEST * WEST) + ".png"); //576
-
-
     blocks[RAIL_OFFSET + NORTH * SOUTH + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH + UP_FIRST) + ".png"); //7*
-    blocks[RAIL_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_FIRST) + ".png"); //49*
     blocks[RAIL_OFFSET + NORTH * SOUTH + UP_SECOND] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH + UP_SECOND) + ".png"); //9*
+    blocks[RAIL_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_FIRST) + ".png"); //49*
     blocks[RAIL_OFFSET + EAST * WEST + UP_SECOND] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_SECOND) + ".png");//51*
-
+    blockVariants[RAIL] = new int[]{1, 2, 6, 24, 4, 12, 48, 36, 144, 576, 7, 9, 49, 51};
 
     if(world == nullptr) {
         world = new Block**[WORLD_SIZE];
@@ -188,10 +193,8 @@ void WorldScene::draw() {
         }
         if((isRightMouseDown && newHoverBlock) || isRightMouseClick) {
             Block* lastBlock = nullptr;
-            /*block->data++;
-            if(block->data % 10 == 5) block->data += 5;
-            if(block->data >= 44) block->data = 0;*/
-            block->type = BELT;
+
+            /*block->type = BELT;
             if(lastBelt == vec3(-1)) {
                 block->setBeltFrom(DEFAULT);
                 block->setBeltTo(DEFAULT);
@@ -212,7 +215,40 @@ void WorldScene::draw() {
                     block->setBeltFrom(WEST);
                     lastBlock->setBeltTo(EAST);
                 }
+            }*/
+
+            if(block->type != RAIL) block->type = RAIL;
+            bool found = false;
+            for(int i = 0; i < 13; i++) {
+                if(block->data == blockVariants[RAIL][i]) {
+                    block->data = blockVariants[RAIL][i + 1];
+                    found = true;
+                    break;
+                }
             }
+            if(!found) block->data = blockVariants[RAIL][0];
+            /*if(lastBelt == vec3(-1)) {
+                block->setRailType(NORTH * NORTH);
+            } else {
+                lastBlock = &world[static_cast<int>(lastBelt.y)][static_cast<int>(lastBelt.x)][static_cast<int>(lastBelt.z)];
+            }
+            if(lastBlock != nullptr) {
+                int hoverBlockDir = 1;
+                int lastBlockDir = lastBlock->data;
+                if(hoverBlock.x > lastBelt.x) {
+
+                    lastBlock->setBeltTo(SOUTH);
+                } else if(hoverBlock.x < lastBelt.x) {
+                    block->setBeltFrom(SOUTH);
+                    lastBlock->setBeltTo(NORTH);
+                } else if(hoverBlock.z > lastBelt.z) {
+                    block->setBeltFrom(EAST);
+                    lastBlock->setBeltTo(WEST);
+                } else if(hoverBlock.z < lastBelt.z) {
+                    block->setBeltFrom(WEST);
+                    lastBlock->setBeltTo(EAST);
+                }
+            }*/
 
             lastBelt = hoverBlock;
         }

@@ -64,30 +64,7 @@ public:
     vec3 lastHoverBlock = vec3(-1);
     constexpr static int WORLD_SIZE = 10;
     static std::map<int, Texture2d> blocks;
-
-    enum RailStates {
-        NORTH_END, //1
-        NORTH_EAST, //2
-        NORTH_SOUTH, //6*
-        NORTH_WEST, //24
-        EAST_NORTH, //2
-        EAST_END, //4
-        EAST_SOUTH, //12
-        EAST_WEST, //48*
-        SOUTH_NORTH, //6*
-        SOUTH_EAST, //12
-        SOUTH_END, //36
-        SOUTH_WEST, //144
-        WEST_NORTH, //24
-        WEST_EAST, //48*
-        WEST_SOUTH, //144
-        WEST_END, //576
-
-        UP_NORTH_SOUTH, //7
-        UP_SOUTH_NORTH, //9
-        UP_EAST_WEST, //49
-        UP_WEST_EAST //51
-    };
+    static std::map<int, int*> blockVariants;
 
     struct Block {
         int type = 0;
@@ -106,7 +83,7 @@ public:
             //west = 4
             //EX: default -> west = 04, EX2: south -> east = 32
             if(type == BELT) blocks[BELT_OFFSET + data].draw(x, y, w, h);
-            //else if(type == RAIL) blocks[RAIL_OFFSET + data].draw(x, y, w, h);
+            else if(type == RAIL) blocks[RAIL_OFFSET + data].draw(x, y, w, h);
             else blocks[type].draw(x, y, w, h);
         }
 
@@ -120,12 +97,8 @@ public:
             if(dir != to) data = dir * 10 + to;
         }
 
-        void setRailTo(int dir, bool up) {
-
-        }
-
-        void setRailFrom(int dir, bool up) {
-
+        void setRailType(int type) {
+            data = type;
         }
 
     };
