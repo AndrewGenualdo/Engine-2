@@ -34,6 +34,7 @@ void mouse_position_callback(GLFWwindow *w, double xpos, double ypos) {
 
 void scroll_callback(GLFWwindow *w, double xoffset, double yoffset) {
     //camera.handleScroll(yoffset);
+    activeScene->scrollWheel(static_cast<float>(xoffset), static_cast<float>(yoffset));
 }
 
 void framebuffer_size_callback(GLFWwindow *w, int width, int height) {

@@ -17,7 +17,7 @@ public:
 
     TemplateScene() = default;
     explicit TemplateScene(Window *w);
-    virtual ~TemplateScene();
+    ~TemplateScene() override;
 
     void load() override;
     void draw() override;

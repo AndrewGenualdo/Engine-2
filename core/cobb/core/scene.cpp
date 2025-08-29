@@ -29,9 +29,17 @@ void Scene::mouseMove(float x, float y)
 
 }
 
-Scene::Scene(Window *window) {
+void Scene::scrollWheel(float xOff, float yOff)
+{
 
 }
 
-Scene::~Scene() {
+Scene::Scene(Window *window)
+{
+
+}
+
+Scene::~Scene()
+{
+
 }

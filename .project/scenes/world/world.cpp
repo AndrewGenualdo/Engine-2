@@ -4,10 +4,10 @@
 
 #include "world.h"
 
-#include <iomanip>
 
-#include "ew/ewMath/ewMath.h"
-#include <sstream>   // for std::ostringstream
+
+
+
 
 Camera WorldScene::camera = Camera();
 Window *WorldScene::window = nullptr;
@@ -16,10 +16,10 @@ bool WorldScene::debugMode = false;
 std::map<int, Texture2d> WorldScene::blocks = std::map<int, Texture2d>();
 std::map<int, int*> WorldScene::blockVariants = std::map<int, int*>();
 Texture2d WorldScene::blank = Texture2d();
-WorldScene::Block ***WorldScene::world = nullptr;
+Block ***WorldScene::world = nullptr;
 vec2 WorldScene::screenOffset = vec2(500);
 vec2 WorldScene::tempScreenOffset = vec2(0);
-std::map<int, WorldScene::RailTypeData> WorldScene::railPaths = std::map<int, RailTypeData>();
+std::map<int, RailTypeData> WorldScene::railPaths = std::map<int, RailTypeData>();
 
 WorldScene::WorldScene(Window *w) {
     window = w;
@@ -34,7 +34,6 @@ void WorldScene::load() {
     camera = Camera(vec3(), vec3(), 60.0f, vec2(window->getWidth(), window->getHeight()));
     fontRenderer = FontRenderer("assets/textures/font/font.png");
     blank = Texture2d("assets/textures/ui/blank.png");
-
 
     blocks.clear();
     blocks[TEMPLATE] = Texture2d("assets/textures/blocks/template.png");
@@ -74,16 +73,16 @@ void WorldScene::load() {
 
 
     blocks[RAIL] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH) + ".png");
-    blocks[RAIL_OFFSET + NORTH * NORTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * NORTH) + ".png"); //1
+    blocks[RAIL_OFFSET + NORTH * NORTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * NORTH) + ".png"); //1*
     blocks[RAIL_OFFSET + NORTH * EAST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * EAST) + ".png"); //2*
     blocks[RAIL_OFFSET + NORTH * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH) + ".png"); //6*
     blocks[RAIL_OFFSET + NORTH * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * WEST) + ".png"); //24*
-    blocks[RAIL_OFFSET + EAST * EAST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * EAST) + ".png"); //4
+    blocks[RAIL_OFFSET + EAST * EAST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * EAST) + ".png"); //4*
     blocks[RAIL_OFFSET + EAST * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * SOUTH) + ".png"); //12*
     blocks[RAIL_OFFSET + EAST * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST) + ".png"); //48*
-    blocks[RAIL_OFFSET + SOUTH * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(SOUTH * SOUTH) + ".png"); //36
+    blocks[RAIL_OFFSET + SOUTH * SOUTH] = Texture2d("assets/textures/blocks/rail/" + std::to_string(SOUTH * SOUTH) + ".png"); //36*
     blocks[RAIL_OFFSET + SOUTH * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(SOUTH * WEST) + ".png"); //144*
-    blocks[RAIL_OFFSET + WEST * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(WEST * WEST) + ".png"); //576
+    blocks[RAIL_OFFSET + WEST * WEST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(WEST * WEST) + ".png"); //576*
     blocks[RAIL_OFFSET + NORTH * SOUTH + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH + UP_FIRST) + ".png"); //7*
     blocks[RAIL_OFFSET + NORTH * SOUTH + UP_SECOND] = Texture2d("assets/textures/blocks/rail/" + std::to_string(NORTH * SOUTH + UP_SECOND) + ".png"); //9*
     blocks[RAIL_OFFSET + EAST * WEST + UP_FIRST] = Texture2d("assets/textures/blocks/rail/" + std::to_string(EAST * WEST + UP_FIRST) + ".png"); //49*
@@ -201,10 +200,15 @@ void WorldScene::draw() {
 
     vec3 hoverBlock = vec3(-1);
 
-    Texture2d::setColor(vec4(1));
+
     for(int y = 0; y < WORLD_SIZE; y++) {
         for(int x = 0; x < WORLD_SIZE; x++) {
             for(int z = 0; z < WORLD_SIZE; z++) {
+
+                if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom - 1) continue;
+                else if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom) Texture2d::setColor(vec4(vec3(1), 0.2f));
+                else Texture2d::setColor(vec4(1));
+
                 vec3 wPos = vec3(x, y, z) + 0.5f;
                 vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
                 if(pos.x < 0 || pos.y < 0 || pos.x > Window::GAME_WIDTH || pos.y > Window::GAME_HEIGHT) continue;
@@ -216,25 +220,67 @@ void WorldScene::draw() {
     }
     cart.update(deltaTime);
     cart.draw(100.0f, 100.0f);
-    bool newHoverBlock = lastHoverBlock != hoverBlock;
-    lastHoverBlock = hoverBlock;
+
     if(hoverBlock != vec3(-1)) {
         Block* block = getBlock(hoverBlock);
-
-        vec3 wPos = vec3(hoverBlock.x, hoverBlock.y, hoverBlock.z) + 0.5f;
-        vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
+        vec3 worldPos = hoverBlock + 0.5f;
+        vec2 pos = vec2(worldPos.z * -50 + worldPos.x * 50, worldPos.z * -25 + worldPos.x * -25 + worldPos.y * 50) + screenOffset + tempScreenOffset;
         Texture2d::setColor(vec4(vec3(1), 0.4f));
         blocks[TEMPLATE].draw(pos.x, pos.y, 100.0f, 100.0f);
         Texture2d::setColor(vec4(1));
         fontRenderer.setColor(vec4(1));
         fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data) + "\n" + std::to_string(static_cast<int>(hoverBlock.x)) + ", " + std::to_string(static_cast<int>(hoverBlock.y)) + ", " + std::to_string(static_cast<int>(hoverBlock.z)), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
-        if(isLeftMouseClick) {
-            block->type++;
-            if(block->type >= BLOCK_TYPES) block->type = 1;
-            block->data = 0;
+
+        if(beltStart != vec3(-1)) {
+            vec3 startWorldPos = beltStart + 0.5f;
+            vec2 startPos = vec2(startWorldPos.z * -50 + startWorldPos.x * 50, startWorldPos.z * -25 + startWorldPos.x * -25 + startWorldPos.y * 50) + screenOffset + tempScreenOffset;
+            Texture2d::setColor(vec4(0.5f, 1.0f, 0.5f, 0.4f));
+            blocks[TEMPLATE].draw(startPos.x, startPos.y, 100.0f, 100.0f);
+            Texture2d::setColor(vec4(1));
         }
-        if((isRightMouseDown && newHoverBlock) || isRightMouseClick) {
-            Block* lastBlock = nullptr;
+    }
+
+    if(isRightMouseClick) beltStart = hoverBlock;
+    else if(isRightMouseDown) {
+
+    } else if(isRightMouseRelease) {
+        vec3 beltEnd = hoverBlock;
+
+        vec3 offset = vec3(0);
+
+        if(beltStart.x != beltEnd.x) {
+            vec3 first = beltStart.x < beltEnd.x ? beltStart : beltEnd;
+            vec3 second = beltStart.x > beltEnd.x ? beltStart : beltEnd;
+            for(int i = first.x; i <= second.x; i++) {
+                setBlock(first + vec3(i - first.x, 0, 0) + offset, Block(RAIL, NORTH * SOUTH));
+            }
+            offset += vec3(second.x - first.x - 1, 0, 0);
+        }
+        if(beltStart.y != beltEnd.y) {
+            vec3 first = beltStart.y < beltEnd.y ? beltStart : beltEnd;
+            vec3 second = beltStart.y > beltEnd.y ? beltStart : beltEnd;
+            for(int i = first.y; i <= second.y; i++) {
+                setBlock(first + vec3(0, i - first.y, 0) + offset, Block(RAIL, NORTH * SOUTH));
+            }
+            offset += vec3(0, second.y - first.y - 1, 0);
+        }
+        if(beltStart.z != beltEnd.z) {
+            vec3 first = beltStart.z < beltEnd.z ? beltStart : beltEnd;
+            vec3 second = beltStart.z > beltEnd.z ? beltStart : beltEnd;
+            for(int i = first.z; i <= second.z; i++) {
+                setBlock(first + vec3(0, 0, i - first.z) + offset, Block(RAIL, NORTH * SOUTH));
+            }
+            offset += vec3(0, 0, second.z - first.z - 1);
+        }
+        beltStart = vec3(-1);
+    }
+
+
+    //bool newHoverBlock = lastHoverBlock != hoverBlock;
+    //lastHoverBlock = hoverBlock;
+    /*if(hoverBlock != vec3(-1)) {
+        //if((isRightMouseDown && newHoverBlock) || isRightMouseClick) {
+            //Block* lastBlock = nullptr;
 
             /*block->type = BELT;
             if(lastBelt == vec3(-1)) {
@@ -259,7 +305,7 @@ void WorldScene::draw() {
                 }
             }*/
 
-            if(block->type != RAIL) block->type = RAIL;
+            /*if(block->type != RAIL) block->type = RAIL;
             bool found = false;
             for(int i = 0; i < 13; i++) {
                 if(block->data == blockVariants[RAIL][i]) {
@@ -271,9 +317,9 @@ void WorldScene::draw() {
             if(!found) block->data = blockVariants[RAIL][0];
             cart.setBlock(hoverBlock);
 
-            lastBelt = hoverBlock;
-        }
-    }
+            lastBelt = hoverBlock;*/
+        //}
+    //}
 
     fontRenderer.setColor(vec4(1, 0.5f, 1, 1));
     std::ostringstream out;
@@ -348,4 +394,10 @@ void WorldScene::keyPress(int key, int action, int mods) {
 void WorldScene::mouseMove(float x, float y) {
     window->mousePos.x = (x - window->gx) * Window::GAME_WIDTH / window->gw;
     window->mousePos.y = Window::GAME_HEIGHT - ((y - window->gy) * Window::GAME_HEIGHT / window->gh);
+}
+
+void WorldScene::scrollWheel(float xOff, float yOff) {
+    zoom += yOff;
+    if(zoom < 0) zoom = 0;
+    if(zoom > WORLD_SIZE * 2 - 1) zoom = WORLD_SIZE * 2 - 1;
 }

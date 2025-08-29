@@ -24,6 +24,7 @@ public:
     virtual void cleanup();
     virtual void keyPress(int key, int action, int mods);
     virtual void mouseMove(float x, float y);
+    virtual void scrollWheel(float xOff, float yOff);
 };
 
 

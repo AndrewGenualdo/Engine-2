@@ -52,7 +52,13 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/gravity/gravity.cpp
         scenes/gravity/gravity.h
         scenes/world/world.cpp
-        scenes/world/world.h)
+        scenes/world/world.h
+        scenes/world/cart.cpp
+        scenes/world/cart.h
+        scenes/world/block.cpp
+        scenes/world/block.h
+        scenes/world/railTypeData.cpp
+        scenes/world/railTypeData.h)
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)
 target_include_directories(project PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
 
