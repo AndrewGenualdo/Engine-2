@@ -70,9 +70,12 @@ public:
     static std::map<int, int*> blockVariants;
 
     struct RailTypeData {
+        constexpr static float FRICTION = 0.1f;
+        constexpr static float GRAVITY = 2.5f;
         std::vector<vec2> pathPoints;
         vec3 railBefore;
         vec3 railAfter;
+        float gravity;
 
         RailTypeData() = default;
 
@@ -81,6 +84,7 @@ public:
             for(vec2 point : pathPoints) this->pathPoints.push_back(point);
             this->railBefore = railBefore;
             this->railAfter = railAfter;
+            this->gravity = abs(railBefore.y - railAfter.y) * GRAVITY;
         }
     };
 
@@ -125,6 +129,11 @@ public:
 
     static Block ***world;
 
+    static Block* getBlock(vec3 pos) {
+        if(pos.x >= WORLD_SIZE || pos.y >= WORLD_SIZE || pos.z >= WORLD_SIZE || pos.x < 0 || pos.y < 0 || pos.z < 0) return nullptr;
+        return &world[static_cast<int>(pos.y)][static_cast<int>(pos.x)][static_cast<int>(pos.z)];
+    }
+
     struct Cart {
         Block* block = nullptr;
         vec3 blockPos = vec3(0);
@@ -132,37 +141,66 @@ public:
         float speed = 0.0f;
         float progress = 0.0f; //0.0 -> 1.0 based on how far along the current track it is
 
+        void setSpeed(float speed) {
+            this->speed = speed;
+        }
+
         void setBlock(vec3 blockPos) {
             this->progress = 0.0f;
-            this->speed = 1.0f;
+            setSpeed(0.0f);
             this->backwards = false;
             this->blockPos = blockPos;
             if(blockPos == vec3(-1)) this->block = nullptr;
-            else this->block = &world[static_cast<int>(blockPos.y)][static_cast<int>(blockPos.x)][static_cast<int>(blockPos.z)];
+            else this->block = getBlock(blockPos);
         }
 
-        explicit Cart(vec3 blockPos = vec3(-1), bool backwards = false, float speed = 1.0f, float progress = 0.0f) {
+        explicit Cart(vec3 blockPos = vec3(-1), bool backwards = false, float speed = 0.0f, float progress = 0.0f) {
             this->setBlock(blockPos);
             this->backwards = backwards;
-            this->speed = speed;
+            setSpeed(speed);
             this->progress = progress;
         }
 
         void update(float dt) {
             if(block == nullptr) return;
-            //
             if(railPaths.find(block->data) == railPaths.end()) return;
-            progress += speed * dt * (backwards ? -1 : 1);
-            /*if(progress > 1.0f) progress -= 1.0f;
-            if(progress < 0.0f) progress += 1.0f;*/
+
             RailTypeData* currRailTypeData = &railPaths[block->data];
+            speed += currRailTypeData->gravity * dt * (backwards ? -1 : 1);
+            if(speed < 0) {
+                backwards = !backwards;
+                speed = -speed;
+            }
+
+            if(abs(speed) < RailTypeData::FRICTION * dt) setSpeed(0);
+            else if(speed > RailTypeData::FRICTION * dt) setSpeed(speed - RailTypeData::FRICTION * dt);
+            else if(speed < -RailTypeData::FRICTION * dt) setSpeed(speed + RailTypeData::FRICTION * dt);
+            progress += speed * dt * (backwards ? -1 : 1);
+
+
+
             if(progress > 1.0f) {
                 float diff = progress - 1.0f;
-                //vec3 railBefore = backwards ? currRailTypeData->railAfter : currRailTypeData->railBefore;
-                //vec3 railAfter = backwards ? currRailTypeData->railBefore : currRailTypeData->railAfter;
                 vec3 railAfter = currRailTypeData->railAfter;
                 vec3 nextRailBlockPos = blockPos + railAfter;
-                Block* nextRail = &world[static_cast<int>(nextRailBlockPos.y)][static_cast<int>(nextRailBlockPos.x)][static_cast<int>(nextRailBlockPos.z)];
+                Block* nextRail = getBlock(nextRailBlockPos);
+                if(nextRail == nullptr || nextRail->type != RAIL) {
+                    nextRailBlockPos += vec3(0.0f, -1.0f, 0.0f);
+                    nextRail = getBlock(nextRailBlockPos);
+                }
+                if(nextRail == nullptr || nextRail->type != RAIL) {
+                    nextRailBlockPos += vec3(0.0f, 2.0f, 0.0f);
+                    nextRail = getBlock(nextRailBlockPos);
+                }
+                if(nextRail == nullptr || nextRail->type != RAIL) {
+                    block = nullptr;
+                    blockPos = vec3(-1.0f);
+                    backwards = false;
+                    progress = 0.0f;
+                    std::cout << "no rail > 1.0f" << std::endl;
+                    setSpeed(0.0f);
+                    return;
+                }
                 RailTypeData* nextRailTypeData = &railPaths[nextRail->data];
 
                 bool startAtEnd = false;
@@ -171,8 +209,6 @@ public:
                 else if(nextRailTypeData->railAfter == -railAfter) startAtEnd = true;
                 else {
                     //no connection
-                    speed = 0.0f;
-                    progress = 0.5f;
                 }
 
                 backwards = startAtEnd;
@@ -181,10 +217,26 @@ public:
                 block = nextRail;
             } else if(progress < 0.0f) {
                 float diff = -progress;
-                //vec3 railBefore = backwards ? currRailTypeData->railAfter : currRailTypeData->railBefore;
                 vec3 railBefore = currRailTypeData->railBefore;
+
                 vec3 nextRailBlockPos = blockPos + railBefore;
-                Block* nextRail = &world[static_cast<int>(nextRailBlockPos.y)][static_cast<int>(nextRailBlockPos.x)][static_cast<int>(nextRailBlockPos.z)];
+                Block* nextRail = getBlock(nextRailBlockPos);
+                if(nextRail == nullptr || nextRail->type != RAIL) {
+                    nextRailBlockPos += vec3(0.0f, -1.0f, 0.0f);
+                    nextRail = getBlock(nextRailBlockPos);
+                }
+                if(nextRail == nullptr || nextRail->type != RAIL) {
+                    nextRailBlockPos += vec3(0.0f, 2.0f, 0.0f);
+                    nextRail = getBlock(nextRailBlockPos);
+                }
+                if(nextRail == nullptr || nextRail->type != RAIL) {
+                    block = nullptr;
+                    blockPos = vec3(-1.0f);
+                    backwards = false;
+                    progress = 0.0f;
+                    setSpeed(0.0f);
+                    return;
+                }
                 RailTypeData* nextRailType = &railPaths[nextRail->data];
 
                 bool startAtEnd = false;
@@ -192,9 +244,10 @@ public:
                 else if(nextRailType->railBefore == -railBefore) startAtEnd = false;
                 else {
                     //no connection
-                    speed = 0.0f;
-                    progress = 0.5f;
                 }
+
+                //I have no idea why this is needed but it needs it to work
+                if(backwards && block->data > 1 && block->data % 2 == 1 && nextRail->data > 1 && nextRail->data % 2 == 1 && blockPos.y != nextRailBlockPos.y) startAtEnd = true;
 
                 backwards = startAtEnd;
                 progress = startAtEnd ? 1.0f - diff : diff;

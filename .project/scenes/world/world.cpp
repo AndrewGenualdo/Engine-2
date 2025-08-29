@@ -4,7 +4,10 @@
 
 #include "world.h"
 
+#include <iomanip>
+
 #include "ew/ewMath/ewMath.h"
+#include <sstream>   // for std::ostringstream
 
 Camera WorldScene::camera = Camera();
 Window *WorldScene::window = nullptr;
@@ -113,10 +116,10 @@ void WorldScene::load() {
     railPaths[SOUTH * SOUTH] = RailTypeData(vec3(1, 0, 0), vec3(1, 0, 0), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
     railPaths[SOUTH * WEST] = RailTypeData(vec3(1, 0, 0), vec3(0, 0, 1), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
     railPaths[WEST * WEST] = RailTypeData(vec3(0, 0, 1), vec3(0, 0, 1), {vec2(-0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
-    railPaths[NORTH * SOUTH + UP_FIRST] = RailTypeData(vec3(-1, 1, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f + 1.0f), vec2(0.25f, -0.125f)});
-    railPaths[NORTH * SOUTH + UP_SECOND] = RailTypeData(vec3(-1, 0, 0), vec3(1, 1, 0), {vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f + 1.0f)});
-    railPaths[EAST * WEST + UP_FIRST] = RailTypeData(vec3(0, 1, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f + 1.0f), vec2(-0.25f, -0.125f)});
-    railPaths[EAST * WEST + UP_SECOND] = RailTypeData(vec3(0, 0, -1), vec3(0, 1, 1), {vec2(0.25f, 0.125f), vec2(-0.25f, -0.125f + 1.0f)});
+    railPaths[NORTH * SOUTH + UP_FIRST] = RailTypeData(vec3(-1, 1, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f + 0.5f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * SOUTH + UP_SECOND] = RailTypeData(vec3(1, 1, 0), vec3(-1, 0, 0), {vec2(0.25f, -0.125f + 0.5f), vec2(-0.25f, 0.125f)});
+    railPaths[EAST * WEST + UP_FIRST] = RailTypeData(vec3(0, 1, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f + 0.5f), vec2(-0.25f, -0.125f)});
+    railPaths[EAST * WEST + UP_SECOND] = RailTypeData(vec3(0, 1, 1), vec3(0, 0, -1), {vec2(-0.25f, -0.125f + 0.5f), vec2(0.25f, 0.125f)});
 
     if(world == nullptr) {
         world = new Block**[WORLD_SIZE];
@@ -216,7 +219,7 @@ void WorldScene::draw() {
     bool newHoverBlock = lastHoverBlock != hoverBlock;
     lastHoverBlock = hoverBlock;
     if(hoverBlock != vec3(-1)) {
-        Block* block = &world[static_cast<int>(hoverBlock.y)][static_cast<int>(hoverBlock.x)][static_cast<int>(hoverBlock.z)];
+        Block* block = getBlock(hoverBlock);
 
         vec3 wPos = vec3(hoverBlock.x, hoverBlock.y, hoverBlock.z) + 0.5f;
         vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
@@ -267,38 +270,19 @@ void WorldScene::draw() {
             }
             if(!found) block->data = blockVariants[RAIL][0];
             cart.setBlock(hoverBlock);
-            /*if(lastBelt == vec3(-1)) {
-                block->setRailType(NORTH * NORTH);
-            } else {
-                lastBlock = &world[static_cast<int>(lastBelt.y)][static_cast<int>(lastBelt.x)][static_cast<int>(lastBelt.z)];
-            }
-            if(lastBlock != nullptr) {
-                int hoverBlockDir = 1;
-                int lastBlockDir = lastBlock->data;
-                if(hoverBlock.x > lastBelt.x) {
-
-                    lastBlock->setBeltTo(SOUTH);
-                } else if(hoverBlock.x < lastBelt.x) {
-                    block->setBeltFrom(SOUTH);
-                    lastBlock->setBeltTo(NORTH);
-                } else if(hoverBlock.z > lastBelt.z) {
-                    block->setBeltFrom(EAST);
-                    lastBlock->setBeltTo(WEST);
-                } else if(hoverBlock.z < lastBelt.z) {
-                    block->setBeltFrom(WEST);
-                    lastBlock->setBeltTo(EAST);
-                }
-            }*/
 
             lastBelt = hoverBlock;
         }
     }
 
     fontRenderer.setColor(vec4(1, 0.5f, 1, 1));
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(2) << cart.speed;
     fontRenderer.draw(
-        "\n\nCart:\n" +
-        std::to_string(cart.blockPos.x) + ", " + std::to_string(cart.blockPos.y) + ", " + std::to_string(cart.blockPos.z) + "\n" +
-        std::to_string(cart.progress) +"\n" +
+        "\n\nCart:\nPos:" +
+        std::to_string(static_cast<int>(cart.blockPos.x)) + ", " + std::to_string(static_cast<int>(cart.blockPos.y)) + ", " + std::to_string(static_cast<int>(cart.blockPos.z)) + "\nProgress:" +
+        std::to_string(cart.progress) +"\nSpeed:" +
+        out.str() + "\n" +
         (cart.backwards ? "backwards" : "forwards"),
         10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 3 * fontScale, fontScale);
 
