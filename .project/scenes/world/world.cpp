@@ -105,20 +105,20 @@ void WorldScene::load() {
     blocks[CART_OFFSET + EAST * WEST + UP_SECOND] = Texture2d("assets/textures/blocks/rail/cart_" + std::to_string(EAST * WEST + UP_SECOND) + ".png");//51*
 
     railPaths.clear();
-    railPaths[NORTH * NORTH] = RailTypeData(vec3(-1, 0, 0), vec3(-1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, 0.125f)});
-    railPaths[NORTH * EAST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, -1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
-    railPaths[NORTH * SOUTH] = RailTypeData(vec3(-1, 0, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f)});
-    railPaths[NORTH * WEST] = RailTypeData(vec3(-1, 0, 0), vec3(0, 0, 1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
-    railPaths[EAST * EAST] = RailTypeData(vec3(0, 0, -1), vec3(0, 0, -1), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
-    railPaths[EAST * SOUTH] = RailTypeData(vec3(0, 0, -1), vec3(1, 0, 0), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
-    railPaths[EAST * WEST] = RailTypeData(vec3(0, 0, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f), vec2(-0.25f, -0.125f)});
-    railPaths[SOUTH * SOUTH] = RailTypeData(vec3(1, 0, 0), vec3(1, 0, 0), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
-    railPaths[SOUTH * WEST] = RailTypeData(vec3(1, 0, 0), vec3(0, 0, 1), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
-    railPaths[WEST * WEST] = RailTypeData(vec3(0, 0, 1), vec3(0, 0, 1), {vec2(-0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
-    railPaths[NORTH * SOUTH + UP_FIRST] = RailTypeData(vec3(-1, 1, 0), vec3(1, 0, 0), {vec2(-0.25f, 0.125f + 0.5f), vec2(0.25f, -0.125f)});
-    railPaths[NORTH * SOUTH + UP_SECOND] = RailTypeData(vec3(1, 1, 0), vec3(-1, 0, 0), {vec2(0.25f, -0.125f + 0.5f), vec2(-0.25f, 0.125f)});
-    railPaths[EAST * WEST + UP_FIRST] = RailTypeData(vec3(0, 1, -1), vec3(0, 0, 1), {vec2(0.25f, 0.125f + 0.5f), vec2(-0.25f, -0.125f)});
-    railPaths[EAST * WEST + UP_SECOND] = RailTypeData(vec3(0, 1, 1), vec3(0, 0, -1), {vec2(-0.25f, -0.125f + 0.5f), vec2(0.25f, 0.125f)});
+    railPaths[NORTH * NORTH] = RailTypeData(ivec3(-1, 0, 0), ivec3(-1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, 0.125f)});
+    railPaths[NORTH * EAST] = RailTypeData(ivec3(-1, 0, 0), ivec3(0, 0, -1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
+    railPaths[NORTH * SOUTH] = RailTypeData(ivec3(-1, 0, 0), ivec3(1, 0, 0), {vec2(-0.25f, 0.125f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * WEST] = RailTypeData(ivec3(-1, 0, 0), ivec3(0, 0, 1), {vec2(-0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
+    railPaths[EAST * EAST] = RailTypeData(ivec3(0, 0, -1), ivec3(0, 0, -1), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, 0.125f)});
+    railPaths[EAST * SOUTH] = RailTypeData(ivec3(0, 0, -1), ivec3(1, 0, 0), {vec2(0.25f, 0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
+    railPaths[EAST * WEST] = RailTypeData(ivec3(0, 0, -1), ivec3(0, 0, 1), {vec2(0.25f, 0.125f), vec2(-0.25f, -0.125f)});
+    railPaths[SOUTH * SOUTH] = RailTypeData(ivec3(1, 0, 0), ivec3(1, 0, 0), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(0.25f, -0.125f)});
+    railPaths[SOUTH * WEST] = RailTypeData(ivec3(1, 0, 0), ivec3(0, 0, 1), {vec2(0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
+    railPaths[WEST * WEST] = RailTypeData(ivec3(0, 0, 1), ivec3(0, 0, 1), {vec2(-0.25f, -0.125f), vec2(0.0f, 0.0f), vec2(-0.25f, -0.125f)});
+    railPaths[NORTH * SOUTH + UP_FIRST] = RailTypeData(ivec3(-1, 1, 0), ivec3(1, 0, 0), {vec2(-0.25f, 0.125f + 0.5f), vec2(0.25f, -0.125f)});
+    railPaths[NORTH * SOUTH + UP_SECOND] = RailTypeData(ivec3(1, 1, 0), ivec3(-1, 0, 0), {vec2(0.25f, -0.125f + 0.5f), vec2(-0.25f, 0.125f)});
+    railPaths[EAST * WEST + UP_FIRST] = RailTypeData(ivec3(0, 1, -1), ivec3(0, 0, 1), {vec2(0.25f, 0.125f + 0.5f), vec2(-0.25f, -0.125f)});
+    railPaths[EAST * WEST + UP_SECOND] = RailTypeData(ivec3(0, 1, 1), ivec3(0, 0, -1), {vec2(-0.25f, -0.125f + 0.5f), vec2(0.25f, 0.125f)});
 
     if(world == nullptr) {
         world = new Block**[WORLD_SIZE];
@@ -198,7 +198,7 @@ void WorldScene::draw() {
     else tempScreenOffset = vec2(0);
     if(isMiddleMouseRelease) screenOffset += vec2(mx, my) - mouseStart;
 
-    vec3 hoverBlock = vec3(-1);
+    ivec3 hoverBlock = vec3(-1);
 
 
     for(int y = 0; y < WORLD_SIZE; y++) {
@@ -206,14 +206,14 @@ void WorldScene::draw() {
             for(int z = 0; z < WORLD_SIZE; z++) {
 
                 if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom - 1) continue;
-                else if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom) Texture2d::setColor(vec4(vec3(1), 0.2f));
+                //else if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom) Texture2d::setColor(vec4(vec3(1), 0.2f));
                 else Texture2d::setColor(vec4(1));
 
                 vec3 wPos = vec3(x, y, z) + 0.5f;
                 vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
                 if(pos.x < 0 || pos.y < 0 || pos.x > Window::GAME_WIDTH || pos.y > Window::GAME_HEIGHT) continue;
 
-                if(world[y][x][z].type != AIR && mx > pos.x && my > pos.y && mx < pos.x + 100 && my < pos.y + 100) hoverBlock = vec3(x, y, z);
+                if(world[y][x][z].type != AIR && mx > pos.x && my > pos.y && mx < pos.x + 100 && my < pos.y + 100) hoverBlock = ivec3(x, y, z);
                 world[y][x][z].draw(pos.x, pos.y, 100.0f, 100.0f);
             }
         }
@@ -221,9 +221,9 @@ void WorldScene::draw() {
     cart.update(deltaTime);
     cart.draw(100.0f, 100.0f);
 
-    if(hoverBlock != vec3(-1)) {
+    if(hoverBlock != ivec3(-1)) {
         Block* block = getBlock(hoverBlock);
-        vec3 worldPos = hoverBlock + 0.5f;
+        vec3 worldPos = vec3(hoverBlock) + 0.5f;
         vec2 pos = vec2(worldPos.z * -50 + worldPos.x * 50, worldPos.z * -25 + worldPos.x * -25 + worldPos.y * 50) + screenOffset + tempScreenOffset;
         Texture2d::setColor(vec4(vec3(1), 0.4f));
         blocks[TEMPLATE].draw(pos.x, pos.y, 100.0f, 100.0f);
@@ -231,8 +231,8 @@ void WorldScene::draw() {
         fontRenderer.setColor(vec4(1));
         fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data) + "\n" + std::to_string(static_cast<int>(hoverBlock.x)) + ", " + std::to_string(static_cast<int>(hoverBlock.y)) + ", " + std::to_string(static_cast<int>(hoverBlock.z)), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
 
-        if(beltStart != vec3(-1)) {
-            vec3 startWorldPos = beltStart + 0.5f;
+        if(beltStart != ivec3(-1)) {
+            vec3 startWorldPos = vec3(beltStart) + 0.5f;
             vec2 startPos = vec2(startWorldPos.z * -50 + startWorldPos.x * 50, startWorldPos.z * -25 + startWorldPos.x * -25 + startWorldPos.y * 50) + screenOffset + tempScreenOffset;
             Texture2d::setColor(vec4(0.5f, 1.0f, 0.5f, 0.4f));
             blocks[TEMPLATE].draw(startPos.x, startPos.y, 100.0f, 100.0f);
@@ -244,11 +244,77 @@ void WorldScene::draw() {
     else if(isRightMouseDown) {
 
     } else if(isRightMouseRelease) {
-        vec3 beltEnd = hoverBlock;
+        ivec3 beltEnd = hoverBlock;
 
-        vec3 offset = vec3(0);
 
-        if(beltStart.x != beltEnd.x) {
+
+        ivec3 dir = vec3(ew::normalize(beltEnd.x - beltStart.x), ew::normalize(beltEnd.y - beltStart.y), ew::normalize(beltEnd.z - beltStart.z));
+
+        ivec3 pos = beltStart;
+        ivec3 amt = beltEnd - beltStart;
+        int yEvery = amt.y == 0 ? INT_MAX : (abs(amt.x) + abs(amt.z)) / abs(amt.y);
+        int delayedY = 0;
+        int railIndex = 0;
+#define yCondition yEvery != INT_MAX && abs(amt.y) > 0
+        setBlock(beltStart, Block(LOG));
+        while(abs(amt.x) > 0) {
+            int railType = NORTH * SOUTH;
+            bool isTurn = beltEnd.x - beltStart.x == amt.x && abs(beltEnd.z - beltStart.z) > 0;
+            bool blockY = isTurn;
+            if(delayedY > 0 && yCondition) {
+                if(blockY) delayedY++;
+                else {
+                    amt -= ivec3(0, dir.y, 0);
+                    delayedY--;
+                }
+            }
+            else if(yCondition && railIndex % yEvery == yEvery / 2) {
+                if(blockY) delayedY++;
+                else {
+                    amt -= ivec3(0, dir.y, 0);
+                    railType += dir.z == 1 ? UP_SECOND : UP_FIRST;
+                }
+            }
+            if(isTurn) setBlock(pos + amt, Block(LOG));
+            else if(railType > 1 && railType % 2 == 1) {
+                setBlock(pos + amt, Block(AIR));
+                setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
+            } else setBlock(pos + amt, Block(RAIL, railType));
+            amt -= ivec3(dir.x, 0, 0);
+            railIndex++;
+        }
+
+        while(abs(amt.z) > 0) {
+            int railType = EAST * WEST;
+            bool isTurn = beltEnd.z - beltStart.z == amt.z && abs(beltEnd.x - beltStart.x) > 0;
+            bool blockY = isTurn;
+            if(delayedY > 0 && yCondition) {
+                if(blockY) delayedY++;
+                else {
+                    amt -= ivec3(0, dir.y, 0);
+                    delayedY--;
+                }
+            }
+            else if(yCondition && railIndex % yEvery == yEvery / 2) {
+                if(blockY) delayedY++;
+                else {
+                    amt -= ivec3(0, dir.y, 0);
+                    railType += dir.z == 1 ? UP_FIRST : UP_SECOND;
+                }
+            }
+            if(isTurn) setBlock(pos + amt, Block(LOG));
+            else if(railType > 1 && railType % 2 == 1) {
+                setBlock(pos + amt, Block(AIR));
+                setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
+            } else setBlock(pos + amt, Block(RAIL, railType));
+            amt -= ivec3(0, 0, dir.z);
+            railIndex++;
+        }
+
+
+
+
+        /*if(beltStart.x != beltEnd.x) {
             vec3 first = beltStart.x < beltEnd.x ? beltStart : beltEnd;
             vec3 second = beltStart.x > beltEnd.x ? beltStart : beltEnd;
             for(int i = first.x; i <= second.x; i++) {
@@ -271,8 +337,8 @@ void WorldScene::draw() {
                 setBlock(first + vec3(0, 0, i - first.z) + offset, Block(RAIL, NORTH * SOUTH));
             }
             offset += vec3(0, 0, second.z - first.z - 1);
-        }
-        beltStart = vec3(-1);
+        }*/
+        beltStart = ivec3(-1);
     }
 
 

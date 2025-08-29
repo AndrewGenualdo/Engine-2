@@ -14,12 +14,12 @@ public:
     constexpr static float FRICTION = 0.1f;
     constexpr static float GRAVITY = 2.5f;
     std::vector<glm::vec2> pathPoints;
-    glm::vec3 railBefore;
-    glm::vec3 railAfter;
+    glm::ivec3 railBefore;
+    glm::ivec3 railAfter;
     float gravity;
 
     RailTypeData() = default;
-    RailTypeData(glm::vec3 railBefore, glm::vec3 railAfter,std::initializer_list<glm::vec2> pathPoints);
+    RailTypeData(glm::ivec3 railBefore, glm::ivec3 railAfter,std::initializer_list<glm::vec2> pathPoints);
 };
 
 

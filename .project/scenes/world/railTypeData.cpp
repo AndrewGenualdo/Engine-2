@@ -6,7 +6,7 @@
 
 
 
-RailTypeData::RailTypeData(glm::vec3 railBefore, glm::vec3 railAfter, std::initializer_list<glm::vec2> pathPoints)  {
+RailTypeData::RailTypeData(glm::ivec3 railBefore, glm::ivec3 railAfter, std::initializer_list<glm::vec2> pathPoints)  {
     this->pathPoints = std::vector<glm::vec2>();
     for(glm::vec2 point : pathPoints) this->pathPoints.push_back(point);
     this->railBefore = railBefore;

@@ -6,12 +6,12 @@
 
 #include "world.h"
 
-void Cart::setBlock(vec3 blockPos) {
+void Cart::setBlock(ivec3 blockPos) {
     this->progress = 0.0f;
     setSpeed(0.0f);
     this->backwards = false;
     this->blockPos = blockPos;
-    if(blockPos == vec3(-1)) this->block = nullptr;
+    if(blockPos == ivec3(-1)) this->block = nullptr;
     else this->block = WorldScene::getBlock(blockPos);
 }
 
@@ -35,20 +35,20 @@ void Cart::update(float dt) {
 
             if(progress > 1.0f) {
                 float diff = progress - 1.0f;
-                vec3 railAfter = currRailTypeData->railAfter;
-                vec3 nextRailBlockPos = blockPos + railAfter;
+                ivec3 railAfter = currRailTypeData->railAfter;
+                ivec3 nextRailBlockPos = blockPos + railAfter;
                 Block* nextRail = WorldScene::getBlock(nextRailBlockPos);
                 if(nextRail == nullptr || nextRail->type != RAIL) {
-                    nextRailBlockPos += vec3(0.0f, -1.0f, 0.0f);
+                    nextRailBlockPos += ivec3(0, -1, 0);
                     nextRail = WorldScene::getBlock(nextRailBlockPos);
                 }
                 if(nextRail == nullptr || nextRail->type != RAIL) {
-                    nextRailBlockPos += vec3(0.0f, 2.0f, 0.0f);
+                    nextRailBlockPos += ivec3(0, 2, 0);
                     nextRail = WorldScene::getBlock(nextRailBlockPos);
                 }
                 if(nextRail == nullptr || nextRail->type != RAIL) {
                     block = nullptr;
-                    blockPos = vec3(-1.0f);
+                    blockPos = ivec3(-1);
                     backwards = false;
                     progress = 0.0f;
                     std::cout << "no rail > 1.0f" << std::endl;
@@ -71,21 +71,21 @@ void Cart::update(float dt) {
                 block = nextRail;
             } else if(progress < 0.0f) {
                 float diff = -progress;
-                vec3 railBefore = currRailTypeData->railBefore;
+                ivec3 railBefore = currRailTypeData->railBefore;
 
-                vec3 nextRailBlockPos = blockPos + railBefore;
+                ivec3 nextRailBlockPos = blockPos + railBefore;
                 Block* nextRail = WorldScene::getBlock(nextRailBlockPos);
                 if(nextRail == nullptr || nextRail->type != RAIL) {
-                    nextRailBlockPos += vec3(0.0f, -1.0f, 0.0f);
+                    nextRailBlockPos += ivec3(0, -1, 0);
                     nextRail = WorldScene::getBlock(nextRailBlockPos);
                 }
                 if(nextRail == nullptr || nextRail->type != RAIL) {
-                    nextRailBlockPos += vec3(0.0f, 2.0f, 0.0f);
+                    nextRailBlockPos += ivec3(0, 2, 0);
                     nextRail = WorldScene::getBlock(nextRailBlockPos);
                 }
                 if(nextRail == nullptr || nextRail->type != RAIL) {
                     block = nullptr;
-                    blockPos = vec3(-1.0f);
+                    blockPos = ivec3(-1);
                     backwards = false;
                     progress = 0.0f;
                     setSpeed(0.0f);

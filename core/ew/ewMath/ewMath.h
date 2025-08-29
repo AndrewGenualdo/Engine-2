@@ -20,6 +20,10 @@ namespace ew {
 	inline glm::vec2 lerp(glm::vec2 a, glm::vec2 b, float t) {
 		return glm::vec2(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
 	}
+	inline float normalize(float value) {
+		if(value == 0) return 0;
+		return value / glm::abs(value);
+	}
 
 	inline glm::vec2 closestPointOnLine(const glm::vec2& A, const glm::vec2& B, const glm::vec2& P) {
 		glm::vec2 AB = B - A;

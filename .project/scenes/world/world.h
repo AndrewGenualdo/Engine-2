@@ -38,7 +38,9 @@
 #define SOUTH 6
 #define WEST 24
 
-#define DOWN 0
+#define DOWN 120
+#define UP 720
+
 #define UP_FIRST 1
 #define UP_SECOND 3
 
@@ -77,21 +79,21 @@ public:
 
     static Block ***world;
 
-    static Block* getBlock(vec3 pos) {
+    static Block* getBlock(ivec3 pos) {
         if(pos.x >= WORLD_SIZE || pos.y >= WORLD_SIZE || pos.z >= WORLD_SIZE || pos.x < 0 || pos.y < 0 || pos.z < 0) return nullptr;
-        return &world[static_cast<int>(pos.y)][static_cast<int>(pos.x)][static_cast<int>(pos.z)];
+        return &world[pos.y][pos.x][pos.z];
     }
 
-    static void setBlock(vec3 pos, Block block) {
+    static void setBlock(ivec3 pos, Block block) {
         if(pos.x >= WORLD_SIZE || pos.y >= WORLD_SIZE || pos.z >= WORLD_SIZE || pos.x < 0 || pos.y < 0 || pos.z < 0) return;
-        world[static_cast<int>(pos.y)][static_cast<int>(pos.x)][static_cast<int>(pos.z)] = block;
+        world[pos.y][pos.x][pos.z] = block;
     }
 
     Cart cart = Cart();
 
     //vec3 lastBelt = vec3(-1);
     //vec3 lastHoverBlock = vec3(-1);
-    vec3 beltStart = vec3(-1);
+    ivec3 beltStart = ivec3(-1);
 
 };
 

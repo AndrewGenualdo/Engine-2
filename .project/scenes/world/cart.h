@@ -13,7 +13,7 @@ using namespace glm;
 class Cart {
 public:
         Block* block = nullptr;
-        vec3 blockPos = vec3(0);
+        ivec3 blockPos = vec3(0);
         bool backwards = false;
         float speed = 0.0f;
         float progress = 0.0f; //0.0 -> 1.0 based on how far along the current track it is
@@ -22,9 +22,9 @@ public:
             this->speed = speed;
         }
 
-        void setBlock(vec3 blockPos);
+        void setBlock(ivec3 blockPos);
 
-        explicit Cart(vec3 blockPos = vec3(-1), bool backwards = false, float speed = 0.0f, float progress = 0.0f) {
+        explicit Cart(ivec3 blockPos = ivec3(-1), bool backwards = false, float speed = 0.0f, float progress = 0.0f) {
             this->setBlock(blockPos);
             this->backwards = backwards;
             setSpeed(speed);
