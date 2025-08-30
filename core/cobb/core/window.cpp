@@ -58,6 +58,27 @@ cobb::Window::Window(const std::string &title) {
     }
 }
 
+void cobb::Window::pollInputs() {
+    for(int i = 0; i < inputs.size(); i++) {
+        wasInputDown[inputs[i]] = isInputDown[inputs[i]];
+
+        //0, 1, 2 are mouse buttons
+        isInputDown[inputs[i]] = inputs[i] < 3 ? glfwGetMouseButton(window, inputs[i]) : glfwGetKey(window, inputs[i]);
+    }
+}
+
+bool cobb::Window::isInputClicked(int input) {
+    return isInputDown[input] && !wasInputDown[input];
+}
+
+bool cobb::Window::isInputPressed(int input) {
+    return isInputDown[input];
+}
+
+bool cobb::Window::isInputReleased(int input) {
+    return !isInputDown[input] && wasInputDown[input];
+}
+
 float cobb::Window::update() {
     //show fps/uptime in window title
     const auto time = static_cast<float>(glfwGetTime() - _timeOffset);
@@ -74,7 +95,7 @@ float cobb::Window::update() {
     //Clear framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+    pollInputs();
     return deltaTime;
 }
 

@@ -65,9 +65,6 @@ public:
     static Texture2d blank;
     static bool debugMode;
 
-    bool wasLeftMouseDown = false;
-    bool wasMiddleMouseDown = false;
-    bool wasRightMouseDown = false;
     vec2 mouseStart = vec2(0);
     static vec2 screenOffset;
     static vec2 tempScreenOffset;
@@ -90,9 +87,6 @@ public:
     }
 
     Cart cart = Cart();
-
-    //vec3 lastBelt = vec3(-1);
-    //vec3 lastHoverBlock = vec3(-1);
     ivec3 beltStart = ivec3(-1);
 
 };

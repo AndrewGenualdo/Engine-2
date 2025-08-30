@@ -158,7 +158,6 @@ void WorldScene::load() {
 
 }
 
-bool wasPDown = false;
 void WorldScene::draw() {
     float deltaTime = window->update();
     camera.update(window->window, deltaTime);
@@ -172,20 +171,7 @@ void WorldScene::draw() {
     Texture2d::gameCamera.expandToInclude(0, 0);
     Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
 
-    bool isLeftMouseDown = glfwGetMouseButton(window->window, GLFW_MOUSE_BUTTON_LEFT);
-    bool isLeftMouseClick = isLeftMouseDown && !wasLeftMouseDown;
-    bool isLeftMouseRelease = !isLeftMouseDown && wasLeftMouseDown;
-    wasLeftMouseDown = isLeftMouseDown;
 
-    bool isMiddleMouseDown = glfwGetMouseButton(window->window, GLFW_MOUSE_BUTTON_MIDDLE);
-    bool isMiddleMouseClick = isMiddleMouseDown && !wasMiddleMouseDown;
-    bool isMiddleMouseRelease = !isMiddleMouseDown && wasMiddleMouseDown;
-    wasMiddleMouseDown = isMiddleMouseDown;
-
-    bool isRightMouseDown = glfwGetMouseButton(window->window, GLFW_MOUSE_BUTTON_RIGHT);
-    bool isRightMouseClick = isRightMouseDown && !wasRightMouseDown;
-    bool isRightMouseRelease = !isRightMouseDown && wasRightMouseDown;
-    wasRightMouseDown = isRightMouseDown;
     float mx = window->mousePos.x;
     float my = window->mousePos.y;
 
@@ -193,10 +179,10 @@ void WorldScene::draw() {
     //block.draw(500, 500, 100, 100.0f); //z = x + 50, y + 25   |   x = x - 50, y + 25   |   y = y + 50
     //block.draw((int) mx, (int) my, 100.0f, 100.0f);
 
-    if(isMiddleMouseClick) mouseStart = vec2(mx, my);
-    if(isMiddleMouseDown) tempScreenOffset = vec2(mx, my) - mouseStart;
+    if(window->isInputClicked(GLFW_MOUSE_BUTTON_MIDDLE)) mouseStart = vec2(mx, my);
+    if(window->isInputPressed(GLFW_MOUSE_BUTTON_MIDDLE)) tempScreenOffset = vec2(mx, my) - mouseStart;
     else tempScreenOffset = vec2(0);
-    if(isMiddleMouseRelease) screenOffset += vec2(mx, my) - mouseStart;
+    if(window->isInputReleased(GLFW_MOUSE_BUTTON_MIDDLE)) screenOffset += vec2(mx, my) - mouseStart;
 
     ivec3 hoverBlock = vec3(-1);
 
@@ -240,26 +226,29 @@ void WorldScene::draw() {
         }
     }
 
-    if(isRightMouseClick) beltStart = hoverBlock;
-    else if(isRightMouseDown) {
+    if(window->isInputClicked(GLFW_MOUSE_BUTTON_RIGHT)) beltStart = hoverBlock;
+    else if(window->isInputPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
 
-    } else if(isRightMouseRelease) {
+    } else if(window->isInputReleased(GLFW_MOUSE_BUTTON_RIGHT)) {
         ivec3 beltEnd = hoverBlock;
-
-
 
         ivec3 dir = vec3(ew::normalize(beltEnd.x - beltStart.x), ew::normalize(beltEnd.y - beltStart.y), ew::normalize(beltEnd.z - beltStart.z));
 
         ivec3 pos = beltStart;
         ivec3 amt = beltEnd - beltStart;
         int yEvery = amt.y == 0 ? INT_MAX : (abs(amt.x) + abs(amt.z)) / abs(amt.y);
+        if(yEvery == 0) amt = ivec3(0);
+        int totalRails = abs(amt.x) + abs(amt.z);
         int delayedY = 0;
         int railIndex = 0;
+        ivec3 firstRail = ivec3(-1);
+        ivec3 lastRail = ivec3(-1);
 #define yCondition yEvery != INT_MAX && abs(amt.y) > 0
-        setBlock(beltStart, Block(LOG));
+
         while(abs(amt.x) > 0) {
             int railType = NORTH * SOUTH;
-            bool isTurn = beltEnd.x - beltStart.x == amt.x && abs(beltEnd.z - beltStart.z) > 0;
+            bool isTurn = beltStart + amt != beltEnd && beltEnd.x - beltStart.x == amt.x && abs(beltEnd.z - beltStart.z) > 0;
+            if(isTurn) railType = (dir.x > 0 ? SOUTH : NORTH) * (dir.z > 0 ? EAST : WEST);
             bool blockY = isTurn;
             if(delayedY > 0 && yCondition) {
                 if(blockY) delayedY++;
@@ -272,21 +261,29 @@ void WorldScene::draw() {
                 if(blockY) delayedY++;
                 else {
                     amt -= ivec3(0, dir.y, 0);
-                    railType += dir.z == 1 ? UP_SECOND : UP_FIRST;
+                    railType += dir.x * -dir.y == 1 ? UP_FIRST : UP_SECOND;
                 }
             }
-            if(isTurn) setBlock(pos + amt, Block(LOG));
-            else if(railType > 1 && railType % 2 == 1) {
-                setBlock(pos + amt, Block(AIR));
-                setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
+            if(railType > 1 && railType % 2 == 1) {
+                if(beltEnd.y > beltStart.y) {
+                    setBlock(pos + amt + ivec3(0, 1, 0), Block(AIR));
+                    setBlock(pos + amt,  Block(RAIL, railType));
+                } else {
+                    setBlock(pos + amt, Block(AIR));
+                    setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
+                }
+
             } else setBlock(pos + amt, Block(RAIL, railType));
+            if(railIndex == totalRails - 1) firstRail = pos + amt;
+            if(railIndex == 1) lastRail = pos + amt;
             amt -= ivec3(dir.x, 0, 0);
             railIndex++;
         }
 
         while(abs(amt.z) > 0) {
             int railType = EAST * WEST;
-            bool isTurn = beltEnd.z - beltStart.z == amt.z && abs(beltEnd.x - beltStart.x) > 0;
+            bool isTurn = beltStart + amt != beltEnd && beltEnd.z - beltStart.z == amt.z && abs(beltEnd.x - beltStart.x) > 0;
+            if(isTurn) railType = (dir.x > 0 ? SOUTH : NORTH) * (dir.z > 0 ? EAST : WEST);
             bool blockY = isTurn;
             if(delayedY > 0 && yCondition) {
                 if(blockY) delayedY++;
@@ -299,47 +296,42 @@ void WorldScene::draw() {
                 if(blockY) delayedY++;
                 else {
                     amt -= ivec3(0, dir.y, 0);
-                    railType += dir.z == 1 ? UP_FIRST : UP_SECOND;
+                    railType += dir.z * -dir.y == 1 ? UP_FIRST : UP_SECOND;
                 }
             }
-            if(isTurn) setBlock(pos + amt, Block(LOG));
-            else if(railType > 1 && railType % 2 == 1) {
-                setBlock(pos + amt, Block(AIR));
-                setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
+
+            if(railType > 1 && railType % 2 == 1) {
+                if(beltEnd.y > beltStart.y) {
+                    setBlock(pos + amt + ivec3(0, 1, 0), Block(AIR));
+                    setBlock(pos + amt,  Block(RAIL, railType));
+                } else {
+                    setBlock(pos + amt, Block(AIR));
+                    setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
+                }
             } else setBlock(pos + amt, Block(RAIL, railType));
+            if(railIndex == totalRails - 1) firstRail = pos + amt;
+            if(railIndex == 1) lastRail = pos + amt;
             amt -= ivec3(0, 0, dir.z);
             railIndex++;
         }
 
-
-
-
-        /*if(beltStart.x != beltEnd.x) {
-            vec3 first = beltStart.x < beltEnd.x ? beltStart : beltEnd;
-            vec3 second = beltStart.x > beltEnd.x ? beltStart : beltEnd;
-            for(int i = first.x; i <= second.x; i++) {
-                setBlock(first + vec3(i - first.x, 0, 0) + offset, Block(RAIL, NORTH * SOUTH));
-            }
-            offset += vec3(second.x - first.x - 1, 0, 0);
+        if(firstRail != ivec3(-1)) {
+            if(beltStart.x > firstRail.x) setBlock(beltStart, Block(RAIL, NORTH * NORTH));
+            else if(beltStart.x < firstRail.x) setBlock(beltStart, Block(RAIL, SOUTH * SOUTH));
+            else if(beltStart.z > firstRail.z) setBlock(beltStart, Block(RAIL, EAST * EAST));
+            else if(beltStart.z < firstRail.z) setBlock(beltStart, Block(RAIL, WEST * WEST));
+            else std::cout << "PANIC! THE RAILS ARE TELEPORTING" << std::endl;
         }
-        if(beltStart.y != beltEnd.y) {
-            vec3 first = beltStart.y < beltEnd.y ? beltStart : beltEnd;
-            vec3 second = beltStart.y > beltEnd.y ? beltStart : beltEnd;
-            for(int i = first.y; i <= second.y; i++) {
-                setBlock(first + vec3(0, i - first.y, 0) + offset, Block(RAIL, NORTH * SOUTH));
-            }
-            offset += vec3(0, second.y - first.y - 1, 0);
+        if(lastRail != ivec3(-1) && !(getBlock(lastRail)->data > 1 && getBlock(lastRail)->data % 2 == 1)) {
+            if(beltEnd.x > lastRail.x) setBlock(beltEnd, Block(RAIL, NORTH * NORTH));
+            else if(beltEnd.x < lastRail.x) setBlock(beltEnd, Block(RAIL, SOUTH * SOUTH));
+            else if(beltEnd.z > lastRail.z) setBlock(beltEnd, Block(RAIL, EAST * EAST));
+            else if(beltEnd.z < lastRail.z) setBlock(beltEnd, Block(RAIL, WEST * WEST));
+            else std::cout << "PANIC! THE RAILS ARE TELEPORTING" << std::endl;
         }
-        if(beltStart.z != beltEnd.z) {
-            vec3 first = beltStart.z < beltEnd.z ? beltStart : beltEnd;
-            vec3 second = beltStart.z > beltEnd.z ? beltStart : beltEnd;
-            for(int i = first.z; i <= second.z; i++) {
-                setBlock(first + vec3(0, 0, i - first.z) + offset, Block(RAIL, NORTH * SOUTH));
-            }
-            offset += vec3(0, 0, second.z - first.z - 1);
-        }*/
         beltStart = ivec3(-1);
     }
+    if(window->isInputClicked(GLFW_KEY_C)) cart.setBlock(hoverBlock);
 
 
     //bool newHoverBlock = lastHoverBlock != hoverBlock;
@@ -399,20 +391,6 @@ void WorldScene::draw() {
         10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 3 * fontScale, fontScale);
 
 
-    bool isPDown = glfwGetKey(window->window, GLFW_KEY_P);
-    if(isPDown && !wasPDown) {
-        for(int y = 0; y < WORLD_SIZE; y++) {
-            for(int x = 0; x < WORLD_SIZE; x++) {
-                for(int z = 0; z < WORLD_SIZE; z++) {
-                    std::cout << world[y][x][z].type << ";" << world[y][x][z].data << " ";
-                }
-                std::cout << "| ";
-            }
-            std::cout << "* ";
-        }
-        std::cout << std::endl;
-    }
-    wasPDown = isPDown;
 }
 
 void WorldScene::cleanup() {
@@ -453,6 +431,17 @@ void WorldScene::keyPress(int key, int action, int mods) {
             load();
         } else if(key == GLFW_KEY_F8) {
             debugMode = !debugMode;
+        } else if(key == GLFW_KEY_P) {
+            for(int y = 0; y < WORLD_SIZE; y++) {
+                for(int x = 0; x < WORLD_SIZE; x++) {
+                    for(int z = 0; z < WORLD_SIZE; z++) {
+                        std::cout << world[y][x][z].type << ";" << world[y][x][z].data << " ";
+                    }
+                    std::cout << "| ";
+                }
+                std::cout << "* ";
+            }
+            std::cout << std::endl;
         }
     }
 }

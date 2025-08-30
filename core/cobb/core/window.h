@@ -13,6 +13,8 @@
 #include "GLFW/glfw3.h"
 #include "glm/vec2.hpp"
 #include <iostream>
+#include <map>
+#include <vector>
 
 
 namespace cobb {
@@ -35,6 +37,12 @@ namespace cobb {
         Window();
 
         explicit Window(const std::string &title);
+
+        void pollInputs();
+
+        bool isInputClicked(int input);
+        bool isInputPressed(int input);
+        bool isInputReleased(int input);
 
         float update();
 
@@ -86,6 +94,44 @@ namespace cobb {
         double _timeOffset;
     public:
         float gx, gy, gw, gh; //game x, game y, game width, game height
+
+
+        std::vector<int> inputs = {
+            GLFW_MOUSE_BUTTON_LEFT,
+            GLFW_MOUSE_BUTTON_MIDDLE,
+            GLFW_MOUSE_BUTTON_RIGHT,
+            GLFW_KEY_A,
+            GLFW_KEY_B,
+            GLFW_KEY_C,
+            GLFW_KEY_D,
+            GLFW_KEY_E,
+            GLFW_KEY_F,
+            GLFW_KEY_G,
+            GLFW_KEY_H,
+            GLFW_KEY_I,
+            GLFW_KEY_J,
+            GLFW_KEY_K,
+            GLFW_KEY_L,
+            GLFW_KEY_M,
+            GLFW_KEY_N,
+            GLFW_KEY_O,
+            GLFW_KEY_P,
+            GLFW_KEY_Q,
+            GLFW_KEY_R,
+            GLFW_KEY_S,
+            GLFW_KEY_T,
+            GLFW_KEY_U,
+            GLFW_KEY_V,
+            GLFW_KEY_W,
+            GLFW_KEY_X,
+            GLFW_KEY_Y,
+            GLFW_KEY_Z,
+            GLFW_KEY_SPACE,
+            GLFW_KEY_LEFT_CONTROL
+        };
+
+        std::map<int, bool> wasInputDown = std::map<int, bool>();
+        std::map<int, bool> isInputDown = std::map<int, bool>();
     };
 
 
