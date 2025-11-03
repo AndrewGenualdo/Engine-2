@@ -16,11 +16,6 @@ out vec4 FragColor;
 
 void main()
 {
-    /*int tileIndex = int(TexCoords.x * maxTiles);
-    int tileX = tileIndex % width;
-    int tileY = tileIndex / width;
-    vec4 color = texture(tex, vec2((TexCoords.x + float(frame)) / float(frames), TexCoords.y)) * color;
-    FragColor = texture(tex, vec2((TexCoords.x + float(frame)) / float(frames), TexCoords.y)) * color;*/
     float x = TexCoords.x;
     float y = TexCoords.y;
     int tileX = int(x * width);
@@ -29,7 +24,7 @@ void main()
     int tileData = tiles[tileIndex];
     float xThroughTextureTile = x * width - floor(x * width);
     float yThroughTextureTile = y * height - floor(y * height);
-    float xOff = tileData * (1 / textureTiles);
+    float xOff = tileData * (1.0f / textureTiles);
     float finalXPos = xOff + (xThroughTextureTile / textureTiles);
     float finalYPos = yThroughTextureTile;
     FragColor = texture(tex, vec2(finalXPos, finalYPos));

@@ -13,6 +13,7 @@ FontRenderer FarmingScene::fontRenderer = FontRenderer();
 Texture2d FarmingScene::blank = Texture2d();
 MultiTexture2d FarmingScene::spritesheet = MultiTexture2d();
 Tiles2d FarmingScene::tiles = Tiles2d();
+Texture2d FarmingScene::guy = Texture2d();
 int *FarmingScene::tileData = nullptr;
 bool FarmingScene::debugMode = false;
 
@@ -30,6 +31,7 @@ void FarmingScene::load() {
     fontRenderer = FontRenderer("assets/textures/font/font.png");
     blank = Texture2d("assets/textures/ui/blank.png");
     spritesheet = MultiTexture2d("assets/farminggame/spritesheet.png", 64);
+    guy = Texture2d("assets/farminggame/guy.png", GL_NEAREST);
 
     tileData = new int[64];
     for (int i = 0; i < 64; i++) {
@@ -38,6 +40,8 @@ void FarmingScene::load() {
     tiles = Tiles2d("assets/farminggame/spritesheet.png", 8, 8, tileData);
     Window::setVsync(false);
 }
+
+vec2 guyPos = vec2(100, 100);
 
 void FarmingScene::draw() {
     float deltaTime = window->update();
@@ -59,7 +63,14 @@ void FarmingScene::draw() {
     //blank.draw(mx - 50, my - 50, 100.0f, 100.0f);
 
     //spritesheet.draw(mx - 50.0f, my - 50.0f, 100.0f, 100.0f, static_cast<int>(window->getTime()), true);
+    if (glfwGetKey(window->window, GLFW_KEY_W)) guyPos.y += deltaTime * 100;
+    if (glfwGetKey(window->window, GLFW_KEY_S)) guyPos.y -= deltaTime * 100;
+    if (glfwGetKey(window->window, GLFW_KEY_A)) guyPos.x -= deltaTime * 100;
+    if (glfwGetKey(window->window, GLFW_KEY_D)) guyPos.x += deltaTime * 100;
+
     tiles.draw(100, 100, 500, 500, true);
+    Texture2d::setColor(vec4(1));
+    guy.draw(guyPos.x, guyPos.y, 100, 200, true);
 }
 
 void FarmingScene::cleanup() {

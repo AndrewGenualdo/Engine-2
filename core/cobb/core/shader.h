@@ -20,7 +20,7 @@ namespace cobb {
         Shader(std::string vertexPath, std::string fragmentPath);
 
         //"activate" the shader to whatever you draw until a different shader is activated? I think
-        void use();
+        void use() const;
 
 
         //set uniforms for inside the shaders

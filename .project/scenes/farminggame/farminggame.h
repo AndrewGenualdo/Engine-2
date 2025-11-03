@@ -30,6 +30,7 @@ public:
     static Texture2d blank;
     static MultiTexture2d spritesheet;
     static Tiles2d tiles;
+    static Texture2d guy;
     static int *tileData;
     static bool debugMode;
 

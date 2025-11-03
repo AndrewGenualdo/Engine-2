@@ -98,7 +98,7 @@ void cobb::Shader::load(std::string vertexPath, std::string fragmentPath) {
     glDeleteShader(fragment);
 }
 
-void cobb::Shader::use() {
+void cobb::Shader::use() const {
     glUseProgram(ID);
 }
 
