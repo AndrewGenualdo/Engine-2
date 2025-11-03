@@ -16,16 +16,29 @@ set(CORE_INC_DIR
 )
 
 add_library(core STATIC ${CORE_SRC} ${CORE_INC}
+        cobb/core/window.h
+        cobb/core/window.cpp
         cobb/core/shader.h
+        cobb/core/shader.cpp
+        cobb/core/camera.h
         cobb/core/camera.cpp
+        cobb/core/object.h
         cobb/core/object.cpp
+        cobb/shapes/line.h
         cobb/shapes/line.cpp
+        cobb/misc/texture2d.h
         cobb/misc/texture2d.cpp
+        cobb/shapes/geometry.h
         cobb/shapes/geometry.cpp
+        cobb/shapes/mesh.h
         cobb/shapes/mesh.cpp
         cobb/shapes/torus.h
+        cobb/shapes/torus.cpp
         cobb/misc/textRenderer.h
+        cobb/misc/textRenderer.cpp
         cobb/shapes/model.h
+        cobb/shapes/model.cpp
+        cobb/shapes/cube.hpp
         cobb/shapes/cube.cpp
         cobb/misc/animation.cpp
         cobb/misc/animation.h
@@ -41,6 +54,8 @@ add_library(core STATIC ${CORE_SRC} ${CORE_INC}
         cobb/shapes/circle2d.h
         cobb/shapes/spline2d.cpp
         cobb/shapes/spline2d.h
+        cobb/misc/Tiles2d.cpp
+        cobb/misc/Tiles2d.h
 )
 
 add_custom_target(copyAssetsLine ALL

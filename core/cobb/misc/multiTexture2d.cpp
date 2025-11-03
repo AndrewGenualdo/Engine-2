@@ -48,18 +48,16 @@ void MultiTexture2d::drawRaw(float x, float y, float width, float height, int fr
     if (shouldBind) bind();
     multiTexture2dShader->use();
     glBindVertexArray(*getVAO());
-    multiTexture2dShader->setInt("frames", m_frames);
+    if (shouldBind) multiTexture2dShader->setMat4("proj", orthoProj);
+    if (shouldBind) multiTexture2dShader->setInt("frames", m_frames);
     multiTexture2dShader->setInt("frame", frame);
-    multiTexture2dShader->setMat4("proj", orthoProj);
-    multiTexture2dShader->setMat4("model", Object::translate(x + w / getWidth() * 0.5f + w * 0.5f, y + h / getHeight(), 0) * Object::scale(w, h, 1));
+    multiTexture2dShader->setMat4("model", Object::translate(x + w, y + h, 0) * Object::scale(w, h, 1));
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     glEnable(GL_DEPTH_TEST);
 }
 
 void MultiTexture2d::draw(float x, float y, float width, float height, int frame, bool shouldBind) const {
     //translates from world coordinates to game camera coordinates
-    gameCamera.adjustToAspectRatio(Window::GAME_WIDTH / Window::GAME_HEIGHT);
-    gameCamera.setMinWidth(100);
     float gsw = Window::GAME_WIDTH / gameCamera.w;
     float gsh = Window::GAME_HEIGHT / gameCamera.h;
     float gx = (x - gameCamera.x) * gsw;
@@ -69,10 +67,11 @@ void MultiTexture2d::draw(float x, float y, float width, float height, int frame
 
     //translates from game camera coordinates to screen coordinates
     float scale = window->gw / Window::GAME_WIDTH;
-    float nx = window->sX(gx) + (window->sX(0) * (gx / Window::GAME_WIDTH));
-    float ny = window->sY(gy) + (window->sY(0) * (gy / Window::GAME_HEIGHT));
+    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH) + m_width / width;
+    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT) + m_height / height;
     float nw = gw * scale;
     float nh = gh * scale;
+
     drawRaw(nx, ny, nw, nh, frame, shouldBind);
 }
 

@@ -101,7 +101,7 @@ void Cart::update(float dt) {
                 }
 
                 //I have no idea why this is needed but it needs it to work
-                if(backwards && block->data > 1 && block->data % 2 == 1 && nextRail->data > 1 && nextRail->data % 2 == 1 && blockPos.y != nextRailBlockPos.y) startAtEnd = true;
+                if(backwards && block->data > 1 && block->data % 2 == 1 && blockPos.y != nextRailBlockPos.y) startAtEnd = true;
 
                 backwards = startAtEnd;
                 progress = startAtEnd ? 1.0f - diff : diff;
@@ -139,6 +139,7 @@ void Cart::draw(float w, float h) const {
 
 
         pos += delta;
-        WorldScene::blocks[CART_OFFSET + block->data].draw(pos.x, pos.y, w, h);
+        //WorldScene::blocks[CART_OFFSET + block->data].draw(pos.x, pos.y, w, h);
+        WorldScene::blank.draw(pos.x, pos.y, w, h);
     }
 }

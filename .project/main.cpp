@@ -9,13 +9,12 @@
 #include "cobb/misc/animation.h"
 
 #include "cobb/misc/fontRenderer.h"
-#include "scenes/world/world.h"
 
 #include <thread>
 
 #include "cobb/shapes/circle2d.h"
 #include "cobb/shapes/line2d.h"
-#include "scenes/game/client.h"
+#include "scenes/farminggame/farminggame.h"
 
 using namespace cobb;
 
@@ -43,10 +42,10 @@ void framebuffer_size_callback(GLFWwindow *w, int width, int height) {
     window.setWidth(width);
     window.setHeight(height);
     glViewport(0, 0, width, height);
-    Texture2d::setOrtho(glm::ortho(0.0f, window.getWidth(), 0.0f, window.getHeight(), -1.0f, 1.0f));
-    if (Client::debug) std::cout << "Window resized to: " << window.getWidth() << "x" << window.getHeight() << "." << std::endl;
+    Texture2d::setOrtho(ortho(0.0f, window.getWidth(), 0.0f, window.getHeight(), -1.0f, 1.0f));
+    std::cout << "Window resized to: " << window.getWidth() << "x" << window.getHeight() << "." << std::endl;
     window.getGameDimensions();
-    if (Client::debug) std::cout << "Game window resized to: " << window.gw << "x" << window.gh << "." << std::endl;
+    std::cout << "Game window resized to: " << window.gw << "x" << window.gh << "." << std::endl;
 }
 
 int main() {
@@ -58,7 +57,7 @@ int main() {
     glfwSetScrollCallback(window.window, scroll_callback);
     glfwSetFramebufferSizeCallback(window.window, framebuffer_size_callback);
     Texture2d::loadShader();
-    Texture2d::setOrtho(glm::ortho(0.0f, Window::SCREEN_WIDTH, 0.0f, Window::SCREEN_HEIGHT, -1.0f, 1.0f));
+    Texture2d::setOrtho(ortho(0.0f, Window::SCREEN_WIDTH, 0.0f, Window::SCREEN_HEIGHT, -1.0f, 1.0f));
     Texture2d::window = &window;
     MultiTexture2d::loadShader();
     FontRenderer::loadShader();
@@ -66,9 +65,10 @@ int main() {
     Line2d::line2dShader->setMat4("projection", Texture2d::orthoProj);
     Circle2d::loadShader();
     Circle2d::circle2dShader->setMat4("projection", Texture2d::orthoProj);
+    Tiles2d::loadShader();
 
 
-    activeScene = new WorldScene(&window);
+    activeScene = new FarmingScene(&window);
     activeScene->load();
 
     //std::thread serv = std::thread(Server::run);

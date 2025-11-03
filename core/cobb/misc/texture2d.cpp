@@ -245,7 +245,7 @@ void cobb::Texture2d::drawRaw(float x, float y, float width, float height, bool 
     texture2dShader->use();
     glBindVertexArray(*getVAO());
     texture2dShader->setMat4("proj", orthoProj);
-    texture2dShader->setMat4("model", Object::translate(x + w / getWidth() * 0.5f + w * 0.5f, y + h / getHeight(), 0) * Object::scale(w, h, 1));
+    texture2dShader->setMat4("model", Object::translate(x + w, y + h, 0) * Object::scale(w, h, 1));
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     glEnable(GL_DEPTH_TEST);
 }
@@ -268,8 +268,6 @@ void cobb::Texture2d::drawRaw(float x, float y, float width, float height, float
 void cobb::Texture2d::draw(float x, float y, float width, float height, bool shouldBind) const {
 
     //translates from world coordinates to game camera coordinates
-    gameCamera.adjustToAspectRatio(Window::GAME_WIDTH / Window::GAME_HEIGHT);
-    gameCamera.setMinWidth(100);
     float gsw = Window::GAME_WIDTH / gameCamera.w;
     float gsh = Window::GAME_HEIGHT / gameCamera.h;
     float gx = (x - gameCamera.x) * gsw;
@@ -279,12 +277,10 @@ void cobb::Texture2d::draw(float x, float y, float width, float height, bool sho
 
     //translates from game camera coordinates to screen coordinates
     float scale = window->gw / Window::GAME_WIDTH;
-    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH);
-    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT);
+    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH) + m_width / width;
+    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT) + m_height / height;
     float nw = gw * scale;
     float nh = gh * scale;
-
-
 
     drawRaw(nx, ny, nw, nh, shouldBind);
 }

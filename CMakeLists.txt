@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+set(CMAKE_POLICY_VERSION_MINIMUM  3.5)
 
 # Include guards
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
@@ -22,7 +23,6 @@ include(external/glfw.cmake)
 include(external/imgui.cmake)
 include(external/glm.cmake)
 include(external/assimp.cmake)
-# include(external/freetype.cmake)
 include(external/enet.cmake)
 
 
@@ -34,8 +34,6 @@ endif()
 if(TARGET enet)
   target_compile_options(enet PRIVATE -Wno-error)
 endif()
-
-
 
 add_subdirectory(core)
 add_subdirectory(.project)

@@ -4,9 +4,7 @@
 
 #include "world.h"
 
-
-
-
+#include "cobb/shapes/line2d.h"
 
 
 Camera WorldScene::camera = Camera();
@@ -17,6 +15,7 @@ std::map<int, Texture2d> WorldScene::blocks = std::map<int, Texture2d>();
 std::map<int, int*> WorldScene::blockVariants = std::map<int, int*>();
 Texture2d WorldScene::blank = Texture2d();
 Block ***WorldScene::world = nullptr;
+std::map<ivec3, Block, WorldScene::IVec3Compare> WorldScene::previewBlocks = std::map<ivec3, Block, IVec3Compare>();
 vec2 WorldScene::screenOffset = vec2(500);
 vec2 WorldScene::tempScreenOffset = vec2(0);
 std::map<int, RailTypeData> WorldScene::railPaths = std::map<int, RailTypeData>();
@@ -36,7 +35,7 @@ void WorldScene::load() {
     blank = Texture2d("assets/textures/ui/blank.png");
 
     blocks.clear();
-    blocks[TEMPLATE] = Texture2d("assets/textures/blocks/template.png");
+    blocks[TEMPLATE] = Texture2d("assets/textures/blocks/baby_template.png");
     blocks[AIR] = Texture2d("assets/textures/blocks/air.png");
     blocks[GRASS] = Texture2d("assets/textures/blocks/grass.png");
     blocks[DIRT] = Texture2d("assets/textures/blocks/dirt.png");
@@ -170,6 +169,7 @@ void WorldScene::draw() {
     Texture2d::gameCamera.reset();
     Texture2d::gameCamera.expandToInclude(0, 0);
     Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
+    //Texture2d::gameCamera.adjustToAspectRatio(Window::GAME_WIDTH / Window::GAME_HEIGHT);
 
 
     float mx = window->mousePos.x;
@@ -178,160 +178,132 @@ void WorldScene::draw() {
     //Texture2d::setColor(vec4(1.0f, 0.5f, 0.5f, 1.0f));
     //block.draw(500, 500, 100, 100.0f); //z = x + 50, y + 25   |   x = x - 50, y + 25   |   y = y + 50
     //block.draw((int) mx, (int) my, 100.0f, 100.0f);
+    //float scale = (sin(window->getTime()) + 2) * 100;
+    /*float scale = 300.0f;
+    Texture2d::setColor(vec3(mx / Window::GAME_WIDTH, 0.5f, my / Window::GAME_HEIGHT));
+    blank.draw(mx - scale * 0.5f, my - scale * 0.5f, scale, scale, true);
+    Texture2d::setColor(vec3(1));
+    blocks[GRASS].draw(mx - scale * 0.5f, my - scale * 0.5f, scale, scale);
+    Line2d(vec2(mx, my) - scale * 0.5f, vec2(mx, my) + scale * 0.5f, vec4(vec3(1.0f - mx / Window::GAME_WIDTH, 0.5f, 1.0f - my / Window::GAME_HEIGHT), 1.0f)).draw(true);*/
+    //std::cout << window->gw << ", " << window->gh << std::endl;
 
     if(window->isInputClicked(GLFW_MOUSE_BUTTON_MIDDLE)) mouseStart = vec2(mx, my);
     if(window->isInputPressed(GLFW_MOUSE_BUTTON_MIDDLE)) tempScreenOffset = vec2(mx, my) - mouseStart;
     else tempScreenOffset = vec2(0);
     if(window->isInputReleased(GLFW_MOUSE_BUTTON_MIDDLE)) screenOffset += vec2(mx, my) - mouseStart;
 
-    ivec3 hoverBlock = vec3(-1);
-
-
+    float blockScale = 100.0f;
+    ivec3 newHoverBlock = vec3(-1);
+    ivec3 placeBlock = ivec3(-1);
     for(int y = 0; y < WORLD_SIZE; y++) {
         for(int x = 0; x < WORLD_SIZE; x++) {
             for(int z = 0; z < WORLD_SIZE; z++) {
-
                 if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom - 1) continue;
-                //else if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom) Texture2d::setColor(vec4(vec3(1), 0.2f));
-                else Texture2d::setColor(vec4(1));
-
                 vec3 wPos = vec3(x, y, z) + 0.5f;
-                vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
+                vec2 pos = vec2( wPos.z * -blockScale * 0.5f + wPos.x * blockScale * 0.5f, wPos.z * -blockScale * 0.25f + wPos.x * -blockScale * 0.25f + wPos.y * blockScale * 0.5f) + screenOffset + tempScreenOffset;
                 if(pos.x < 0 || pos.y < 0 || pos.x > Window::GAME_WIDTH || pos.y > Window::GAME_HEIGHT) continue;
+                if(world[y][x][z].type != AIR && mx > pos.x && my > pos.y && mx < pos.x + blockScale && my < pos.y + blockScale) {
+                    vec2 p = vec2(mx - pos.x, my - pos.y) / blockScale; //0.0 -> 1.0 within block
 
-                if(world[y][x][z].type != AIR && mx > pos.x && my > pos.y && mx < pos.x + 100 && my < pos.y + 100) hoverBlock = ivec3(x, y, z);
-                world[y][x][z].draw(pos.x, pos.y, 100.0f, 100.0f);
+                    //based on desmos (that I made): https://www.desmos.com/calculator/zsnu3vttub
+                    float green = 0.5 * p.x + 0.75; //less
+                    float purple = -0.5f * p.x + 1.25f; //less
+                    float black = -0.5f * p.x + 0.25f; // greater
+                    float orange = 0.5f * p.x - 0.25f; //greater
+                    if(!(p.y < green && p.y < purple && p.y > black && p.y > orange)) continue;
+
+                    //if its greater than both of these, its the block above, otherwise, check if p.x is more or less than 0.5f
+                    float red = -0.5f * p.x + 0.75f;
+                    float blue = 0.5f * p.x + 0.25f;
+                    if(p.y > red && p.y > blue) placeBlock = ivec3(x, y+1, z);
+                    else if(p.x < 0.5f) placeBlock = ivec3(x, y, z + 1);
+                    else placeBlock = ivec3(x + 1, y, z);
+                    newHoverBlock = ivec3(x, y, z);
+                }
             }
         }
     }
+
+    bool changedHoverBlock = newHoverBlock != hoverBlock;
+    hoverBlock = newHoverBlock;
+
+    if(window->isInputClicked(GLFW_MOUSE_BUTTON_RIGHT)) {
+        railStart = placeBlock;
+        previewBlocks.clear();
+        RailTypeData::getRailPlacements(railStart, placeBlock);
+    }
+    else if(window->isInputPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+        if(changedHoverBlock) {
+            previewBlocks.clear();
+            RailTypeData::getRailPlacements(railStart, placeBlock);
+        }
+    } else if(window->isInputReleased(GLFW_MOUSE_BUTTON_RIGHT)) {
+        RailTypeData::placeRails(railStart, placeBlock);
+        railStart = ivec3(-1);
+        previewBlocks.clear();
+
+    }
+    if(window->isInputReleased(GLFW_MOUSE_BUTTON_LEFT)) {
+        setBlock(hoverBlock, Block(AIR));
+    }
+    if(window->isInputClicked(GLFW_KEY_C)) cart.setBlock(hoverBlock);
+
+    Texture2d::setColor(vec4(1));
+    for(int y = 0; y < WORLD_SIZE; y++) {
+        for(int x = 0; x < WORLD_SIZE; x++) {
+            for(int z = 0; z < WORLD_SIZE; z++) {
+                if((WORLD_SIZE - 1) - x + (WORLD_SIZE - 1) - z < zoom - 1) continue;
+                vec3 wPos = vec3(x, y, z) + 0.5f;
+                vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
+                if(pos.x < 0 || pos.y < 0 || pos.x > Window::GAME_WIDTH || pos.y > Window::GAME_HEIGHT) continue;
+                bool isPreview = previewBlocks.find(ivec3(x, y, z)) != previewBlocks.end();
+                Block *block = !isPreview ? getBlock(ivec3(x, y, z)) : &previewBlocks[ivec3(x, y, z)];
+                Texture2d::setColor(isPreview ? vec4(0.5f, 0.5f, 1.0f, 0.8f) : vec4(1.0f));
+
+                if(block->type != AIR && mx > pos.x && my > pos.y && mx < pos.x + 100 && my < pos.y + 100) newHoverBlock = ivec3(x, y, z);
+                block->draw(pos.x, pos.y, 100.0f, 100.0f);
+            }
+        }
+    }
+
+    /*for(int y = 0; y < WORLD_SIZE; y++)
+        for(int x = 0; x < WORLD_SIZE; x++)
+            for(int z = 0; z < WORLD_SIZE; z++)
+                if(world[y][x][z].type == RAIL) {
+
+
+                    std::vector<vec2> railPoints = railPaths[world[y][x][z].data].pathPoints;
+                    for(int i = 0; i < railPoints.size() - 1; i++) {
+                        vec3 wPos = vec3(x, y, z);
+                        vec2 pos = vec2( wPos.z * -50 + wPos.x * 50, wPos.z * -25 + wPos.x * -25 + wPos.y * 50) + screenOffset + tempScreenOffset;
+                        Line2d line = Line2d(pos + vec2(railPoints[i].x * 50, railPoints[i].y * 25), pos + vec2(railPoints[i + 1].x * 50, railPoints[i + 1].y * 25), vec4(1));
+                        line.draw(true);
+                    }
+                }*/
     cart.update(deltaTime);
     cart.draw(100.0f, 100.0f);
 
-    if(hoverBlock != ivec3(-1)) {
-        Block* block = getBlock(hoverBlock);
+
+    Block* placeBlockData = getBlock(hoverBlock);
+    if(placeBlockData != nullptr) {
         vec3 worldPos = vec3(hoverBlock) + 0.5f;
         vec2 pos = vec2(worldPos.z * -50 + worldPos.x * 50, worldPos.z * -25 + worldPos.x * -25 + worldPos.y * 50) + screenOffset + tempScreenOffset;
         Texture2d::setColor(vec4(vec3(1), 0.4f));
         blocks[TEMPLATE].draw(pos.x, pos.y, 100.0f, 100.0f);
         Texture2d::setColor(vec4(1));
         fontRenderer.setColor(vec4(1));
-        fontRenderer.draw(std::to_string(block->type) + ":" + std::to_string(block->data) + "\n" + std::to_string(static_cast<int>(hoverBlock.x)) + ", " + std::to_string(static_cast<int>(hoverBlock.y)) + ", " + std::to_string(static_cast<int>(hoverBlock.z)), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
-
-        if(beltStart != ivec3(-1)) {
-            vec3 startWorldPos = vec3(beltStart) + 0.5f;
-            vec2 startPos = vec2(startWorldPos.z * -50 + startWorldPos.x * 50, startWorldPos.z * -25 + startWorldPos.x * -25 + startWorldPos.y * 50) + screenOffset + tempScreenOffset;
-            Texture2d::setColor(vec4(0.5f, 1.0f, 0.5f, 0.4f));
-            blocks[TEMPLATE].draw(startPos.x, startPos.y, 100.0f, 100.0f);
-            Texture2d::setColor(vec4(1));
-        }
+        fontRenderer.draw(std::to_string(placeBlockData->type) + ":" + std::to_string(placeBlockData->data) + "\n" + std::to_string(hoverBlock.x) + ", " + std::to_string(hoverBlock.y) + ", " + std::to_string(hoverBlock.z), 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * fontScale, fontScale);
     }
 
-    if(window->isInputClicked(GLFW_MOUSE_BUTTON_RIGHT)) beltStart = hoverBlock;
-    else if(window->isInputPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-
-    } else if(window->isInputReleased(GLFW_MOUSE_BUTTON_RIGHT)) {
-        ivec3 beltEnd = hoverBlock;
-
-        ivec3 dir = vec3(ew::normalize(beltEnd.x - beltStart.x), ew::normalize(beltEnd.y - beltStart.y), ew::normalize(beltEnd.z - beltStart.z));
-
-        ivec3 pos = beltStart;
-        ivec3 amt = beltEnd - beltStart;
-        int yEvery = amt.y == 0 ? INT_MAX : (abs(amt.x) + abs(amt.z)) / abs(amt.y);
-        if(yEvery == 0) amt = ivec3(0);
-        int totalRails = abs(amt.x) + abs(amt.z);
-        int delayedY = 0;
-        int railIndex = 0;
-        ivec3 firstRail = ivec3(-1);
-        ivec3 lastRail = ivec3(-1);
-#define yCondition yEvery != INT_MAX && abs(amt.y) > 0
-
-        while(abs(amt.x) > 0) {
-            int railType = NORTH * SOUTH;
-            bool isTurn = beltStart + amt != beltEnd && beltEnd.x - beltStart.x == amt.x && abs(beltEnd.z - beltStart.z) > 0;
-            if(isTurn) railType = (dir.x > 0 ? SOUTH : NORTH) * (dir.z > 0 ? EAST : WEST);
-            bool blockY = isTurn;
-            if(delayedY > 0 && yCondition) {
-                if(blockY) delayedY++;
-                else {
-                    amt -= ivec3(0, dir.y, 0);
-                    delayedY--;
-                }
-            }
-            else if(yCondition && railIndex % yEvery == yEvery / 2) {
-                if(blockY) delayedY++;
-                else {
-                    amt -= ivec3(0, dir.y, 0);
-                    railType += dir.x * -dir.y == 1 ? UP_FIRST : UP_SECOND;
-                }
-            }
-            if(railType > 1 && railType % 2 == 1) {
-                if(beltEnd.y > beltStart.y) {
-                    setBlock(pos + amt + ivec3(0, 1, 0), Block(AIR));
-                    setBlock(pos + amt,  Block(RAIL, railType));
-                } else {
-                    setBlock(pos + amt, Block(AIR));
-                    setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
-                }
-
-            } else setBlock(pos + amt, Block(RAIL, railType));
-            if(railIndex == totalRails - 1) firstRail = pos + amt;
-            if(railIndex == 1) lastRail = pos + amt;
-            amt -= ivec3(dir.x, 0, 0);
-            railIndex++;
-        }
-
-        while(abs(amt.z) > 0) {
-            int railType = EAST * WEST;
-            bool isTurn = beltStart + amt != beltEnd && beltEnd.z - beltStart.z == amt.z && abs(beltEnd.x - beltStart.x) > 0;
-            if(isTurn) railType = (dir.x > 0 ? SOUTH : NORTH) * (dir.z > 0 ? EAST : WEST);
-            bool blockY = isTurn;
-            if(delayedY > 0 && yCondition) {
-                if(blockY) delayedY++;
-                else {
-                    amt -= ivec3(0, dir.y, 0);
-                    delayedY--;
-                }
-            }
-            else if(yCondition && railIndex % yEvery == yEvery / 2) {
-                if(blockY) delayedY++;
-                else {
-                    amt -= ivec3(0, dir.y, 0);
-                    railType += dir.z * -dir.y == 1 ? UP_FIRST : UP_SECOND;
-                }
-            }
-
-            if(railType > 1 && railType % 2 == 1) {
-                if(beltEnd.y > beltStart.y) {
-                    setBlock(pos + amt + ivec3(0, 1, 0), Block(AIR));
-                    setBlock(pos + amt,  Block(RAIL, railType));
-                } else {
-                    setBlock(pos + amt, Block(AIR));
-                    setBlock(pos + amt - ivec3(0, 1, 0), Block(RAIL, railType));
-                }
-            } else setBlock(pos + amt, Block(RAIL, railType));
-            if(railIndex == totalRails - 1) firstRail = pos + amt;
-            if(railIndex == 1) lastRail = pos + amt;
-            amt -= ivec3(0, 0, dir.z);
-            railIndex++;
-        }
-
-        if(firstRail != ivec3(-1)) {
-            if(beltStart.x > firstRail.x) setBlock(beltStart, Block(RAIL, NORTH * NORTH));
-            else if(beltStart.x < firstRail.x) setBlock(beltStart, Block(RAIL, SOUTH * SOUTH));
-            else if(beltStart.z > firstRail.z) setBlock(beltStart, Block(RAIL, EAST * EAST));
-            else if(beltStart.z < firstRail.z) setBlock(beltStart, Block(RAIL, WEST * WEST));
-            else std::cout << "PANIC! THE RAILS ARE TELEPORTING" << std::endl;
-        }
-        if(lastRail != ivec3(-1) && !(getBlock(lastRail)->data > 1 && getBlock(lastRail)->data % 2 == 1)) {
-            if(beltEnd.x > lastRail.x) setBlock(beltEnd, Block(RAIL, NORTH * NORTH));
-            else if(beltEnd.x < lastRail.x) setBlock(beltEnd, Block(RAIL, SOUTH * SOUTH));
-            else if(beltEnd.z > lastRail.z) setBlock(beltEnd, Block(RAIL, EAST * EAST));
-            else if(beltEnd.z < lastRail.z) setBlock(beltEnd, Block(RAIL, WEST * WEST));
-            else std::cout << "PANIC! THE RAILS ARE TELEPORTING" << std::endl;
-        }
-        beltStart = ivec3(-1);
+    if(railStart != ivec3(-1)) {
+        vec3 startWorldPos = vec3(railStart) + 0.5f;
+        vec2 startPos = vec2(startWorldPos.z * -50 + startWorldPos.x * 50, startWorldPos.z * -25 + startWorldPos.x * -25 + startWorldPos.y * 50) + screenOffset + tempScreenOffset;
+        Texture2d::setColor(vec4(0.5f, 1.0f, 0.5f, 0.4f));
+        blocks[TEMPLATE].draw(startPos.x, startPos.y, 100.0f, 100.0f);
+        Texture2d::setColor(vec4(1));
     }
-    if(window->isInputClicked(GLFW_KEY_C)) cart.setBlock(hoverBlock);
+
+
 
 
     //bool newHoverBlock = lastHoverBlock != hoverBlock;

@@ -9,17 +9,22 @@
 #include <glm/vec3.hpp>
 #include <vector>
 
+using namespace glm;
+
 class RailTypeData {
 public:
     constexpr static float FRICTION = 0.1f;
     constexpr static float GRAVITY = 2.5f;
-    std::vector<glm::vec2> pathPoints;
-    glm::ivec3 railBefore;
-    glm::ivec3 railAfter;
+    std::vector<vec2> pathPoints;
+    ivec3 railBefore;
+    ivec3 railAfter;
     float gravity;
 
     RailTypeData() = default;
-    RailTypeData(glm::ivec3 railBefore, glm::ivec3 railAfter,std::initializer_list<glm::vec2> pathPoints);
+    RailTypeData(ivec3 railBefore, ivec3 railAfter,std::initializer_list<vec2> pathPoints);
+
+    static void placeRails(ivec3 railStart, ivec3 railEnd);
+    static void getRailPlacements(ivec3 railStart, ivec3 railEnd);
 };
 
 

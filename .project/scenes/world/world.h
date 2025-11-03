@@ -86,8 +86,24 @@ public:
         world[pos.y][pos.x][pos.z] = block;
     }
 
+    static void setPreviewBlock(ivec3 pos, Block block) {
+        if(pos.x >= WORLD_SIZE || pos.y >= WORLD_SIZE || pos.z >= WORLD_SIZE || pos.x < 0 || pos.y < 0 || pos.z < 0) return;
+        previewBlocks[pos] = block;
+    }
+
     Cart cart = Cart();
-    ivec3 beltStart = ivec3(-1);
+    ivec3 railStart = ivec3(-1);
+    ivec3 hoverBlock = ivec3(-1);
+
+
+    struct IVec3Compare {
+        bool operator()(const ivec3& a, const ivec3& b) const {
+            return a.x + a.y * WORLD_SIZE + a.z * WORLD_SIZE * WORLD_SIZE < b.x + b.y * WORLD_SIZE + b.z * WORLD_SIZE * WORLD_SIZE;
+        }
+    };
+    static std::map<ivec3, Block, IVec3Compare> previewBlocks;
+
+
 
 };
 

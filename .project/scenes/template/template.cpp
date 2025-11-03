@@ -31,6 +31,8 @@ void TemplateScene::draw() {
     float fontScale = 3.0f;
 
     //do background stuff here
+    Texture2d::setColor(vec4(0, 0, 0, 1));
+    blank.drawRaw(window->gx, window->gy, window->gw, window->gh, true);
 
     Texture2d::gameCamera.reset();
     Texture2d::gameCamera.expandToInclude(0, 0);
@@ -50,22 +52,7 @@ void TemplateScene::cleanup() {
 
 void TemplateScene::keyPress(int key, int action, int mods) {
     if (action == GLFW_PRESS) {
-        if(key == GLFW_KEY_SPACE) {
-            /*if(coins >= GUY_MURDER_COST) {
-                coins -= GUY_MURDER_COST;
-                float speed = 9999999.0f;
-                int unit = -1;
-                for(int i = 0; i < MAX_GUYS; i++) {
-                    if(guys[i].exists) {
-                        if(length(guys[i].getSpeed()) < speed) {
-                            unit = i;
-                            speed = length(guys[i].getSpeed());
-                        }
-                    }
-                }
-                if(unit != -1) guys[unit].exists = false;
-            }*/
-        } else if(key == GLFW_KEY_R) {
+        if(key == GLFW_KEY_R) {
             cleanup();
             load();
         } else if(key == GLFW_KEY_F8) {

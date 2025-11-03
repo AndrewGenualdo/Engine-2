@@ -66,7 +66,7 @@ namespace cobb {
             glBindVertexArray(0);
         }
 
-        virtual void draw(bool bind = false) {
+        virtual void draw(bool bind = true) {
             //translates from world coordinates to game camera coordinates
             Texture2d::gameCamera.adjustToAspectRatio(Window::GAME_WIDTH / Window::GAME_HEIGHT);
             Texture2d::gameCamera.setMinWidth(100);
