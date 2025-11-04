@@ -45,6 +45,8 @@ void Tiles2d::drawRaw(const float x, const float y, const float width, const flo
     const float h = height * 0.5f;
     loadShader();
     glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if (shouldBind) bind();
     tiles2dShader->use();
     glBindVertexArray(*getVAO());

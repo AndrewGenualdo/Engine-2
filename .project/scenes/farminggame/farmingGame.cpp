@@ -27,8 +27,8 @@ FarmingScene::~FarmingScene() {
 
 constexpr int TILE_OFFSET_X = 100;
 constexpr int TILE_OFFSET_Y = 100;
-constexpr int TILE_WIDTH = 50;
-constexpr int TILE_HEIGHT = 50;
+constexpr int TILE_WIDTH = 75;
+constexpr int TILE_HEIGHT = 75;
 
 constexpr int TEXTURE_TILE_COUNT = 16;
 
@@ -58,7 +58,7 @@ void FarmingScene::draw() {
     float fontScale = 3.0f;
 
     //do background stuff here
-    Texture2d::setColor(vec4(0, 0, 0, 1));
+    Texture2d::setColor(vec4(38, 127, 0, 255) / 255.0f);
     blank.drawRaw(window->gx, window->gy, window->gw, window->gh, true);
 
     Texture2d::gameCamera.reset();
@@ -69,7 +69,7 @@ void FarmingScene::draw() {
     const float my = window->mousePos.y;
 
     if (glfwGetKey(window->window, GLFW_KEY_W)) guyPos.y += deltaTime * 200;
-    if (glfwGetKey(window->window, GLFW_KEY_S)) guyPos.y -= deltaTime * 200;
+    if (glfwGetKey(window->window, GLFW_KEY_S) && !glfwGetKey(window->window, GLFW_KEY_LEFT_CONTROL)) guyPos.y -= deltaTime * 200;
     if (glfwGetKey(window->window, GLFW_KEY_A)) guyPos.x -= deltaTime * 200;
     if (glfwGetKey(window->window, GLFW_KEY_D)) guyPos.x += deltaTime * 200;
 
@@ -109,8 +109,8 @@ void FarmingScene::draw() {
         default: break;
     }
     blank.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, true);
-    //Texture2d::setColor(vec4(1));
-    //guy.draw(guyPos.x, guyPos.y, 75, 150, true);
+    Texture2d::setColor(vec4(1));
+    guy.draw(guyPos.x, guyPos.y, 75, 150, true);
 }
 
 void FarmingScene::cleanup() {
@@ -124,7 +124,7 @@ void FarmingScene::keyPress(int key, int action, int mods) {
             load();
         } else if(key == GLFW_KEY_F8) {
             debugMode = !debugMode;
-        } else if (key == GLFW_KEY_S) {
+        } else if (key == GLFW_KEY_S && mods & GLFW_MOD_CONTROL) {
             world.save();
         }
     }

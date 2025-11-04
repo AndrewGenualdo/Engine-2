@@ -42,4 +42,5 @@ void main()
     FragColor = texture(tex, vec2(finalXPos, finalYPos));
     //FragColor = vec4(finalXPos, finalYPos, 0, 1);
     //FragColor = vec4(x, y, 0, 1);
+    //FragColor = texture(tex, TexCoords);
 }
