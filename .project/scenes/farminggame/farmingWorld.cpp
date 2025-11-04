@@ -27,7 +27,7 @@ FarmingWorld::~FarmingWorld() {
 
 void FarmingWorld::load() {
     for (int i = 0; i < tilesHoriz * tilesVert; i++) {
-        landData[i] = static_cast<unsigned int>(0);
+        landData[i] = static_cast<unsigned int>(3);
         structureData[i] = static_cast<unsigned int>(0);
     }
 

@@ -128,6 +128,7 @@ void cobb::Shader::set8BitUnsignedIntArray(const std::string &name, const unsign
             (static_cast<uint32_t>(value[i + 1]) << 16) |
             (static_cast<uint32_t>(value[i + 2]) << 8)  |
             (static_cast<uint32_t>(value[i + 3]));
+
         j++;
     }
     for (int i = j; i < 512; i++) v[i] = 1;

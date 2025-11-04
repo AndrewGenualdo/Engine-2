@@ -30,7 +30,7 @@ constexpr int TILE_OFFSET_Y = 100;
 constexpr int TILE_WIDTH = 50;
 constexpr int TILE_HEIGHT = 50;
 
-constexpr int TEXTURE_TILE_COUNT = 64;
+constexpr int TEXTURE_TILE_COUNT = 16;
 
 void FarmingScene::load() {
     window->setWindowTitle("Farming Sim Scene");
@@ -53,7 +53,7 @@ vec2 guyPos = vec2(100, 100);
 int layer = 0;
 
 void FarmingScene::draw() {
-    float deltaTime = window->update();
+    const float deltaTime = window->update();
     camera.update(window->window, deltaTime);
     float fontScale = 3.0f;
 
@@ -65,17 +65,17 @@ void FarmingScene::draw() {
     Texture2d::gameCamera.expandToInclude(0, 0);
     Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
 
-    float mx = window->mousePos.x;
-    float my = window->mousePos.y;
+    const float mx = window->mousePos.x;
+    const float my = window->mousePos.y;
 
     if (glfwGetKey(window->window, GLFW_KEY_W)) guyPos.y += deltaTime * 200;
     if (glfwGetKey(window->window, GLFW_KEY_S)) guyPos.y -= deltaTime * 200;
     if (glfwGetKey(window->window, GLFW_KEY_A)) guyPos.x -= deltaTime * 200;
     if (glfwGetKey(window->window, GLFW_KEY_D)) guyPos.x += deltaTime * 200;
 
-    int tileX = (mx - TILE_OFFSET_X) / TILE_WIDTH;
-    int tileY = (my - TILE_OFFSET_Y) / TILE_HEIGHT;
-    int tileIndex = tileY * FarmingWorld::TILES_HORIZ + tileX;
+    const int tileX = (mx - TILE_OFFSET_X) / TILE_WIDTH;
+    const int tileY = (my - TILE_OFFSET_Y) / TILE_HEIGHT;
+    const int tileIndex = tileY * FarmingWorld::TILES_HORIZ + tileX;
     if (tileIndex >= 0 && tileIndex < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT) {
         switch (layer) {
             case 0: {
@@ -87,25 +87,28 @@ void FarmingScene::draw() {
 
                 break;
             }
+            default: break;
         }
 
-        if (world.getLandData(tileIndex) == 255 ) world.setLandData(tileIndex, 0);
-        if (world.getLandData(tileIndex) > TEXTURE_TILE_COUNT) world.setLandData(tileIndex, TEXTURE_TILE_COUNT);
-        if (window->isInputClicked(GLFW_KEY_UP) || window->isInputClicked(GLFW_KEY_DOWN)) {
+        if (world.getLandData(tileIndex) > 100000000 ) world.setLandData(tileIndex, 0);
+        if (world.getLandData(tileIndex) >= TEXTURE_TILE_COUNT * TEXTURE_TILE_COUNT) world.setLandData(tileIndex, TEXTURE_TILE_COUNT * TEXTURE_TILE_COUNT - 1);
+        if (window->isInputClicked(GLFW_KEY_J) || window->isInputClicked(GLFW_KEY_K)) {
             if (layer == 0) layer = 1;
             else layer = 0;
+            std::cout << "layer: " << layer << std::endl;
         }
     }
 
     Texture2d::setColor(vec4(1));
     tiles.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * FarmingWorld::TILES_HORIZ, TILE_HEIGHT * FarmingWorld::TILES_VERT, true);
-    structures.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * FarmingWorld::TILES_HORIZ, TILE_HEIGHT * FarmingWorld::TILES_VERT, true);
+    //structures.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * FarmingWorld::TILES_HORIZ, TILE_HEIGHT * FarmingWorld::TILES_VERT, true);
     Texture2d::setColor(vec4(1, 1, 1, 0.25f));
     switch (layer) {
-        case 0: landTextures.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, world.landData[tileIndex] + 1, true); break;
-        case 1: landTextures.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, world.structureData[tileIndex] + 1, true); break;
+        //case 0: landTextures.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, world.landData[tileIndex] + 1, true); break;
+        //case 1: structureTextures.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, world.structureData[tileIndex] + 1, true); break;
+        default: break;
     }
-    //blank.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, true);
+    blank.draw(TILE_OFFSET_X + tileX * TILE_WIDTH, TILE_OFFSET_Y + tileY * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, true);
     //Texture2d::setColor(vec4(1));
     //guy.draw(guyPos.x, guyPos.y, 75, 150, true);
 }
