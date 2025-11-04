@@ -6,9 +6,12 @@
 #define ENGINE_2_WORLD_H
 #include <string>
 #include <fstream>
-#include <cstdint> // for uint8_t
+#include <cstdint>
 #include <iostream>
-#include <bitset>   // <-- Needed for std::bitset
+#include <bitset>
+#include "glm/vec2.hpp"
+
+using namespace glm;
 
 class FarmingWorld {
 public:
@@ -21,7 +24,12 @@ public:
     constexpr static int STONE_PATH = 5;
     constexpr static int STONE_PATH_2 = 6;
 
+    constexpr static int TILE_OFFSET_X = 100;
+    constexpr static int TILE_OFFSET_Y = 100;
+    constexpr static int TILE_WIDTH = 75;
+    constexpr static int TILE_HEIGHT = 75;
 
+    constexpr static int TEXTURE_TILE_COUNT = 16;
 
     constexpr static int TILES_HORIZ = 25;
     constexpr static int TILES_VERT = 12;
@@ -51,14 +59,19 @@ public:
 
     void load();
     void save() const;
-
     void cleanup();
+
+    void draw();
+
     void updateTileTypes();
     static bool isFarmland(int texIndex);
-    bool isFarmland(int x, int y) const;
+    [[nodiscard]] bool isFarmland(int x, int y) const;
 
 
     [[nodiscard]] Tile getTile(int x, int y) const;
+    [[nodiscard]] static vec2 getTilePos(int x, int y);
+    [[nodiscard]] static ivec2 getTileFromPos(vec2 pos);
+
     [[nodiscard]] unsigned int getLandData(int index) const;
     void setLandData(int index, unsigned int value);
 

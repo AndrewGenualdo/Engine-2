@@ -171,17 +171,17 @@ void FarmingWorld::updateTileTypes() {
             //std::cout << "Bitmask: " << std::bitset<8>(mask) << "\n";
 
             switch (mask) {
-                case 0b11010000: subType = 0; break;
-                case 0b11111000: subType = 1; break;
-                case 0b01101000: subType = 2; break;
-                case 0b01000000: subType = 3; break;
-                case 0b01010000: subType = 4; break;
-                case 0b01111000: subType = 5; break;
-                case 0b11011000: subType = 6; break;
-                case 0b01001000: subType = 7; break;
-                case 0b01011000: subType = 8; break;
-                case 0b01010010: subType = 9; break;
-                case 0b11011011: subType = 10; break;//maybe wrong
+                case 0b11010000: subType =  0; break;
+                case 0b11111000: subType =  1; break;
+                case 0b01101000: subType =  2; break;
+                case 0b01000000: subType =  3; break;
+                case 0b01010000: subType =  4; break;
+                case 0b01111000: subType =  5; break;
+                case 0b11011000: subType =  6; break;
+                case 0b01001000: subType =  7; break;
+                case 0b01011000: subType =  8; break;
+                case 0b01010010: subType =  9; break;
+                case 0b11011011: subType = 10; break;
                 case 0b01011010: subType = 11; break;
                 case 0b11010110: subType = 16; break;
                 case 0b11111111: subType = 17; break;
@@ -254,5 +254,25 @@ void FarmingWorld::setLandData(int index, unsigned int value) {
         std::cout << "SET LAND OUT OF BOUNDS" << std::endl;
     }
 
+}
+
+unsigned int FarmingWorld::getStructureData(int index) const {
+    return 0;
+}
+
+void FarmingWorld::setStructureData(int index, unsigned int value) {
+
+}
+
+vec2 FarmingWorld::getTilePos(int x, int y) {
+    return {TILE_OFFSET_X + x * TILE_WIDTH, TILE_OFFSET_Y + y * TILE_HEIGHT};
+}
+
+void FarmingWorld::draw() {
+
+}
+
+ivec2 FarmingWorld::getTileFromPos(vec2 pos) {
+    return (pos - vec2(TILE_OFFSET_X, TILE_OFFSET_Y)) / vec2(TILE_WIDTH, TILE_HEIGHT);
 }
 

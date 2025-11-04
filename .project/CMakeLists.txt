@@ -18,6 +18,8 @@ install(FILES ${PROJECT_INC} DESTINATION include/project)
 add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/farmingWorld.cpp
         scenes/farminggame/farmingWorld.h
+        scenes/farminggame/littleGuy.cpp
+        scenes/farminggame/littleGuy.h
 )
 
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)
