@@ -111,10 +111,29 @@ void cobb::Shader::setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void cobb::Shader::setIntArray64(const std::string &name, const int *value) const {
-    GLint v[64];
-    for (int i = 0; i < 64; i++) v[i] = value[i];
-    glUniform1iv(glGetUniformLocation(ID, name.c_str()), 64, v);
+/**
+ *
+ * @param name
+ * @param value MAX SIZE 2048
+ * @param size
+ */
+void cobb::Shader::set8BitUnsignedIntArray(const std::string &name, const unsigned int *value, const int size) const {
+    assert(size < 2048);
+    GLuint v[512];
+
+    int j = 0;
+    for (int i = 0; i < size; i+=4) {
+        v[j] =
+            (static_cast<uint32_t>(value[i]) << 24) |
+            (static_cast<uint32_t>(value[i + 1]) << 16) |
+            (static_cast<uint32_t>(value[i + 2]) << 8)  |
+            (static_cast<uint32_t>(value[i + 3]));
+        j++;
+    }
+    for (int i = j; i < 512; i++) v[i] = 1;
+    /*for (int i = 0; i < size; i++) v[i] = value[i];
+    */
+    glUniform1uiv(glGetUniformLocation(ID, name.c_str()), 512, v);
 }
 
 void cobb::Shader::setFloat(const std::string &name, float value) const {

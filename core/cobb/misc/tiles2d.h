@@ -13,12 +13,12 @@ static Shader *tiles2dShader;
 
 class Tiles2d : public Texture2d {
 
-    int m_width, m_height;
-    int *m_data;
+    int m_tilesHoriz, m_tilesVert, m_textureTileCount;
+    unsigned int *m_data;
 
 public:
     Tiles2d();
-    Tiles2d(const std::string &path, int width, int height, int *data);
+    Tiles2d(const std::string &path, int width, int height, int textureTileCount, unsigned int *data);
 
     //[[nodiscard]] float getWidth() const override;
     //[[nodiscard]] float getTotalWidth() const;

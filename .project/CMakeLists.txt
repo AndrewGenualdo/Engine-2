@@ -16,7 +16,9 @@ add_custom_target(copyAssetsProject ALL COMMAND ${CMAKE_COMMAND} -E copy_directo
 
 install(FILES ${PROJECT_INC} DESTINATION include/project)
 add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
-        )
+        scenes/farminggame/farmingWorld.cpp
+        scenes/farminggame/farmingWorld.h
+)
 
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)
 target_include_directories(project PUBLIC ${CORE_INC_DIR} ${CMAKE_SOURCE_DIR}/core ${stb_INCLUDE_DIR})

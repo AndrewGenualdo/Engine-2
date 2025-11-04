@@ -14,7 +14,7 @@
 
 #include "cobb/shapes/circle2d.h"
 #include "cobb/shapes/line2d.h"
-#include "scenes/farminggame/farminggame.h"
+#include "scenes/farminggame/farmingGame.h"
 
 using namespace cobb;
 
