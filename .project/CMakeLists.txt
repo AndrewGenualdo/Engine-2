@@ -24,6 +24,16 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/tasks/Task.h
         scenes/farminggame/tasks/TaskTravel.cpp
         scenes/farminggame/tasks/TaskTravel.h
+        scenes/farminggame/tasks/TaskRetrieveItem.cpp
+        scenes/farminggame/tasks/TaskRetrieveItem.h
+        scenes/farminggame/items/Item.cpp
+        scenes/farminggame/items/Item.h
+        scenes/farminggame/tiles/Tile.cpp
+        scenes/farminggame/tiles/Tile.h
+        scenes/farminggame/items/ItemTomatoSeed.cpp
+        scenes/farminggame/items/ItemTomatoSeed.h
+        scenes/farminggame/items/ItemTomato.cpp
+        scenes/farminggame/items/ItemTomato.h
 )
 
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)

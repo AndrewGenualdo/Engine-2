@@ -4,6 +4,7 @@
 
 #include "farmingGame.h"
 #include "littleGuy.h"
+#include "items/Item.h"
 #include "tasks/TaskTravel.h"
 
 Camera FarmingScene::camera = Camera();
@@ -37,6 +38,7 @@ void FarmingScene::load() {
 
     LittleGuy::setWorld(&world);
     LittleGuy::setTexture("assets/farminggame/guy.png", 50, 100);
+    Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH * 0.25f, FarmingWorld::TILE_HEIGHT * 0.25f, 64);
     Window::setVsync(true);
 }
 
