@@ -60,7 +60,7 @@ bool TaskTravel::generatePath() {
 
             float currentCost = costSoFar[key(current)];
 
-            // Example condition: if both are path tiles, cost = 0.5, else 1
+
             //bool currIsPath = world->getTile(current.x, current.y).landType == FarmingWorld::FARMLAND;
             //bool nextIsPath = world->getTile(next.x, next.y).landType == FarmingWorld::FARMLAND;
             //float moveCost = (currIsPath && nextIsPath) ? 0.5f : 1.0f;
@@ -77,9 +77,9 @@ bool TaskTravel::generatePath() {
         }
     }
 
-    // reconstruct path
+
     if (cameFrom.find(key(goal)) == cameFrom.end())
-        return false; // no path found
+        return false; //no path found
 
     ivec2 current = goal;
     while (current.x != -9999) {
@@ -89,13 +89,6 @@ bool TaskTravel::generatePath() {
     std::reverse(path.begin(), path.end());
 
     if (path.size() > 1) pathIndex = 1; //skip first tile
-
-    /*std::cout << "| ";
-    for (auto & i : path) {
-        std::cout << i.x << ", " << i.y << " | ";
-    }
-    std::cout << std::endl;*/
-
     return true;
 }
 

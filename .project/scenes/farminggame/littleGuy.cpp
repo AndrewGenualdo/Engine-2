@@ -50,6 +50,16 @@ void LittleGuy::update(float dt) {
         delete task;
         task = nullptr;
     }
+    for (int i = 0; i < world->objects.size(); i++) {
+        if (world->objects[i] != nullptr) {
+            Item *item = dynamic_cast<Item *>(world->objects[i]);
+            if (item && length(item->pos - pos) < FarmingWorld::TILE_WIDTH) {
+                giveItem(item);
+                world->objects.erase(world->objects.begin() + i);
+                break;
+            }
+        }
+    }
 }
 
 void LittleGuy::tick() {
