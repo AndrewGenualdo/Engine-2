@@ -3,3 +3,7 @@
 //
 
 #include "Tile.h"
+
+Tile::Tile(const ivec2 tile) {
+    this->tile = tile;
+}
