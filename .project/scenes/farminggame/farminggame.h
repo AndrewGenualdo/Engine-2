@@ -30,11 +30,10 @@ public:
 
     static FontRenderer fontRenderer;
     static Texture2d blank;
-    static MultiTexture2d landTextures;
-    static MultiTexture2d structureTextures;
-    static Tiles2d tiles;
-    static Tiles2d structures;
-    static Texture2d guy;
+    //static MultiTexture2d landTextures;
+    //static MultiTexture2d structureTextures;
+
+    //static Texture2d guy;
     static FarmingWorld world;
 
     static bool debugMode;

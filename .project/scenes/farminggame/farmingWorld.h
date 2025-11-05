@@ -9,9 +9,15 @@
 #include <cstdint>
 #include <iostream>
 #include <bitset>
+#include <vector>
 #include "glm/vec2.hpp"
+#include "cobb/misc/texture2d.h"
+#include "cobb/misc/tiles2d.h"
 
+using namespace cobb;
 using namespace glm;
+
+class LittleGuy;
 
 class FarmingWorld {
 public:
@@ -33,40 +39,44 @@ public:
 
     constexpr static int TILES_HORIZ = 25;
     constexpr static int TILES_VERT = 12;
-    unsigned int landData[TILES_HORIZ * TILES_VERT]{};
-    unsigned int structureData[TILES_HORIZ * TILES_VERT]{};
+
+    unsigned int landData[TILES_HORIZ * TILES_VERT];
+    unsigned int plantData[TILES_HORIZ * TILES_VERT];
+
+    static Tiles2d landTilemap;
+    static Tiles2d plantTilemap;
 
     struct Tile {
         int landType = 0;
-        int structureType = 0;
+        int plantType = 0;
 
         Tile() = default;
         Tile(int landType, int structureType) {
             this->landType = landType;
-            this->structureType = structureType;
+            this->plantType = structureType;
         }
     };
 
     Tile tiles[TILES_HORIZ * TILES_VERT]{};
 
-    int tilesHoriz;
-    int tilesVert;
     std::string savePath;
 
+    std::vector<LittleGuy> guys;
+
     FarmingWorld();
-    FarmingWorld(int tilesHoriz, int tilesVert, const std::string &savePath);
+    explicit FarmingWorld(const std::string &savePath);
     ~FarmingWorld();
 
     void load();
     void save() const;
     void cleanup();
 
-    void draw();
+    void update(float dt);
+    void draw() const;
 
     void updateTileTypes();
     static bool isFarmland(int texIndex);
     [[nodiscard]] bool isFarmland(int x, int y) const;
-
 
     [[nodiscard]] Tile getTile(int x, int y) const;
     [[nodiscard]] static vec2 getTilePos(int x, int y);

@@ -8,7 +8,7 @@ Tiles2d::Tiles2d() {
     m_path = "";
 }
 
-Tiles2d::Tiles2d(const std::string &path, int tilesHoriz, int tilesVert, int textureTileCount, unsigned int *data) {
+Tiles2d::Tiles2d(const std::string &path, const int tilesHoriz, const int tilesVert, int textureTileCount, unsigned int *data) {
     this->m_tilesHoriz = tilesHoriz;
     this->m_tilesVert = tilesVert;
     this->m_textureTileCount = textureTileCount;

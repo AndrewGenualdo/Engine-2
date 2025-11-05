@@ -132,8 +132,6 @@ void cobb::Shader::set8BitUnsignedIntArray(const std::string &name, const unsign
         j++;
     }
     for (int i = j; i < 512; i++) v[i] = 1;
-    /*for (int i = 0; i < size; i++) v[i] = value[i];
-    */
     glUniform1uiv(glGetUniformLocation(ID, name.c_str()), 512, v);
 }
 

@@ -6,19 +6,19 @@
 
 #include <filesystem>
 #include <iostream>
+#include "littleGuy.h"
 
+Tiles2d FarmingWorld::landTilemap = Tiles2d();
+Tiles2d FarmingWorld::plantTilemap = Tiles2d();
 
 FarmingWorld::FarmingWorld() {
-    this->tilesHoriz = 1;
-    this->tilesVert = 1;
     this->savePath = "";
 }
 
-FarmingWorld::FarmingWorld(int tilesHoriz, int tilesVert, const std::string &savePath) {
-    this->tilesHoriz = tilesHoriz;
-    this->tilesVert = tilesVert;
+FarmingWorld::FarmingWorld(const std::string &savePath) {
     this->savePath = savePath;
     load();
+
 }
 
 FarmingWorld::~FarmingWorld() {
@@ -26,14 +26,15 @@ FarmingWorld::~FarmingWorld() {
 }
 
 void FarmingWorld::load() {
-    for (int i = 0; i < tilesHoriz * tilesVert; i++) {
+    for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
         landData[i] = EMPTY;
-        structureData[i] = EMPTY;
+        plantData[i] = EMPTY;
     }
 
     enum LoadState {
         LAND,
-        STRUCTURE
+        PLANT,
+        PLANT_DURATION
     };
     LoadState state = LAND;
     if (!savePath.empty()) {
@@ -41,10 +42,12 @@ void FarmingWorld::load() {
         if (saveFileData.is_open()) {
             std::string line;
             int i = 0;
-            while (std::getline(saveFileData, line) && i < tilesHoriz * tilesVert) {
+            while (std::getline(saveFileData, line)) {
                 LoadState prevState = state;
+                //std::cout << "'" << line << "'" << std::endl;
                 if (line == "LAND") state = LAND;
-                else if (line == "STRUCTURE") state = STRUCTURE;
+                else if (line == "PLANT") state = PLANT;
+                else if (line == "PLANT_DURATION") state = PLANT_DURATION;
 
                 if (prevState != state) {
                     i = 0;
@@ -53,21 +56,27 @@ void FarmingWorld::load() {
 
                 switch (state) {
                     case LAND: {
+                        if (i > TILES_VERT * TILES_HORIZ) continue;
                         std::istringstream iss(line);
                         int number;
-                        while (iss >> number && i < tilesHoriz * tilesVert) {
+                        while (iss >> number && i < TILES_HORIZ * TILES_VERT) {
                             landData[i] = number;
                             i++;
                         }
                         break;
                     }
-                    case STRUCTURE: {
+                    case PLANT: {
+                        if (i > TILES_VERT * TILES_HORIZ) continue;
                         std::istringstream iss(line);
                         int number;
-                        while (iss >> number && i < tilesHoriz * tilesVert) {
-                            structureData[i] = number;
+                        while (iss >> number && i < TILES_HORIZ * TILES_VERT) {
+                            plantData[i] = number;
                             i++;
                         }
+                        break;
+                    }
+                    case PLANT_DURATION: {
+
                         break;
                     }
                 }
@@ -77,15 +86,14 @@ void FarmingWorld::load() {
         } else {
             std::cout << "Failed to open save file at: " << savePath << std::endl;
         }
-        for (int i = 0; i < tilesHoriz * tilesVert; i++) {
+        for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
             tiles[i].landType = landData[i];
-            tiles[i].structureType = structureData[i];
+            tiles[i].plantType = plantData[i];
 
             int landX = landData[i] % 16;
             int landY = landData[i] / 16;
             if (landY >= 1 && landY <= 4 && landX >= 0 && landX <= 11) {
                 tiles[i].landType = FARMLAND;
-
             }
 
         }
@@ -93,6 +101,10 @@ void FarmingWorld::load() {
         updateTileTypes();
     }
     std::cout << "Loaded world from file!" << std::endl;
+
+    guys.emplace_back();
+
+
 }
 
 void FarmingWorld::save() const {
@@ -101,18 +113,18 @@ void FarmingWorld::save() const {
         std::ofstream saveFileData(savePath);
         if (saveFileData.is_open()) {
             std::string output = "LAND\n";
-            for (int y = 0; y < tilesVert; y++) {
-                for (int x = 0; x < tilesHoriz; x++) {
-                    output += std::to_string(landData[y * tilesHoriz + x]);
-                    if (x != tilesHoriz - 1) output += " ";
+            for (int y = 0; y < TILES_VERT; y++) {
+                for (int x = 0; x < TILES_HORIZ; x++) {
+                    output += std::to_string(landData[y * TILES_HORIZ + x]);
+                    if (x != TILES_HORIZ - 1) output += " ";
                 }
                 output += "\n";
             }
-            output += "STRUCTURE\n";
-            for (int y = 0; y < tilesVert; y++) {
-                for (int x = 0; x < tilesHoriz; x++) {
-                    output += std::to_string(structureData[y * tilesHoriz + x]);
-                    if (x != tilesHoriz - 1) output += " ";
+            output += "PLANT\n";
+            for (int y = 0; y < TILES_VERT; y++) {
+                for (int x = 0; x < TILES_HORIZ; x++) {
+                    output += std::to_string(plantData[y * TILES_HORIZ + x]);
+                    if (x != TILES_HORIZ - 1) output += " ";
                 }
                 output += "\n";
             }
@@ -132,18 +144,24 @@ void FarmingWorld::cleanup() {
 
 }
 
+void FarmingWorld::update(float dt) {
+    for (int i = 0; i < guys.size(); i++) {
+        guys[i].update(dt);
+    }
+}
+
 bool FarmingWorld::isFarmland(int texIndex) {
     return texIndex == FARMLAND || (texIndex % 16 <= 11 && texIndex >= 16 && texIndex <= 79);
 }
 
 bool FarmingWorld::isFarmland(int x, int y) const {
-    return x < 0 || y < 0 || x >= tilesHoriz || y >= tilesVert ? false : isFarmland(landData[y * tilesHoriz + x]);
+    return x < 0 || y < 0 || x >= TILES_HORIZ || y >= TILES_VERT ? false : isFarmland(landData[y * TILES_HORIZ + x]);
 }
 
 void FarmingWorld::updateTileTypes() {
-    for (int i = 0; i < tilesHoriz * tilesVert; i++) {
-        int x = i % tilesHoriz;
-        int y = i / tilesHoriz;
+    for (int i = 0; i < TILES_VERT * TILES_HORIZ; i++) {
+        int x = i % TILES_HORIZ;
+        int y = i / TILES_HORIZ;
         if (isFarmland(landData[i])) {
             int subType;
 
@@ -227,8 +245,8 @@ void FarmingWorld::updateTileTypes() {
 }
 
 FarmingWorld::Tile FarmingWorld::getTile(int x, int y) const {
-    int index = y * tilesHoriz + x;
-    if (index >= 0 && index < tilesHoriz * tilesVert) {
+    int index = y * TILES_HORIZ + x;
+    if (index >= 0 && index < TILES_VERT * TILES_HORIZ) {
         return tiles[index];
     }
     return {};
@@ -236,7 +254,7 @@ FarmingWorld::Tile FarmingWorld::getTile(int x, int y) const {
 
 
 unsigned int FarmingWorld::getLandData(int index) const {
-    if (index >= 0 && index < tilesHoriz * tilesVert) {
+    if (index >= 0 && index < TILES_VERT * TILES_HORIZ) {
         unsigned int data = landData[index];
         if (isFarmland(data)) return FARMLAND;
         return landData[index];
@@ -246,7 +264,7 @@ unsigned int FarmingWorld::getLandData(int index) const {
 }
 
 void FarmingWorld::setLandData(int index, unsigned int value) {
-    if (index >= 0 && index < tilesHoriz * tilesVert) {
+    if (index >= 0 && index < TILES_VERT * TILES_HORIZ) {
         tiles[index].landType = index;
         landData[index] = value;
         updateTileTypes();
@@ -268,8 +286,15 @@ vec2 FarmingWorld::getTilePos(int x, int y) {
     return {TILE_OFFSET_X + x * TILE_WIDTH, TILE_OFFSET_Y + y * TILE_HEIGHT};
 }
 
-void FarmingWorld::draw() {
+void FarmingWorld::draw() const {
+    Texture2d::setColor(vec4(1));
+    landTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
+    plantTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
 
+    Texture2d::setColor(vec4(1));
+    for (int i = 0; i < guys.size(); i++) {
+        guys[i].draw(i == 0);
+    }
 }
 
 ivec2 FarmingWorld::getTileFromPos(vec2 pos) {
