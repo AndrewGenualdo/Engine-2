@@ -5,13 +5,12 @@
 #ifndef ENGINE_2_ITEM_H
 #define ENGINE_2_ITEM_H
 
-#include <glm/vec2.hpp>
-#include <cobb/misc/multiTexture2d.h>
+#include "../FarmingObject.h"
 
 using namespace glm;
 using namespace cobb;
 
-class Item {
+class Item : public FarmingObject {
 
     static MultiTexture2d itemsTexture;
     static int width, height;
@@ -27,15 +26,21 @@ public:
     };
 
     ItemType type;
-    ivec2 tile;
     vec2 pos;
 
+    Item() = default;
     Item(ItemType type, ivec2 tile);
     Item(ItemType type, vec2 pos);
-    virtual ~Item() = default;
+    ~Item() override = default;
 
-    virtual void update(float dt);
-    virtual void draw(bool bind);
+    void update(float dt) override;
+    void tick() override;
+    void draw(bool bind) override;
+    void draw(float offsetX, float offsetY, bool bind) override;
+
+    std::string getConfigKey() override;
+    std::string getConfig() override;
+    void loadConfig(const std::string &line, int i) override;
 
 };
 

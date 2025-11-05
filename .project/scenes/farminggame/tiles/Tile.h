@@ -5,19 +5,24 @@
 #ifndef ENGINE_2_TILE_H
 #define ENGINE_2_TILE_H
 
-#include <cobb/misc/texture2d.h>
-#include <glm/vec2.hpp>
+#include "../FarmingObject.h"
 
 using namespace glm;
 using namespace cobb;
 
-class Tile {
-
-    ivec2 tile;
+class Tile : public FarmingObject {
 
 public:
     Tile() = default;
-    Tile(ivec2 tile);
+    explicit Tile(ivec2 tile);
+
+    void update(float dt) override;
+    void tick() override;
+    void draw(bool bind) override;
+
+    std::string getConfigKey() override;
+    std::string getConfig() override;
+    void loadConfig(const std::string &line, int i) override;
 
 };
 

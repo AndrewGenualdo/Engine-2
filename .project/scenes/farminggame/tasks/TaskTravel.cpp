@@ -61,9 +61,10 @@ bool TaskTravel::generatePath() {
             float currentCost = costSoFar[key(current)];
 
             // Example condition: if both are path tiles, cost = 0.5, else 1
-            bool currIsPath = world->getTile(current.x, current.y).landType == FarmingWorld::FARMLAND;
-            bool nextIsPath = world->getTile(next.x, next.y).landType == FarmingWorld::FARMLAND;
-            float moveCost = (currIsPath && nextIsPath) ? 0.5f : 1.0f;
+            //bool currIsPath = world->getTile(current.x, current.y).landType == FarmingWorld::FARMLAND;
+            //bool nextIsPath = world->getTile(next.x, next.y).landType == FarmingWorld::FARMLAND;
+            //float moveCost = (currIsPath && nextIsPath) ? 0.5f : 1.0f;
+            float moveCost = 1.0f;
 
             float newCost = currentCost + moveCost;
 
@@ -115,7 +116,7 @@ bool TaskTravel::update(float dt) {
     }
 
     float travelDist = guy->getSpeed() * dt;
-    if (world->getTile(path[pathIndex].x, path[pathIndex].y).landType == FarmingWorld::FARMLAND) travelDist *= 2;
+    //if (world->getTile(path[pathIndex].x, path[pathIndex].y).landType == FarmingWorld::FARMLAND) travelDist *= 2;
 
     while (travelDist > 0) {
         if (pathIndex >= path.size()) return true; //done pathfinding :D

@@ -18,6 +18,25 @@ void ItemTomato::draw(bool bind) {
     Item::draw(bind);
 }
 
+void ItemTomato::tick() {
+    Item::tick();
+}
+
 void ItemTomato::update(float dt) {
+
+}
+
+std::string ItemTomato::getConfigKey() {
+    return Item::getConfigKey() + "_TOMATO";
+}
+
+std::string ItemTomato::getConfig() {
+    return Item::getConfig() + "-\n";
+}
+
+void ItemTomato::loadConfig(const std::string &line, int i) {
+    if (i == 2) {
+
+    } else Item::loadConfig(line, i);
 
 }

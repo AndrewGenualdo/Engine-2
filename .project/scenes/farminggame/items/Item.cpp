@@ -3,6 +3,9 @@
 //
 
 #include "Item.h"
+
+
+
 #include "../farmingWorld.h"
 
 MultiTexture2d Item::itemsTexture = MultiTexture2d();
@@ -15,15 +18,13 @@ void Item::setTexture(const std::string &path, int width, int height, int items)
     Item::height = height;
 }
 
-Item::Item(ItemType type, ivec2 tile) {
+Item::Item(ItemType type, ivec2 tile) : FarmingObject(tile) {
     this->type = type;
     this->pos = FarmingWorld::getTilePos(tile.x, tile.y);
-    this->tile = tile;
 }
 
-Item::Item(ItemType type, vec2 pos) {
+Item::Item(ItemType type, vec2 pos) : FarmingObject(FarmingWorld::getTileFromPos(pos)) {
     this->type = type;
-    this->tile = FarmingWorld::getTileFromPos(pos);
     this->pos = pos;
 }
 
@@ -31,6 +32,33 @@ void Item::update(float dt) {
 
 }
 
+void Item::tick() {
+    FarmingObject::tick();
+}
+
 void Item::draw(bool bind) {
     itemsTexture.draw(pos.x, pos.y, width, height, type, bind);
+}
+
+void Item::draw(float offsetX, float offsetY, bool bind) {
+    itemsTexture.draw(pos.x + offsetX, pos.y + offsetY, width, height, type, bind);
+}
+
+std::string Item::getConfigKey() {
+    return FarmingObject::getConfigKey() + "ITEM";
+}
+
+std::string Item::getConfig() {
+    return FarmingObject::getConfig() + std::to_string(type) + " " + std::to_string(pos.x) + " " + std::to_string(pos.y) + "\n";
+}
+
+void Item::loadConfig(const std::string &line, int i) {
+    if (i == 1) {
+        std::istringstream iss(line);
+        int value;
+        iss >> value >> pos.x >> pos.y;
+        type = static_cast<ItemType>(value);
+    } else {
+        FarmingObject::loadConfig(line, i);
+    }
 }

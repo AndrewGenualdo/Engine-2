@@ -8,6 +8,7 @@
 
 #include "glm/vec2.hpp"
 #include "farmingWorld.h"
+#include "items/Item.h"
 #include "tasks/Task.h"
 
 using namespace glm;
@@ -15,10 +16,11 @@ using namespace glm;
 class LittleGuy {
 
     static FarmingWorld *world;
-    static Texture2d texture;
+    static MultiTexture2d texture;
     static int width, height;
 
     Task *task = nullptr;
+    std::vector<Item*> items;
 
     vec2 pos;
     ivec2 tile;
@@ -26,7 +28,7 @@ class LittleGuy {
 
 public:
     static void setWorld(FarmingWorld *w);
-    static void setTexture(const std::string &path, int width, int height);
+    static void setTexture(const std::string &path, int width, int height, int frames);
 
     LittleGuy();
     explicit LittleGuy(ivec2 tile);
@@ -34,7 +36,10 @@ public:
     ~LittleGuy();
 
     void update(float dt);
+    void tick();
     void draw(bool bind = true) const;
+
+    void clearObjects();
 
     [[nodiscard]] vec2 getPos() const;
     void move(vec2 diff);
@@ -45,6 +50,8 @@ public:
 
     [[nodiscard]] float getSpeed() const;
     void setSpeed(float speed);
+
+    void giveItem(Item *item);
 
     void setTask(Task *task);
 };

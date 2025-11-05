@@ -7,7 +7,7 @@
 #include "tasks/Task.h"
 
 FarmingWorld *LittleGuy::world = nullptr;
-Texture2d LittleGuy::texture = Texture2d();
+MultiTexture2d LittleGuy::texture = MultiTexture2d();
 int LittleGuy::width = 1;
 int LittleGuy::height = 1;
 
@@ -38,10 +38,10 @@ void LittleGuy::setWorld(FarmingWorld *w) {
     world = w;
 }
 
-void LittleGuy::setTexture(const std::string &path, int width, int height) {
+void LittleGuy::setTexture(const std::string &path, int width, int height, int frames) {
     LittleGuy::width = width;
     LittleGuy::height = height;
-    texture = Texture2d(path, GL_NEAREST, GL_TEXTURE_WRAP_S);;
+    texture = MultiTexture2d(path, frames);
 }
 
 void LittleGuy::update(float dt) {
@@ -52,8 +52,27 @@ void LittleGuy::update(float dt) {
     }
 }
 
+void LittleGuy::tick() {
+    if (task != nullptr) {
+        task->tick();
+    }
+}
+
 void LittleGuy::draw(bool bind) const {
-    texture.draw(pos.x, pos.y, width, height, bind);
+    texture.draw(pos.x, pos.y, width, height, items.empty() ? 0 : 1, bind);
+    for (int i = 0; i < items.size();i++) {
+        items[i]->draw(-items[i]->pos.x + pos.x, -items[i]->pos.y + pos.y + (items.size() - i) * FarmingWorld::TILE_HEIGHT, i == 0);
+    }
+}
+
+void LittleGuy::clearObjects() {
+    for (int i = 0; i < items.size(); i++) {
+        if (items[i] != nullptr) {
+            delete items[i];
+            items[i] = nullptr;
+        }
+    }
+    items.clear();
 }
 
 vec2 LittleGuy::getPos() const {
@@ -82,6 +101,10 @@ float LittleGuy::getSpeed() const {
 
 void LittleGuy::setSpeed(float speed) {
     this->speed = speed;
+}
+
+void LittleGuy::giveItem(Item *item) {
+    items.push_back(item);
 }
 
 void LittleGuy::setTask(Task *task) {

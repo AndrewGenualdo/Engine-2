@@ -24,6 +24,7 @@ public:
     static void setWorld(FarmingWorld *w);
 
     virtual bool update(float dt);
+    virtual void tick();
 
     virtual bool isActive();
 

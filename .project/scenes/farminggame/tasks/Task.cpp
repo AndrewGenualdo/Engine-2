@@ -18,6 +18,10 @@ bool Task::update(float dt) {
     return true;
 }
 
+void Task::tick() {
+
+}
+
 bool Task::isActive() {
     //???
     return false;

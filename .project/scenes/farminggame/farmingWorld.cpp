@@ -6,7 +6,15 @@
 
 #include <filesystem>
 #include <iostream>
+
+#include "FarmingObject.h"
 #include "littleGuy.h"
+#include "items/Item.h"
+#include "items/ItemTomato.h"
+#include "items/ItemTomatoSeed.h"
+#include "tiles/Tile.h"
+#include "tiles/TilePlant.h"
+#include "tiles/TilePlantTomato.h"
 
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
 Tiles2d FarmingWorld::plantTilemap = Tiles2d();
@@ -17,8 +25,9 @@ FarmingWorld::FarmingWorld() {
 
 FarmingWorld::FarmingWorld(const std::string &savePath) {
     this->savePath = savePath;
+    TilePlant::setWorld(this);
+    LittleGuy::setWorld(this);
     load();
-
 }
 
 FarmingWorld::~FarmingWorld() {
@@ -31,28 +40,51 @@ void FarmingWorld::load() {
         plantData[i] = EMPTY;
     }
 
+    std::vector<std::string> types;
+    types.push_back(FarmingObject().getConfigKey()); //0
+    types.push_back(Tile().getConfigKey()); //1
+    types.push_back(TilePlant().getConfigKey()); //2
+    types.push_back(Item().getConfigKey()); //3
+    types.push_back(ItemTomato().getConfigKey()); //4
+    types.push_back(ItemTomatoSeed().getConfigKey()); //5
+    types.push_back(TilePlantTomato().getConfigKey()); //6
+
+
     enum LoadState {
         LAND,
-        PLANT,
-        PLANT_DURATION
+        OBJECTS
     };
+
     LoadState state = LAND;
+    int object = -1;
+
     if (!savePath.empty()) {
         std::ifstream saveFileData(savePath);
         if (saveFileData.is_open()) {
             std::string line;
             int i = 0;
             while (std::getline(saveFileData, line)) {
+                if (line.empty()) continue;
                 LoadState prevState = state;
                 //std::cout << "'" << line << "'" << std::endl;
                 if (line == "LAND") state = LAND;
-                else if (line == "PLANT") state = PLANT;
-                else if (line == "PLANT_DURATION") state = PLANT_DURATION;
-
+                else if (line == "OBJECTS") state = OBJECTS;
                 if (prevState != state) {
                     i = 0;
                     continue;
                 }
+                bool skipLine = false;
+                if (state == OBJECTS) {
+                    for (int j = 0; j < types.size(); j++) {
+                        if (line == "=" + types[j]) {
+                            object = j;
+                            i = 0;
+                            skipLine = true;
+                            break;
+                        }
+                    }
+                }
+                if (skipLine) continue;
 
                 switch (state) {
                     case LAND: {
@@ -65,46 +97,40 @@ void FarmingWorld::load() {
                         }
                         break;
                     }
-                    case PLANT: {
-                        if (i > TILES_VERT * TILES_HORIZ) continue;
-                        std::istringstream iss(line);
-                        int number;
-                        while (iss >> number && i < TILES_HORIZ * TILES_VERT) {
-                            plantData[i] = number;
-                            i++;
+                    case OBJECTS: {
+                        if (i == 0) {
+                            switch (object) {
+                                case 0: objects.push_back(new FarmingObject()); break;
+                                case 1: objects.push_back(new Tile()); break;
+                                case 2: objects.push_back(new TilePlant()); break;
+                                case 3: objects.push_back(new Item()); break;
+                                case 4: objects.push_back(new ItemTomato()); break;
+                                case 5: objects.push_back(new ItemTomatoSeed()); break;
+                                case 6: objects.push_back(new TilePlantTomato()); break;
+                                default: {
+                                    std::cout << "UNKNOWN OBJECT IS BEING LOADED!!" << std::endl << "Object: '" << line << "'" << std::endl;
+                                    break;
+                                }
+                            }
                         }
-                        break;
-                    }
-                    case PLANT_DURATION: {
 
+                        objects[objects.size() - 1]->loadConfig(line, i);
+
+                        i++;
                         break;
                     }
                 }
-
             }
             saveFileData.close();
         } else {
             std::cout << "Failed to open save file at: " << savePath << std::endl;
         }
-        for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
-            tiles[i].landType = landData[i];
-            tiles[i].plantType = plantData[i];
-
-            int landX = landData[i] % 16;
-            int landY = landData[i] / 16;
-            if (landY >= 1 && landY <= 4 && landX >= 0 && landX <= 11) {
-                tiles[i].landType = FARMLAND;
-            }
-
-        }
 
         updateTileTypes();
     }
-    std::cout << "Loaded world from file!" << std::endl;
+    std::cout << "Loaded world from file! (" + std::to_string(objects.size()) + " objects)" << std::endl;
 
     guys.emplace_back();
-
-
 }
 
 void FarmingWorld::save() const {
@@ -120,13 +146,10 @@ void FarmingWorld::save() const {
                 }
                 output += "\n";
             }
-            output += "PLANT\n";
-            for (int y = 0; y < TILES_VERT; y++) {
-                for (int x = 0; x < TILES_HORIZ; x++) {
-                    output += std::to_string(plantData[y * TILES_HORIZ + x]);
-                    if (x != TILES_HORIZ - 1) output += " ";
-                }
-                output += "\n";
+            output += "OBJECTS\n";
+            for (auto object : objects) {
+                output += "="+object->getConfigKey() + "\n";
+                output += object->getConfig();
             }
 
             saveFileData << output;
@@ -141,12 +164,29 @@ void FarmingWorld::save() const {
 }
 
 void FarmingWorld::cleanup() {
-
+    for (auto & object : objects) {
+        if (object != nullptr) {
+            delete object;
+            object = nullptr;
+        }
+    }
+    objects.clear();
 }
 
 void FarmingWorld::update(float dt) {
-    for (int i = 0; i < guys.size(); i++) {
-        guys[i].update(dt);
+    for (auto & guy : guys) {
+        guy.update(dt);
+    }
+}
+
+void FarmingWorld::tick() {
+    for (auto & guy : guys) {
+        guy.tick();
+    }
+    for (auto & object : objects) {
+        if (object != nullptr) {
+            object->tick();
+        }
     }
 }
 
@@ -244,43 +284,17 @@ void FarmingWorld::updateTileTypes() {
     }
 }
 
-FarmingWorld::Tile FarmingWorld::getTile(int x, int y) const {
-    int index = y * TILES_HORIZ + x;
-    if (index >= 0 && index < TILES_VERT * TILES_HORIZ) {
-        return tiles[index];
+void FarmingWorld::clearObjects() {
+    for (int i = 0; i < objects.size(); i++) {
+        if (dynamic_cast<TilePlant*>(objects[i])) {
+            plantData[objects[i]->tile.y * TILES_HORIZ + objects[i]->tile.x] = 0;
+            delete objects[i];
+            objects[i] = nullptr;
+        }
     }
-    return {};
+    objects.clear();
 }
 
-
-unsigned int FarmingWorld::getLandData(int index) const {
-    if (index >= 0 && index < TILES_VERT * TILES_HORIZ) {
-        unsigned int data = landData[index];
-        if (isFarmland(data)) return FARMLAND;
-        return landData[index];
-    }
-    std::cout << "GET LAND OUT OF BOUNDS" << std::endl;
-    return EMPTY;
-}
-
-void FarmingWorld::setLandData(int index, unsigned int value) {
-    if (index >= 0 && index < TILES_VERT * TILES_HORIZ) {
-        tiles[index].landType = index;
-        landData[index] = value;
-        updateTileTypes();
-    } else {
-        std::cout << "SET LAND OUT OF BOUNDS" << std::endl;
-    }
-
-}
-
-unsigned int FarmingWorld::getStructureData(int index) const {
-    return 0;
-}
-
-void FarmingWorld::setStructureData(int index, unsigned int value) {
-
-}
 
 vec2 FarmingWorld::getTilePos(int x, int y) {
     return {TILE_OFFSET_X + x * TILE_WIDTH, TILE_OFFSET_Y + y * TILE_HEIGHT};
@@ -294,6 +308,11 @@ void FarmingWorld::draw() const {
     Texture2d::setColor(vec4(1));
     for (int i = 0; i < guys.size(); i++) {
         guys[i].draw(i == 0);
+    }
+    for (int i = 0; i < objects.size(); i++) {
+        if (dynamic_cast<Item*>(objects[i])) {
+            objects[i]->draw(i == 0);
+        }
     }
 }
 

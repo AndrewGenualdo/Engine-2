@@ -11,12 +11,18 @@
 
 class ItemTomato : public Item {
 
-
+public:
+    ItemTomato() = default;
     explicit ItemTomato(ivec2 tile);
     explicit ItemTomato(vec2 pos);
 
     void draw(bool bind) override;
+    void tick() override;
     void update(float dt) override;
+
+    std::string getConfigKey() override;
+    std::string getConfig() override;
+    void loadConfig(const std::string &line, int i) override;
 
 };
 
