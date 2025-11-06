@@ -15,10 +15,14 @@ class TaskTravel : public Task {
 public:
     ivec2 goal;
     std::vector<ivec2> path;
+    float cost = 0;
     int pathIndex = 0;
 
+    TaskTravel() = default;
     TaskTravel(LittleGuy *guy, ivec2 goal);
     bool update(float dt) override;
+    float getCost() override;
+
     std::string getName() override;
 };
 

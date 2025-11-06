@@ -22,6 +22,10 @@ void Task::tick() {
 
 }
 
+float Task::getCost() {
+    return 0.0f;
+}
+
 bool Task::isActive() {
     //???
     return false;

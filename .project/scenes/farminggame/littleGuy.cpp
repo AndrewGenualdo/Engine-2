@@ -54,8 +54,8 @@ void LittleGuy::update(float dt) {
         if (world->objects[i] != nullptr) {
             Item *item = dynamic_cast<Item *>(world->objects[i]);
             if (item && length(item->pos - pos) < FarmingWorld::TILE_WIDTH) {
-                giveItem(item);
-                world->objects.erase(world->objects.begin() + i);
+
+
                 break;
             }
         }

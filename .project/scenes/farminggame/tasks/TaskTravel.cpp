@@ -30,7 +30,7 @@ bool TaskTravel::generatePath() {
         return (static_cast<long long>(v.x) << 32) | (v.y & 0xffffffff);
     };
 
-    // priority queue for Dijkstra: lowest cost first
+    //priority queue for dijkstra (lowest cost is first in the queue)
     struct Node {
         ivec2 pos;
         float priority;
@@ -89,10 +89,11 @@ bool TaskTravel::generatePath() {
     std::reverse(path.begin(), path.end());
 
     if (path.size() > 1) pathIndex = 1; //skip first tile
+    cost = costSoFar[key(goal)];
     return true;
 }
 
-TaskTravel::TaskTravel(LittleGuy *guy, ivec2 goal) {
+TaskTravel::TaskTravel(LittleGuy *guy, ivec2 goal) : Task(guy){
     this->guy = guy;
     this->goal = goal;
 }
@@ -132,6 +133,10 @@ bool TaskTravel::update(float dt) {
 
 
     return false;
+}
+
+float TaskTravel::getCost() {
+    return FarmingWorld::TICKS_PER_SECOND * cost * guy->getSpeed() / FarmingWorld::TILE_WIDTH;
 }
 
 std::string TaskTravel::getName() {

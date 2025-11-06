@@ -102,13 +102,27 @@ void cobb::Shader::use() const {
     glUseProgram(ID);
 }
 
-void cobb::Shader::setBool(const std::string &name, bool value) const {
-    //this works this way because the gpu doesn't understand booleans, only 1 and 0s
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+GLint cobb::Shader::getUniformLocation(const std::string &name) {
+
+    auto it = uniformCache.find(name);
+    if (it != uniformCache.end())
+        return it->second;
+
+    GLint location = glGetUniformLocation(ID, name.c_str());
+    uniformCache[name] = location;
+    std::cout << "[" << ID << "][" << name << "] = " << std::to_string(location) << std::endl;
+    return location;
+
+    //return glGetUniformLocation(ID, name.c_str());
 }
 
-void cobb::Shader::setInt(const std::string &name, int value) const {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+void cobb::Shader::setBool(const std::string &name, bool value) {
+    //this works this way because the gpu doesn't understand booleans, only 1 and 0s
+    glUniform1i(getUniformLocation(name), (int)value);
+}
+
+void cobb::Shader::setInt(const std::string &name, int value) {
+    glUniform1i(getUniformLocation(name), value);
 }
 
 /**
@@ -117,7 +131,7 @@ void cobb::Shader::setInt(const std::string &name, int value) const {
  * @param value MAX SIZE 2048
  * @param size
  */
-void cobb::Shader::set8BitUnsignedIntArray(const std::string &name, const unsigned int *value, const int size) const {
+void cobb::Shader::set8BitUnsignedIntArray(const std::string &name, const unsigned int *value, const int size) {
     assert(size < 2048);
     GLuint v[512];
 
@@ -132,31 +146,31 @@ void cobb::Shader::set8BitUnsignedIntArray(const std::string &name, const unsign
         j++;
     }
     for (int i = j; i < 512; i++) v[i] = 1;
-    glUniform1uiv(glGetUniformLocation(ID, name.c_str()), 512, v);
+    glUniform1uiv(getUniformLocation(name), 512, v);
 }
 
-void cobb::Shader::setFloat(const std::string &name, float value) const {
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+void cobb::Shader::setFloat(const std::string &name, float value) {
+    glUniform1f(getUniformLocation(name), value);
 }
 
-void cobb::Shader::setVec2(const std::string &name, const glm::vec2 &value) const {
-    glUniform2f(glGetUniformLocation(ID, name.c_str()), value.x, value.y);
+void cobb::Shader::setVec2(const std::string &name, const glm::vec2 &value) {
+    glUniform2f(getUniformLocation(name), value.x, value.y);
 }
 
-void cobb::Shader::setVec3(const std::string &name, const glm::vec3 &value) const {
-    glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
+void cobb::Shader::setVec3(const std::string &name, const glm::vec3 &value) {
+    glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
 }
 
-void cobb::Shader::setVec4(const std::string &name, const glm::vec4 &value) const {
-    glUniform4f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z, value.w);
+void cobb::Shader::setVec4(const std::string &name, const glm::vec4 &value) {
+    glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
 }
 
-void cobb::Shader::setMat3(const std::string &name, const glm::mat3& value) const {
-    glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+void cobb::Shader::setMat3(const std::string &name, const glm::mat3& value) {
+    glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 }
 
-void cobb::Shader::setMat4(const std::string &name, const glm::mat4& value) const {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+void cobb::Shader::setMat4(const std::string &name, const glm::mat4& value) {
+    glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 }
 
 //void cobb::Shader::setTexture2D(const string &name, )

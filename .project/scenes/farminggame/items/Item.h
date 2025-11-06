@@ -17,8 +17,9 @@ class Item : public FarmingObject {
 
 public:
 
-    static void setTexture(const std::string &path, int width, int height, int items);
 
+
+    constexpr static int ITEM_TYPES = 4;
     enum ItemType {
         TOMATO_SEED = 0,
         TOMATO,
@@ -27,10 +28,25 @@ public:
         NONE = 63
     };
 
+    struct ItemData {
+        ItemType category;
+
+        ItemData(ItemType category) : category(category) {
+
+        }
+    };
+    static void setTexture(const std::string &path, int width, int height, int items);
+    static void loadData();
+
+
+
+
+
     ItemType type;
     vec2 pos;
 
     Item() = default;
+
     Item(ItemType type, ivec2 tile);
     Item(ItemType type, vec2 pos);
     ~Item() override = default;

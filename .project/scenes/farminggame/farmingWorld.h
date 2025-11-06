@@ -43,6 +43,8 @@ public:
     constexpr static int TILES_HORIZ = 24;
     constexpr static int TILES_VERT = 13;
 
+    constexpr static int TICKS_PER_SECOND = 10;
+
     unsigned int landData[TILES_HORIZ * TILES_VERT];
     unsigned int plantData[TILES_HORIZ * TILES_VERT];
 

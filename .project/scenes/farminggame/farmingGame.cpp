@@ -10,6 +10,7 @@
 #include "items/ItemCarrotSeed.h"
 #include "items/ItemTomato.h"
 #include "items/ItemTomatoSeed.h"
+#include "tasks/TaskRetrieveItem.h"
 #include "tasks/TaskTravel.h"
 #include "tiles/TilePlantTomato.h"
 
@@ -21,8 +22,6 @@ FarmingWorld *FarmingScene::world = nullptr;
 float FarmingScene::lastTick = 0.0f;
 
 bool FarmingScene::debugMode = false;
-
-constexpr float TICK_DURATION = 0.1f;
 
 FarmingScene::FarmingScene(Window *w) {
     window = w;
@@ -42,6 +41,7 @@ void FarmingScene::load() {
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
     LittleGuy::setTexture("assets/farminggame/guy.png", FarmingWorld::TILE_WIDTH * 0.5f, FarmingWorld::TILE_HEIGHT, 2);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
+    Item::loadData();
     Window::setVsync(true);
 }
 
@@ -63,7 +63,8 @@ void FarmingScene::draw() {
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
     if (window->isInputClicked(GLFW_KEY_F)) {
-        world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
+        //world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
+        world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], Item::TOMATO, 5));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
@@ -111,8 +112,8 @@ void FarmingScene::draw() {
 
     world->update(deltaTime);
 
-    if (window->getTime() - lastTick >= TICK_DURATION) {
-        lastTick += TICK_DURATION;
+    if (window->getTime() - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
+        lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
         world->tick();
     }
 

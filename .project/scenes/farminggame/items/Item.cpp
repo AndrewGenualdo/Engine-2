@@ -18,12 +18,16 @@ void Item::setTexture(const std::string &path, int width, int height, int items)
     Item::height = height;
 }
 
-Item::Item(ItemType type, ivec2 tile) : FarmingObject(tile) {
+void Item::loadData() {
+
+}
+
+Item::Item(ItemType type, ivec2 tile) {
     this->type = type;
     this->pos = FarmingWorld::getTilePos(tile.x, tile.y);
 }
 
-Item::Item(ItemType type, vec2 pos) : FarmingObject(FarmingWorld::getTileFromPos(pos)) {
+Item::Item(ItemType type, vec2 pos) {
     this->type = type;
     this->pos = pos;
 }
