@@ -64,3 +64,13 @@ void FarmingObject::loadConfig(const std::string &line, int i) {
     std::istringstream iss(line);
     iss >> tile.x >> tile.y;
 }
+
+template<class T>
+T * FarmingObject::getObjectData(T) {
+    for (auto & i : objectData) {
+        if (dynamic_cast<T *>(i)) {
+            return dynamic_cast<T *>(i);
+        }
+    }
+    return nullptr;
+}

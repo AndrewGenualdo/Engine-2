@@ -64,7 +64,7 @@ void FarmingScene::draw() {
 
     if (window->isInputClicked(GLFW_KEY_F)) {
         //world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
-        //world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], , 5));
+        world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], FarmingObject::getObjectData(TilePlant::PlantType()), 5));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
@@ -81,7 +81,7 @@ void FarmingScene::draw() {
                 }
             }
             if (!planted) {
-                world->objects.push_back(new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), 4, 100, 4));
+                world->objects.push_back(new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
                 break;
             }
         }

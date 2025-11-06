@@ -56,7 +56,8 @@ public:
     virtual std::string getConfig();
     virtual void loadConfig(const std::string &line, int i);
 
-    
+    template <class T>
+    static T* getObjectData(T objectType);
 };
 
 

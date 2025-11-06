@@ -27,6 +27,7 @@ public:
         int stageCount = 1;
         int ripeStage = 1;
         int ticksBetweenStage = 1;
+        PlantData() : TileData() {}
         explicit PlantData(const PlantType plantType, int stageCount, int ripeStage, int ticksBetweenStage) : TileData(PLANT) {
             this->stageCount = stageCount;
             this->ripeStage = ripeStage - 1;

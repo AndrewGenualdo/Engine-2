@@ -10,7 +10,7 @@
 class TilePlantTomato : public TilePlant {
 public:
     TilePlantTomato() = default;
-    TilePlantTomato(ivec2 tile, int stageCount, int ticksBetweenStage, int ripeStage);
+    explicit TilePlantTomato(ivec2 tile);
 
     void update(float dt) override;
     void tick() override;

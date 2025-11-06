@@ -20,8 +20,9 @@ public:
 
     class TileData : public ObjectData {
     public:
-        TileType tileType;
+        TileType tileType = NONE;
 
+        TileData() : ObjectData() {}
         explicit TileData(const TileType tileType) : ObjectData(TILE) {
             this->tileType = tileType;
         }

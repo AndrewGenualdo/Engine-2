@@ -5,7 +5,7 @@
 #include "TilePlantTomato.h"
 #include "../../farmingWorld.h"
 
-TilePlantTomato::TilePlantTomato(const ivec2 tile, const int stageCount, const int ticksBetweenStage, const int ripeStage) : TilePlant(TOMATO, tile, stageCount, ticksBetweenStage, ripeStage) {
+TilePlantTomato::TilePlantTomato(const ivec2 tile) : TilePlant(TOMATO, tile) {
     TilePlantTomato::updatePlantState();
 }
 
