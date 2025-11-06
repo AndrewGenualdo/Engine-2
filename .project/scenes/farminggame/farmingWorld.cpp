@@ -10,13 +10,13 @@
 #include "FarmingObject.h"
 #include "littleGuy.h"
 #include "items/Item.h"
-#include "items/ItemCarrot.h"
-#include "items/ItemCarrotSeed.h"
-#include "items/ItemTomato.h"
-#include "items/ItemTomatoSeed.h"
+#include "items/produce/ItemCarrot.h"
+#include "items/seeds/ItemCarrotSeed.h"
+#include "items/produce/ItemTomato.h"
+#include "items/seeds/ItemTomatoSeed.h"
 #include "tiles/Tile.h"
-#include "tiles/TilePlant.h"
-#include "tiles/TilePlantTomato.h"
+#include "tiles/plants/TilePlant.h"
+#include "tiles/plants/TilePlantTomato.h"
 
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
 Tiles2d FarmingWorld::plantTilemap = Tiles2d();

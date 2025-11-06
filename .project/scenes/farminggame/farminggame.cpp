@@ -6,13 +6,13 @@
 #include "littleGuy.h"
 #include "ew/ewMath/ewMath.h"
 #include "items/Item.h"
-#include "items/ItemCarrot.h"
-#include "items/ItemCarrotSeed.h"
-#include "items/ItemTomato.h"
-#include "items/ItemTomatoSeed.h"
+#include "items/produce/ItemCarrot.h"
+#include "items/seeds/ItemCarrotSeed.h"
+#include "items/produce/ItemTomato.h"
+#include "items/seeds/ItemTomatoSeed.h"
 #include "tasks/TaskRetrieveItem.h"
 #include "tasks/TaskTravel.h"
-#include "tiles/TilePlantTomato.h"
+#include "tiles/plants/TilePlantTomato.h"
 
 Camera FarmingScene::camera = Camera();
 Window *FarmingScene::window = nullptr;
@@ -64,7 +64,7 @@ void FarmingScene::draw() {
 
     if (window->isInputClicked(GLFW_KEY_F)) {
         //world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
-        world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], Item::TOMATO, 5));
+        world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], FarmingObject::ObjectType::ITEM_TOMATO, 5));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {

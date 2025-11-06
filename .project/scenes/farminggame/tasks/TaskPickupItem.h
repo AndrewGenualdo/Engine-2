@@ -10,10 +10,10 @@
 class TaskPickupItem : Task {
     constexpr static float PICKUP_DISTANCE = (FarmingWorld::TILE_WIDTH + FarmingWorld::TILE_HEIGHT) * 0.5f;
 
-    Item::ItemType type;
+    FarmingObject::ObjectType type;
 
 public:
-    TaskPickupItem(LittleGuy *guy, Item::ItemType type);
+    TaskPickupItem(LittleGuy *guy, FarmingObject::ObjectType type);
     ~TaskPickupItem() override;
 
     bool update(float dt) override;

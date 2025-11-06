@@ -6,7 +6,7 @@
 #include "../items/Item.h"
 #include "../littleGuy.h"
 
-TaskRetrieveItem::TaskRetrieveItem(LittleGuy *guy, Item::ItemType type, int amount) : Task(guy) {
+TaskRetrieveItem::TaskRetrieveItem(LittleGuy *guy, FarmingObject::ObjectType type, int amount) : Task(guy) {
     this->goalAmount = amount;
     this->type = type;
     getClosestItem();

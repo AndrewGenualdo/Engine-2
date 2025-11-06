@@ -4,7 +4,18 @@
 
 #include "FarmingObject.h"
 
-FarmingObject::FarmingObject(ivec2 tile) {
+#include "items/produce/ItemProduce.h"
+#include "items/seeds/ItemSeed.h"
+
+void FarmingObject::loadData() {
+    objectData.push_back(new ItemProduce::ProduceData(ItemProduce::TOMATO));
+    objectData.push_back(new ItemProduce::ProduceData(ItemProduce::CARROT));
+    objectData.push_back(new ItemSeed::SeedData(ItemSeed::TOMATO));
+    objectData.push_back(new ItemSeed::SeedData(ItemSeed::CARROT));
+}
+
+FarmingObject::FarmingObject(const ObjectType type, const ivec2 tile) {
+    this->type = type;
     this->tile = tile;
     this->beingUsed = false;
 }

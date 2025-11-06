@@ -14,13 +14,34 @@ using namespace cobb;
 class FarmingObject {
 
 public:
-    virtual ~FarmingObject() = default;
+    enum ObjectType {
+        NONE,
+        ITEM,
+        TILE,
+        MISC
+    };
+
+    class ObjectData {
+    public:
+        ObjectType objectType;
+
+        ObjectData() = default;
+        explicit ObjectData(const ObjectType objectType) {
+            this->objectType = objectType;
+        }
+    };
+
+    static std::vector<ObjectData*> objectData;
+
+    static void loadData();
 
     ivec2 tile = ivec2(0);
+    ObjectType type = NONE;
     bool beingUsed = false;
 
     FarmingObject() = default;
-    explicit FarmingObject(ivec2 tile);
+    FarmingObject(ObjectType type, ivec2 tile);
+    virtual ~FarmingObject() = default;
 
     virtual void update(float deltaTime);
     virtual void tick();

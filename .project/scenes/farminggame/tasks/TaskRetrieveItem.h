@@ -16,13 +16,13 @@ class TaskRetrieveItem : public Task {
 
     int goalAmount = 0;
     int amount = 0;
-    Item::ItemType type;
+    FarmingObject::ObjectType type;
 
     TaskTravel *travelTask = nullptr;
     TaskPickupItem *pickupTask = nullptr;
 
 public:
-    TaskRetrieveItem(LittleGuy *guy, Item::ItemType type, int amount);
+    TaskRetrieveItem(LittleGuy *guy, FarmingObject::ObjectType type, int amount);
     ~TaskRetrieveItem() override;
 
     bool update(float dt) override;

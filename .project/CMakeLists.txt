@@ -30,22 +30,26 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/items/Item.h
         scenes/farminggame/tiles/Tile.cpp
         scenes/farminggame/tiles/Tile.h
-        scenes/farminggame/items/ItemTomatoSeed.cpp
-        scenes/farminggame/items/ItemTomatoSeed.h
-        scenes/farminggame/items/ItemTomato.cpp
-        scenes/farminggame/items/ItemTomato.h
-        scenes/farminggame/tiles/TilePlant.cpp
-        scenes/farminggame/tiles/TilePlant.h
+        scenes/farminggame/items/seeds/ItemTomatoSeed.cpp
+        scenes/farminggame/items/seeds/ItemTomatoSeed.h
+        scenes/farminggame/items/produce/ItemTomato.cpp
+        scenes/farminggame/items/produce/ItemTomato.h
+        scenes/farminggame/tiles/plants/TilePlant.cpp
+        scenes/farminggame/tiles/plants/TilePlant.h
         scenes/farminggame/FarmingObject.cpp
         scenes/farminggame/FarmingObject.h
-        scenes/farminggame/tiles/TilePlantTomato.cpp
-        scenes/farminggame/tiles/TilePlantTomato.h
-        scenes/farminggame/items/ItemCarrot.cpp
-        scenes/farminggame/items/ItemCarrot.h
-        scenes/farminggame/items/ItemCarrotSeed.cpp
-        scenes/farminggame/items/ItemCarrotSeed.h
+        scenes/farminggame/tiles/plants/TilePlantTomato.cpp
+        scenes/farminggame/tiles/plants/TilePlantTomato.h
+        scenes/farminggame/items/produce/ItemCarrot.cpp
+        scenes/farminggame/items/produce/ItemCarrot.h
+        scenes/farminggame/items/seeds/ItemCarrotSeed.cpp
+        scenes/farminggame/items/seeds/ItemCarrotSeed.h
         scenes/farminggame/tasks/TaskPickupItem.cpp
         scenes/farminggame/tasks/TaskPickupItem.h
+        scenes/farminggame/items/seeds/ItemSeed.cpp
+        scenes/farminggame/items/seeds/ItemSeed.h
+        scenes/farminggame/items/produce/ItemProduce.cpp
+        scenes/farminggame/items/produce/ItemProduce.h
 )
 
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)

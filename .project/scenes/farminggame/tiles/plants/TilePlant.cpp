@@ -4,7 +4,7 @@
 
 #include "TilePlant.h"
 
-#include "../farmingWorld.h"
+#include "../../farmingWorld.h"
 
 FarmingWorld *TilePlant::world = nullptr;
 
@@ -12,8 +12,7 @@ void TilePlant::setWorld(FarmingWorld *world) {
     TilePlant::world = world;
 }
 
-TilePlant::TilePlant(const PlantType type, const ivec2 tile, const int stageCount, const int ticksBetweenStage, const int ripeStage) : Tile(tile) {
-    this->type = type;
+TilePlant::TilePlant(const ObjectType type, const ivec2 tile, const int stageCount, const int ticksBetweenStage, const int ripeStage) : Tile(type, tile) {
     this->stage = 0;
     this->ticksBetweenStage = ticksBetweenStage;
     this->ticksUntilStage = ticksBetweenStage;
@@ -53,7 +52,7 @@ void TilePlant::loadConfig(const std::string &line, int i) {
         std::istringstream iss(line);
         int value;
         iss >> value >> stage >> stageCount >> ticksBetweenStage >> ticksUntilStage >> ripeStage;
-        type = static_cast<PlantType>(value);
+        type = static_cast<ObjectType>(value);
     } else Tile::loadConfig(line, i);
 }
 

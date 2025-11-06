@@ -5,7 +5,7 @@
 #include "TaskPickupItem.h"
 #include "../littleGuy.h"
 
-TaskPickupItem::TaskPickupItem(LittleGuy *guy, Item::ItemType type) : Task(guy) {
+TaskPickupItem::TaskPickupItem(LittleGuy *guy, FarmingObject::ObjectType type) : Task(guy) {
     this->type = type;
 }
 

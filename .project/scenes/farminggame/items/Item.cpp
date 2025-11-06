@@ -12,24 +12,20 @@ MultiTexture2d Item::itemsTexture = MultiTexture2d();
 int Item::width = 1;
 int Item::height = 1;
 
-void Item::setTexture(const std::string &path, int width, int height, int items) {
+void Item::setTexture(const std::string &path, const int width, const int height, const int items) {
     itemsTexture = MultiTexture2d(path, items);
     Item::width = width;
     Item::height = height;
 }
 
-void Item::loadData() {
-
-}
-
-Item::Item(ItemType type, ivec2 tile) {
-    this->type = type;
+Item::Item(const ItemType itemType, const ivec2 tile) : FarmingObject(ITEM, tile) {
     this->pos = FarmingWorld::getTilePos(tile.x, tile.y);
+    this->itemType = itemType;
 }
 
-Item::Item(ItemType type, vec2 pos) {
-    this->type = type;
+Item::Item(const ItemType itemType, const vec2 pos) : FarmingObject(ITEM, FarmingWorld::getTileFromPos(pos)){
     this->pos = pos;
+    this->itemType = itemType;
 }
 
 void Item::update(float dt) {
@@ -61,7 +57,7 @@ void Item::loadConfig(const std::string &line, int i) {
         std::istringstream iss(line);
         int value;
         iss >> value >> pos.x >> pos.y;
-        type = static_cast<ItemType>(value);
+        type = static_cast<ObjectType>(value);
     } else {
         FarmingObject::loadConfig(line, i);
     }

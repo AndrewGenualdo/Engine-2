@@ -17,38 +17,34 @@ class Item : public FarmingObject {
 
 public:
 
-
-
-    constexpr static int ITEM_TYPES = 4;
-    enum ItemType {
-        TOMATO_SEED = 0,
-        TOMATO,
-        CARROT_SEED,
-        CARROT,
-        NONE = 63
-    };
-
-    struct ItemData {
-        ItemType category;
-
-        ItemData(ItemType category) : category(category) {
-
-        }
-    };
     static void setTexture(const std::string &path, int width, int height, int items);
-    static void loadData();
+
+    enum ItemType {
+        NONE,
+        SEED,
+        PRODUCE
+    };
+
+    class ItemData : public ObjectData {
+    public:
+        ItemType itemType = NONE;
+
+        ItemData() : ObjectData() {}
+        explicit ItemData(const ItemType itemType) : ObjectData(ITEM) {
+            this->itemType = itemType;
+        };
+    };
 
 
 
 
-
-    ItemType type;
     vec2 pos;
+    ItemType itemType = NONE;
 
     Item() = default;
 
-    Item(ItemType type, ivec2 tile);
-    Item(ItemType type, vec2 pos);
+    Item(ItemType itemType, ivec2 tile);
+    Item(ItemType itemType, vec2 pos);
     ~Item() override = default;
 
     void update(float dt) override;

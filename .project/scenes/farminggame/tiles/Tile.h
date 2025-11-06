@@ -11,10 +11,24 @@ using namespace glm;
 using namespace cobb;
 
 class Tile : public FarmingObject {
-
 public:
+    enum TileType {
+        PLANT,
+        MISC
+    };
+
+    class TileData : public ObjectData {
+    public:
+        TileType tileType;
+
+        explicit TileData(const TileType tileType) : ObjectData(TILE) {
+            this->tileType = tileType;
+        }
+
+    };
+
     Tile() = default;
-    explicit Tile(ivec2 tile);
+    Tile(ObjectType type, ivec2 tile);
 
     void update(float dt) override;
     void tick() override;

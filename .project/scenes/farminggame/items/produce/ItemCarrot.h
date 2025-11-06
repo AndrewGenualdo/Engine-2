@@ -4,10 +4,10 @@
 
 #ifndef ENGINE_2_ITEMCARROT_H
 #define ENGINE_2_ITEMCARROT_H
-#include "Item.h"
+#include "ItemProduce.h"
 
 
-class ItemCarrot  : public Item {
+class ItemCarrot  : public ItemProduce {
 
 public:
     ItemCarrot() = default;

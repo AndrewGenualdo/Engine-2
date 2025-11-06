@@ -5,7 +5,7 @@
 #ifndef ENGINE_2_TILETOMATOPLANT_H
 #define ENGINE_2_TILETOMATOPLANT_H
 
-#include "Tile.h"
+#include "../Tile.h"
 
 class FarmingWorld;
 class TilePlant : public Tile {
@@ -16,11 +16,18 @@ public:
     static void setWorld(FarmingWorld *world);
 
     enum PlantType {
-        NONE,
         TOMATO
     };
 
-    PlantType type = NONE;
+    class PlantData : public TileData {
+    public:
+        PlantType plantType;
+
+        explicit PlantData(const PlantType plantType) : TileData(PLANT) {
+            this->plantType = plantType;
+        }
+    };
+
     int stage = 0;
     int stageCount = 1;
     int ticksBetweenStage = 1;
@@ -28,7 +35,7 @@ public:
     int ripeStage = 1;
 
     TilePlant() = default;
-    TilePlant(PlantType type, ivec2 tile, int stageCount, int ticksBetweenStage, int ripeStage);
+    TilePlant(ObjectType type, ivec2 tile, int stageCount, int ticksBetweenStage, int ripeStage);
 
     void update(float dt) override;
     void tick() override;

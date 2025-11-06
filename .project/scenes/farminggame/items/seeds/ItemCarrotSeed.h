@@ -4,15 +4,16 @@
 
 #ifndef ENGINE_2_ITEMCARROTSEED_H
 #define ENGINE_2_ITEMCARROTSEED_H
-#include "Item.h"
+#include "ItemSeed.h"
 
 
-class ItemCarrotSeed : public Item {
+class ItemCarrotSeed : public ItemSeed {
 
 public:
-    ItemCarrotSeed() = default;
+    ItemCarrotSeed() : ItemSeed() {}
     explicit ItemCarrotSeed(ivec2 tile);
     explicit ItemCarrotSeed(vec2 pos);
+    ~ItemCarrotSeed() override;
 
     void draw(bool bind) override;
     void tick() override;

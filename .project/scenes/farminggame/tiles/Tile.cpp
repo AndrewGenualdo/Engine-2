@@ -4,7 +4,7 @@
 
 #include "Tile.h"
 
-Tile::Tile(const ivec2 tile) : FarmingObject(tile) {
+Tile::Tile(const ObjectType type, const ivec2 tile) : FarmingObject(type, tile) {
 
 }
 
