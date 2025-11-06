@@ -5,7 +5,7 @@
 #ifndef ENGINE_2_ITEMSEED_H
 #define ENGINE_2_ITEMSEED_H
 #include "../Item.h"
-
+#include "../produce/ItemProduce.h"
 
 class ItemSeed : public Item {
 public:
@@ -18,10 +18,12 @@ public:
     class SeedData : public ItemData {
     public:
         SeedType seedType = NONE;
+        ItemProduce::ProduceType produces = ItemProduce::ProduceType::NONE;
 
         SeedData() : ItemData() {}
-        explicit SeedData(const SeedType seedType) : ItemData(SEED) {
+        explicit SeedData(const SeedType seedType, const ItemProduce::ProduceType produces) : ItemData(SEED) {
             this->seedType = seedType;
+            this->produces = produces;
         }
     };
 

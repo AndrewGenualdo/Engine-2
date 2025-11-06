@@ -56,6 +56,7 @@ public:
     virtual std::string getConfig();
     virtual void loadConfig(const std::string &line, int i);
 
+    
 };
 
 

@@ -24,21 +24,23 @@ public:
     class PlantData : public TileData {
     public:
         PlantType plantType;
-
-        explicit PlantData(const PlantType plantType) : TileData(PLANT) {
+        int stageCount = 1;
+        int ripeStage = 1;
+        int ticksBetweenStage = 1;
+        explicit PlantData(const PlantType plantType, int stageCount, int ripeStage, int ticksBetweenStage) : TileData(PLANT) {
+            this->stageCount = stageCount;
+            this->ripeStage = ripeStage - 1;
+            this->ticksBetweenStage = ticksBetweenStage;
             this->plantType = plantType;
         }
     };
 
     PlantType plantType = NONE;
     int stage = 0;
-    int stageCount = 1;
-    int ticksBetweenStage = 1;
     int ticksUntilStage = 1;
-    int ripeStage = 1;
 
     TilePlant() = default;
-    TilePlant(PlantType plantType, ivec2 tile, int stageCount, int ticksBetweenStage, int ripeStage);
+    TilePlant(PlantType plantType, ivec2 tile);
 
     void update(float dt) override;
     void tick() override;

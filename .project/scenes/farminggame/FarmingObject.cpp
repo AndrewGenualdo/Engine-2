@@ -12,10 +12,10 @@ std::vector<FarmingObject::ObjectData *> FarmingObject::objectData = std::vector
 void FarmingObject::loadData() {
     objectData.push_back(new ItemProduce::ProduceData(ItemProduce::TOMATO, TilePlant::TOMATO));
     objectData.push_back(new ItemProduce::ProduceData(ItemProduce::CARROT, TilePlant::CARROT));
-    objectData.push_back(new ItemSeed::SeedData(ItemSeed::TOMATO));
-    objectData.push_back(new ItemSeed::SeedData(ItemSeed::CARROT));
-    objectData.push_back(new TilePlant::PlantData(TilePlant::TOMATO));
-    objectData.push_back(new TilePlant::PlantData(TilePlant::CARROT));
+    objectData.push_back(new ItemSeed::SeedData(ItemSeed::TOMATO, ItemProduce::TOMATO));
+    objectData.push_back(new ItemSeed::SeedData(ItemSeed::CARROT, ItemProduce::CARROT));
+    objectData.push_back(new TilePlant::PlantData(TilePlant::TOMATO, 4, 4, 100));
+    objectData.push_back(new TilePlant::PlantData(TilePlant::CARROT, 4, 4, 50));
 }
 
 void FarmingObject::cleanData() {
