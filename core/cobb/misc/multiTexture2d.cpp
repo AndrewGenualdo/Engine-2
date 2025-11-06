@@ -67,8 +67,8 @@ void MultiTexture2d::draw(float x, float y, float width, float height, int frame
 
     //translates from game camera coordinates to screen coordinates
     float scale = window->gw / Window::GAME_WIDTH;
-    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH) + m_width / width;
-    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT) + m_height / height;
+    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH);// + m_width / width;
+    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT);// + m_height / height;
     float nw = gw * scale;
     float nh = gh * scale;
 

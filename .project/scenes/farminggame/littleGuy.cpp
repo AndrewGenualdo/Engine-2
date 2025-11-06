@@ -68,18 +68,39 @@ void LittleGuy::tick() {
     }
 }
 
-void LittleGuy::draw(bool bind) const {
-    texture.draw(pos.x, pos.y, width, height, items.empty() ? 0 : 1, bind);
-    for (int i = 0; i < items.size();i++) {
-        items[i]->draw(-items[i]->pos.x + pos.x, -items[i]->pos.y + pos.y + (items.size() - i) * FarmingWorld::TILE_HEIGHT, i == 0);
+void LittleGuy::draw(bool bind) {
+    texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, items.empty() ? 0 : 1, bind);
+    for (int i = items.size() - 1; i >= 0; i--) {
+        items[i]->draw(-items[i]->pos.x + pos.x, -items[i]->pos.y + pos.y + (0.722f * height) + (items.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, i == items.size() - 1);
     }
 }
 
+std::string LittleGuy::getConfigKey() {
+    return "LITTLE_GUY";
+}
+
+std::string LittleGuy::getConfig() {
+    std::string output = FarmingObject::getConfig();
+    output += std::to_string(pos.x) + " " + std::to_string(pos.y) + " " + std::to_string(speed) + "\n";
+    for (auto & item : items) {
+        output += "="+item->getConfigKey() + "\n";
+        output += item->getConfig();
+    }
+    return output;
+}
+
+void LittleGuy::loadConfig(const std::string &line, int i) {
+    if (i == 1) {
+        std::istringstream iss(line);
+        iss >> pos.x >> pos.y >> speed;
+    } else FarmingObject::loadConfig(line, i);
+}
+
 void LittleGuy::clearObjects() {
-    for (int i = 0; i < items.size(); i++) {
-        if (items[i] != nullptr) {
-            delete items[i];
-            items[i] = nullptr;
+    for (auto & item : items) {
+        if (item != nullptr) {
+            delete item;
+            item = nullptr;
         }
     }
     items.clear();

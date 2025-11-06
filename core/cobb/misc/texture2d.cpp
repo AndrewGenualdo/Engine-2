@@ -277,8 +277,8 @@ void cobb::Texture2d::draw(float x, float y, float width, float height, bool sho
 
     //translates from game camera coordinates to screen coordinates
     float scale = window->gw / Window::GAME_WIDTH;
-    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH) + m_width / width;
-    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT) + m_height / height;
+    float nx = window->sX(gx) + window->sX(0) * (gx / Window::GAME_WIDTH);// + m_width / width;
+    float ny = window->sY(gy) + window->sY(0) * (gy / Window::GAME_HEIGHT);// + m_height / height;
     float nw = gw * scale;
     float nh = gh * scale;
 
@@ -304,15 +304,15 @@ void cobb::Texture2d::draw(float x, float y, float width, float height, float ro
     drawRaw(nx, ny, nw, nh, rotation, shouldBind);
 }
 
-void cobb::Texture2d::setColor(vec3 col) {
+void cobb::Texture2d::setColor(vec3 color) {
     texture2dShader->use();
-    texture2dShader->setVec4("color", vec4(col, 1.0f));
+    texture2dShader->setVec4("color", vec4(color, 1.0f));
 }
 
 
-void cobb::Texture2d::setColor(vec4 col) {
+void cobb::Texture2d::setColor(vec4 color) {
     texture2dShader->use();
-    texture2dShader->setVec4("color", col);
+    texture2dShader->setVec4("color", color);
 }
 
 std::string cobb::Texture2d::getPath() const {

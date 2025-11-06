@@ -13,7 +13,7 @@
 
 using namespace glm;
 
-class LittleGuy {
+class LittleGuy : public FarmingObject {
 
     static FarmingWorld *world;
     static MultiTexture2d texture;
@@ -23,21 +23,25 @@ class LittleGuy {
     std::vector<Item*> items;
 
     vec2 pos;
-    ivec2 tile;
-    float speed = 150;
+    float speed = 300;
 
 public:
+
     static void setWorld(FarmingWorld *w);
     static void setTexture(const std::string &path, int width, int height, int frames);
 
     LittleGuy();
     explicit LittleGuy(ivec2 tile);
     explicit LittleGuy(vec2 pos);
-    ~LittleGuy();
+    ~LittleGuy() override;
 
-    void update(float dt);
-    void tick();
-    void draw(bool bind = true) const;
+    void update(float dt) override;
+    void tick() override;
+    void draw(bool bind) override;
+
+    std::string getConfigKey() override;
+    std::string getConfig() override;
+    void loadConfig(const std::string &line, int i) override;
 
     void clearObjects();
 

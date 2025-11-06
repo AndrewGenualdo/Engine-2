@@ -22,6 +22,8 @@ public:
     enum ItemType {
         TOMATO_SEED = 0,
         TOMATO,
+        CARROT_SEED,
+        CARROT,
         NONE = 63
     };
 

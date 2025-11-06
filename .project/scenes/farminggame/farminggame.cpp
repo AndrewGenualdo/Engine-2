@@ -6,6 +6,8 @@
 #include "littleGuy.h"
 #include "ew/ewMath/ewMath.h"
 #include "items/Item.h"
+#include "items/ItemCarrot.h"
+#include "items/ItemCarrotSeed.h"
 #include "items/ItemTomato.h"
 #include "items/ItemTomatoSeed.h"
 #include "tasks/TaskTravel.h"
@@ -38,8 +40,7 @@ void FarmingScene::load() {
     world = new FarmingWorld("saves/farming.txt");
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
-
-    LittleGuy::setTexture("assets/farminggame/guy.png", 50, 100, 2);
+    LittleGuy::setTexture("assets/farminggame/guy.png", FarmingWorld::TILE_WIDTH * 0.5f, FarmingWorld::TILE_HEIGHT, 2);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
 }
@@ -62,7 +63,7 @@ void FarmingScene::draw() {
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
     if (window->isInputClicked(GLFW_KEY_F)) {
-        world->guys[0].setTask(new TaskTravel(&world->guys[0], mouseTile));
+        world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
@@ -86,18 +87,25 @@ void FarmingScene::draw() {
     }
     if (window->isInputClicked(GLFW_KEY_O)) {
         world->clearObjects();
-        world->guys[0].clearObjects();
+
     }
 
     if (window->isInputClicked(GLFW_KEY_I)) {
-        if (length(vec2(mx, my) - world->guys[0].getPos()) < FarmingWorld::TILE_WIDTH) {
-            if (ew::RandomRange(0, 1) > 0.5f) world->guys[0].giveItem(new ItemTomato(vec2(mx, my)));
-            else world->guys[0].giveItem(new ItemTomatoSeed(vec2(mx, my)));
-        } else {
-            if (ew::RandomRange(0, 1) > 0.5f) world->objects.push_back(new ItemTomato(vec2(mx, my)));
-            else world->objects.push_back(new ItemTomatoSeed(vec2(mx, my)));
+        Item *item = nullptr;
+        int random = ew::RandomRange(0, 4);
+        switch (random) {
+            case 0: item = new ItemTomato(vec2(mx, my)); break;
+            case 1: item = new ItemTomatoSeed(vec2(mx, my)); break;
+            case 2: item = new ItemCarrot(vec2(mx, my)); break;
+            case 3: item = new ItemCarrotSeed(vec2(mx, my)); break;
+            default: item = new Item();
         }
 
+        if (length(vec2(mx, my) - world->guys[0]->getPos()) < FarmingWorld::TILE_WIDTH) {
+            world->guys[0]->giveItem(item);
+        } else {
+            world->objects.push_back(item);
+        }
     }
 
 
@@ -109,16 +117,12 @@ void FarmingScene::draw() {
     }
 
     world->draw();
-    fontRenderer.draw("Pos: " + std::to_string(world->guys[0].getPos().x) + ", " + std::to_string(world->guys[0].getPos().y) + "\nTile: " + std::to_string(world->guys[0].getTile().x) + ", " + std::to_string(world->guys[0].getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);
+    fontRenderer.draw("Pos: " + std::to_string(world->guys[0]->getPos().x) + ", " + std::to_string(world->guys[0]->getPos().y) + "\nTile: " + std::to_string(world->guys[0]->getTile().x) + ", " + std::to_string(world->guys[0]->getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);
 
 
     const int mouseTileIndex = mouseTile.y * FarmingWorld::TILES_HORIZ + mouseTile.x;
     if (mx >= FarmingWorld::TILE_OFFSET_X && my >= FarmingWorld::TILE_OFFSET_Y && mouseTile.x < FarmingWorld::TILES_HORIZ && mouseTile.y < FarmingWorld::TILES_VERT) {
-        //if (window->isInputClicked(GLFW_MOUSE_BUTTON_LEFT)) world.setLandData(mouseTileIndex, world.getLandData(mouseTileIndex) + 1);
-        //if (window->isInputClicked(GLFW_MOUSE_BUTTON_RIGHT)) world.setLandData(mouseTileIndex, world.getLandData(mouseTileIndex) - 1);
-        //if (world.getLandData(mouseTileIndex) > 100000000 ) world.setLandData(mouseTileIndex, 0);
-        //if (world.getLandData(mouseTileIndex) >= FarmingWorld::TEXTURE_TILE_COUNT * FarmingWorld::TEXTURE_TILE_COUNT) world.setLandData(mouseTileIndex, FarmingWorld::TEXTURE_TILE_COUNT * FarmingWorld::TEXTURE_TILE_COUNT - 1);
-        Texture2d::setColor(vec4(1, 1, 1, 0.25f));
+        Texture2d::setColor(vec4(1, 1, 1, 0.5f));
         blank.draw(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT, FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
     }
 

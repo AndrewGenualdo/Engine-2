@@ -5,9 +5,11 @@
 #include "ItemTomatoSeed.h"
 
 ItemTomatoSeed::ItemTomatoSeed(ivec2 tile) : Item(TOMATO_SEED, tile) {
+
 }
 
 ItemTomatoSeed::ItemTomatoSeed(vec2 pos) : Item(TOMATO_SEED, pos) {
+
 }
 
 void ItemTomatoSeed::draw(bool bind) {
@@ -31,7 +33,7 @@ std::string ItemTomatoSeed::getConfig() {
 }
 
 void ItemTomatoSeed::loadConfig(const std::string &line, int i) {
-    if (i == 3) {
+    if (i == 2) {
 
     } else Item::loadConfig(line, i);
 }

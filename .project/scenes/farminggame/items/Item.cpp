@@ -37,11 +37,11 @@ void Item::tick() {
 }
 
 void Item::draw(bool bind) {
-    itemsTexture.draw(pos.x, pos.y, width, height, type, bind);
+    draw(0, 0, bind);
 }
 
 void Item::draw(float offsetX, float offsetY, bool bind) {
-    itemsTexture.draw(pos.x + offsetX, pos.y + offsetY, width, height, type, bind);
+    itemsTexture.draw(pos.x + offsetX - (width * 0.5f), pos.y + offsetY - (height * 0.5f), width, height, type, bind);
 }
 
 std::string Item::getConfigKey() {

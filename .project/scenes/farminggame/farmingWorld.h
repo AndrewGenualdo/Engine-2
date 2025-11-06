@@ -51,7 +51,7 @@ public:
 
     std::string savePath;
 
-    std::vector<LittleGuy> guys;
+    std::vector<LittleGuy*> guys;
     std::vector<FarmingObject*> objects;
 
     FarmingWorld();
@@ -64,7 +64,7 @@ public:
 
     void update(float dt);
     void tick();
-    void draw() const;
+    void draw();
 
     void updateTileTypes();
     void clearObjects();
