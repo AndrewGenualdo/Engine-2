@@ -6,6 +6,7 @@
 #define ENGINE_2_ITEMPRODUCE_H
 
 #include "../Item.h"
+#include "../../tiles/plants/TilePlant.h"
 
 class ItemProduce : public Item {
 
@@ -19,10 +20,12 @@ public:
     class ProduceData : public ItemData {
     public:
         ProduceType produceType = NONE;
+        TilePlant::PlantType producedFrom = TilePlant::PlantType::NONE;
 
         ProduceData() : ItemData() {}
-        explicit ProduceData(const ProduceType produceType) : ItemData(PRODUCE) {
+        explicit ProduceData(const ProduceType produceType, const TilePlant::PlantType producedFrom) : ItemData(PRODUCE) {
             this->produceType = produceType;
+            this->producedFrom = producedFrom;
         }
     };
 

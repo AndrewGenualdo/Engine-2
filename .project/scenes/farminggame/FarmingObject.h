@@ -2,8 +2,8 @@
 // Created by cobble on 11/5/2025.
 //
 
-#ifndef ENGINE_2_OBJECT_H
-#define ENGINE_2_OBJECT_H
+#ifndef ENGINE_2_FARMINGOBJECT_H
+#define ENGINE_2_FARMINGOBJECT_H
 
 #include "cobb/misc/multiTexture2d.h"
 #include <sstream>
@@ -34,6 +34,7 @@ public:
     static std::vector<ObjectData*> objectData;
 
     static void loadData();
+    static void cleanData();
 
     ivec2 tile = ivec2(0);
     ObjectType type = NONE;
@@ -58,4 +59,4 @@ public:
 };
 
 
-#endif //ENGINE_2_OBJECT_H
+#endif //ENGINE_2_FARMINGOBJECT_H

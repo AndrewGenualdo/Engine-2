@@ -2,18 +2,18 @@
 // Created by cobble on 11/5/2025.
 //
 
-#ifndef ENGINE_2_ITEMCARROTSEED_H
-#define ENGINE_2_ITEMCARROTSEED_H
+#ifndef ENGINE_2_ITEMSEEDCARROT_H
+#define ENGINE_2_ITEMSEEDCARROT_H
 #include "ItemSeed.h"
 
 
-class ItemCarrotSeed : public ItemSeed {
+class ItemSeedCarrot : public ItemSeed {
 
 public:
-    ItemCarrotSeed() : ItemSeed() {}
-    explicit ItemCarrotSeed(ivec2 tile);
-    explicit ItemCarrotSeed(vec2 pos);
-    ~ItemCarrotSeed() override;
+    ItemSeedCarrot() : ItemSeed() {}
+    explicit ItemSeedCarrot(ivec2 tile);
+    explicit ItemSeedCarrot(vec2 pos);
+    ~ItemSeedCarrot() override;
 
     void draw(bool bind) override;
     void tick() override;
@@ -24,4 +24,4 @@ public:
     void loadConfig(const std::string &line, int i) override;
 
 };
-#endif //ENGINE_2_ITEMCARROTSEED_H
+#endif //ENGINE_2_ITEMSEEDCARROT_H

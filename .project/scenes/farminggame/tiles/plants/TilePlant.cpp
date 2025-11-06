@@ -12,7 +12,8 @@ void TilePlant::setWorld(FarmingWorld *world) {
     TilePlant::world = world;
 }
 
-TilePlant::TilePlant(const ObjectType type, const ivec2 tile, const int stageCount, const int ticksBetweenStage, const int ripeStage) : Tile(type, tile) {
+TilePlant::TilePlant(const PlantType plantType, const ivec2 tile, const int stageCount, const int ticksBetweenStage, const int ripeStage) : Tile(PLANT, tile) {
+    this->plantType = plantType;
     this->stage = 0;
     this->ticksBetweenStage = ticksBetweenStage;
     this->ticksUntilStage = ticksBetweenStage;
@@ -47,7 +48,7 @@ std::string TilePlant::getConfig() {
     return Tile::getConfig() + std::to_string(type) + " " + std::to_string(stage) + " " + std::to_string(stageCount) + " " + std::to_string(ticksBetweenStage) + " " + std::to_string(ticksUntilStage) + " " + std::to_string(ripeStage) + "\n";
 }
 
-void TilePlant::loadConfig(const std::string &line, int i) {
+void TilePlant::loadConfig(const std::string &line, const int i) {
     if (i == 2) {
         std::istringstream iss(line);
         int value;

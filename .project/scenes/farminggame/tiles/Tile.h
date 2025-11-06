@@ -13,6 +13,7 @@ using namespace cobb;
 class Tile : public FarmingObject {
 public:
     enum TileType {
+        NONE,
         PLANT,
         MISC
     };
@@ -27,8 +28,10 @@ public:
 
     };
 
+    TileType tileType = NONE;
+
     Tile() = default;
-    Tile(ObjectType type, ivec2 tile);
+    Tile(TileType tileType, ivec2 tile);
 
     void update(float dt) override;
     void tick() override;

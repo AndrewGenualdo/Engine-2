@@ -2,8 +2,8 @@
 // Created by drewg on 11/5/2025.
 //
 
-#ifndef ENGINE_2_TILETOMATOPLANT_H
-#define ENGINE_2_TILETOMATOPLANT_H
+#ifndef ENGINE_2_TILEPLANT_H
+#define ENGINE_2_TILEPLANT_H
 
 #include "../Tile.h"
 
@@ -16,7 +16,9 @@ public:
     static void setWorld(FarmingWorld *world);
 
     enum PlantType {
-        TOMATO
+        NONE,
+        TOMATO,
+        CARROT
     };
 
     class PlantData : public TileData {
@@ -28,6 +30,7 @@ public:
         }
     };
 
+    PlantType plantType = NONE;
     int stage = 0;
     int stageCount = 1;
     int ticksBetweenStage = 1;
@@ -35,7 +38,7 @@ public:
     int ripeStage = 1;
 
     TilePlant() = default;
-    TilePlant(ObjectType type, ivec2 tile, int stageCount, int ticksBetweenStage, int ripeStage);
+    TilePlant(PlantType plantType, ivec2 tile, int stageCount, int ticksBetweenStage, int ripeStage);
 
     void update(float dt) override;
     void tick() override;
@@ -54,4 +57,4 @@ public:
 };
 
 
-#endif //ENGINE_2_TILETOMATOPLANT_H
+#endif //ENGINE_2_TILEPLANT_H

@@ -10,10 +10,10 @@
 #include "FarmingObject.h"
 #include "littleGuy.h"
 #include "items/Item.h"
-#include "items/produce/ItemCarrot.h"
-#include "items/seeds/ItemCarrotSeed.h"
-#include "items/produce/ItemTomato.h"
-#include "items/seeds/ItemTomatoSeed.h"
+#include "items/produce/ItemProduceCarrot.h"
+#include "items/seeds/ItemSeedCarrot.h"
+#include "items/produce/ItemProduceTomato.h"
+#include "items/seeds/ItemSeedTomato.h"
 #include "tiles/Tile.h"
 #include "tiles/plants/TilePlant.h"
 #include "tiles/plants/TilePlantTomato.h"
@@ -47,12 +47,12 @@ void FarmingWorld::load() {
     types.push_back(Tile().getConfigKey()); //1
     types.push_back(TilePlant().getConfigKey()); //2
     types.push_back(Item().getConfigKey()); //3
-    types.push_back(ItemTomato().getConfigKey()); //4
-    types.push_back(ItemTomatoSeed().getConfigKey()); //5
+    types.push_back(ItemProduceTomato().getConfigKey()); //4
+    types.push_back(ItemSeedTomato().getConfigKey()); //5
     types.push_back(TilePlantTomato().getConfigKey()); //6
     types.push_back(LittleGuy().getConfigKey()); //7
-    types.push_back(ItemCarrot().getConfigKey()); //8
-    types.push_back(ItemCarrotSeed().getConfigKey()); //9
+    types.push_back(ItemProduceCarrot().getConfigKey()); //8
+    types.push_back(ItemSeedCarrot().getConfigKey()); //9
 
     bool inGuy = false;
 
@@ -141,12 +141,12 @@ void FarmingWorld::load() {
                                 case 1: currentObject = new Tile(); break;
                                 case 2: currentObject = new TilePlant(); break;
                                 case 3: currentObject = new Item(); break;
-                                case 4: currentObject = new ItemTomato(); break;
-                                case 5: currentObject = new ItemTomatoSeed(); break;
+                                case 4: currentObject = new ItemProduceTomato(); break;
+                                case 5: currentObject = new ItemSeedTomato(); break;
                                 case 6: currentObject = new TilePlantTomato(); break;
                                 case 7: break; //skip cuz little guy
-                                case 8: currentObject = new ItemCarrot(); break;
-                                case 9: currentObject = new ItemCarrotSeed(); break;
+                                case 8: currentObject = new ItemProduceCarrot(); break;
+                                case 9: currentObject = new ItemSeedCarrot(); break;
                                 default: {
                                     std::cout << "UNKNOWN OBJECT IS BEING LOADED!!" << std::endl << "Object: '" << line << "'" << std::endl;
                                     break;

@@ -7,11 +7,23 @@
 #include "items/produce/ItemProduce.h"
 #include "items/seeds/ItemSeed.h"
 
+std::vector<FarmingObject::ObjectData *> FarmingObject::objectData = std::vector <ObjectData *>();
+
 void FarmingObject::loadData() {
-    objectData.push_back(new ItemProduce::ProduceData(ItemProduce::TOMATO));
-    objectData.push_back(new ItemProduce::ProduceData(ItemProduce::CARROT));
+    objectData.push_back(new ItemProduce::ProduceData(ItemProduce::TOMATO, TilePlant::TOMATO));
+    objectData.push_back(new ItemProduce::ProduceData(ItemProduce::CARROT, TilePlant::CARROT));
     objectData.push_back(new ItemSeed::SeedData(ItemSeed::TOMATO));
     objectData.push_back(new ItemSeed::SeedData(ItemSeed::CARROT));
+    objectData.push_back(new TilePlant::PlantData(TilePlant::TOMATO));
+    objectData.push_back(new TilePlant::PlantData(TilePlant::CARROT));
+}
+
+void FarmingObject::cleanData() {
+    for (auto & i : objectData) {
+        delete i;
+        i = nullptr;
+    }
+    objectData.clear();
 }
 
 FarmingObject::FarmingObject(const ObjectType type, const ivec2 tile) {

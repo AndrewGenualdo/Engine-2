@@ -30,20 +30,20 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/items/Item.h
         scenes/farminggame/tiles/Tile.cpp
         scenes/farminggame/tiles/Tile.h
-        scenes/farminggame/items/seeds/ItemTomatoSeed.cpp
-        scenes/farminggame/items/seeds/ItemTomatoSeed.h
-        scenes/farminggame/items/produce/ItemTomato.cpp
-        scenes/farminggame/items/produce/ItemTomato.h
+        scenes/farminggame/items/seeds/ItemSeedTomato.cpp
+        scenes/farminggame/items/seeds/ItemSeedTomato.h
+        scenes/farminggame/items/produce/ItemProduceTomato.cpp
+        scenes/farminggame/items/produce/ItemProduceTomato.h
         scenes/farminggame/tiles/plants/TilePlant.cpp
         scenes/farminggame/tiles/plants/TilePlant.h
         scenes/farminggame/FarmingObject.cpp
         scenes/farminggame/FarmingObject.h
         scenes/farminggame/tiles/plants/TilePlantTomato.cpp
         scenes/farminggame/tiles/plants/TilePlantTomato.h
-        scenes/farminggame/items/produce/ItemCarrot.cpp
-        scenes/farminggame/items/produce/ItemCarrot.h
-        scenes/farminggame/items/seeds/ItemCarrotSeed.cpp
-        scenes/farminggame/items/seeds/ItemCarrotSeed.h
+        scenes/farminggame/items/produce/ItemProduceCarrot.cpp
+        scenes/farminggame/items/produce/ItemProduceCarrot.h
+        scenes/farminggame/items/seeds/ItemSeedCarrot.cpp
+        scenes/farminggame/items/seeds/ItemSeedCarrot.h
         scenes/farminggame/tasks/TaskPickupItem.cpp
         scenes/farminggame/tasks/TaskPickupItem.h
         scenes/farminggame/items/seeds/ItemSeed.cpp

@@ -34,7 +34,7 @@ std::string ItemSeed::getConfigKey() {
 }
 
 std::string ItemSeed::getConfig() {
-    return Item::getConfig();
+    return Item::getConfig() + "-\n";
 }
 
 void ItemSeed::loadConfig(const std::string &line, const int i) {

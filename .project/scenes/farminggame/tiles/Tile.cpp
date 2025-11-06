@@ -4,8 +4,8 @@
 
 #include "Tile.h"
 
-Tile::Tile(const ObjectType type, const ivec2 tile) : FarmingObject(type, tile) {
-
+Tile::Tile(const TileType tileType, const ivec2 tile) : FarmingObject(TILE, tile) {
+    this->tileType = tileType;
 }
 
 void Tile::update(float dt) {

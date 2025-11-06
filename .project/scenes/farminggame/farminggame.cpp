@@ -6,10 +6,10 @@
 #include "littleGuy.h"
 #include "ew/ewMath/ewMath.h"
 #include "items/Item.h"
-#include "items/produce/ItemCarrot.h"
-#include "items/seeds/ItemCarrotSeed.h"
-#include "items/produce/ItemTomato.h"
-#include "items/seeds/ItemTomatoSeed.h"
+#include "items/produce/ItemProduceCarrot.h"
+#include "items/seeds/ItemSeedCarrot.h"
+#include "items/produce/ItemProduceTomato.h"
+#include "items/seeds/ItemSeedTomato.h"
 #include "tasks/TaskRetrieveItem.h"
 #include "tasks/TaskTravel.h"
 #include "tiles/plants/TilePlantTomato.h"
@@ -39,10 +39,10 @@ void FarmingScene::load() {
     world = new FarmingWorld("saves/farming.txt");
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
-    LittleGuy::setTexture("assets/farminggame/guy.png", FarmingWorld::TILE_WIDTH * 0.5f, FarmingWorld::TILE_HEIGHT, 2);
+    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 2);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
-    Item::loadData();
     Window::setVsync(true);
+    FarmingObject::loadData();
 }
 
 void FarmingScene::draw() {
@@ -64,7 +64,7 @@ void FarmingScene::draw() {
 
     if (window->isInputClicked(GLFW_KEY_F)) {
         //world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
-        world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], FarmingObject::ObjectType::ITEM_TOMATO, 5));
+        //world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], , 5));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
@@ -73,7 +73,7 @@ void FarmingScene::draw() {
             if (isFarmland) {
                 for (int j = 0; j < world->objects.size(); j++) {
                     FarmingObject *obj = world->objects[j];
-                    auto *tomato = dynamic_cast<TilePlantTomato*>(obj);
+                    const auto *tomato = dynamic_cast<TilePlantTomato*>(obj);
                     if (tomato && tomato->tile.y * FarmingWorld::TILES_HORIZ + tomato->tile.x == i) {
                         planted = true;
                         break;
@@ -93,12 +93,12 @@ void FarmingScene::draw() {
 
     if (window->isInputClicked(GLFW_KEY_I)) {
         Item *item = nullptr;
-        int random = ew::RandomRange(0, 4);
+        int random = static_cast<int>(ew::RandomRange(0, 4));
         switch (random) {
-            case 0: item = new ItemTomato(vec2(mx, my)); break;
-            case 1: item = new ItemTomatoSeed(vec2(mx, my)); break;
-            case 2: item = new ItemCarrot(vec2(mx, my)); break;
-            case 3: item = new ItemCarrotSeed(vec2(mx, my)); break;
+            case 0: item = new ItemProduceTomato(vec2(mx, my)); break;
+            case 1: item = new ItemSeedTomato(vec2(mx, my)); break;
+            case 2: item = new ItemProduceCarrot(vec2(mx, my)); break;
+            case 3: item = new ItemSeedCarrot(vec2(mx, my)); break;
             default: item = new Item();
         }
 
@@ -124,7 +124,7 @@ void FarmingScene::draw() {
     const int mouseTileIndex = mouseTile.y * FarmingWorld::TILES_HORIZ + mouseTile.x;
     if (mx >= FarmingWorld::TILE_OFFSET_X && my >= FarmingWorld::TILE_OFFSET_Y && mouseTile.x < FarmingWorld::TILES_HORIZ && mouseTile.y < FarmingWorld::TILES_VERT) {
         Texture2d::setColor(vec4(1, 1, 1, 0.5f));
-        blank.draw(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT, FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
+        blank.draw(static_cast<float>(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH), static_cast<float>(FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT), FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
     }
 
 }
@@ -135,6 +135,7 @@ void FarmingScene::cleanup() {
         delete world;
         world = nullptr;
     }
+    FarmingObject::cleanData();
 }
 
 void FarmingScene::keyPress(int key, int action, int mods) {

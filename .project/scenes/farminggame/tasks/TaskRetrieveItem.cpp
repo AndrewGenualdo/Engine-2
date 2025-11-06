@@ -6,7 +6,7 @@
 #include "../items/Item.h"
 #include "../littleGuy.h"
 
-TaskRetrieveItem::TaskRetrieveItem(LittleGuy *guy, FarmingObject::ObjectType type, int amount) : Task(guy) {
+TaskRetrieveItem::TaskRetrieveItem(LittleGuy *guy, FarmingObject::ObjectType type, const int amount) : Task(guy) {
     this->goalAmount = amount;
     this->type = type;
     getClosestItem();
@@ -19,11 +19,10 @@ TaskRetrieveItem::~TaskRetrieveItem() {
     }
 }
 
-bool TaskRetrieveItem::update(float dt) {
+bool TaskRetrieveItem::update(const float dt) {
     if (travelTask != nullptr) {
         if (amount < goalAmount) {
-            bool res = travelTask->update(dt);
-            if (res) {
+            if (travelTask->update(dt)) {
                 delete travelTask;
                 travelTask = nullptr;
                 pickupTask = new TaskPickupItem(guy, type);
@@ -31,8 +30,7 @@ bool TaskRetrieveItem::update(float dt) {
             return false;
         }
     } else if (pickupTask != nullptr) {
-        bool res = pickupTask->update(dt);
-        if (res) {
+        if (pickupTask->update(dt)) {
             delete pickupTask;
             pickupTask = nullptr;
             amount++;
@@ -58,9 +56,9 @@ bool TaskRetrieveItem::getClosestItem() {
 
     //if pickup item
 
-    Item *closestItem = nullptr;
+    const Item *closestItem = nullptr;
     for (auto & object : world->objects) {
-        Item *item = dynamic_cast<Item*>(object);
+        const Item *item = dynamic_cast<Item*>(object);
         if (item && item->type == type) {
             if (closestItem == nullptr || length(closestItem->pos - guy->getPos()) > length(item->pos - guy->getPos())) {
                 closestItem = item;

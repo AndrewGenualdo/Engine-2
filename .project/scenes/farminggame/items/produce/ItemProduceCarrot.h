@@ -2,17 +2,17 @@
 // Created by cobble on 11/5/2025.
 //
 
-#ifndef ENGINE_2_ITEMCARROT_H
-#define ENGINE_2_ITEMCARROT_H
+#ifndef ENGINE_2_ITEMPRODUCECARROT_H
+#define ENGINE_2_ITEMPRODUCECARROT_H
 #include "ItemProduce.h"
 
 
-class ItemCarrot  : public ItemProduce {
+class ItemProduceCarrot  : public ItemProduce {
 
 public:
-    ItemCarrot() = default;
-    explicit ItemCarrot(ivec2 tile);
-    explicit ItemCarrot(vec2 pos);
+    ItemProduceCarrot() = default;
+    explicit ItemProduceCarrot(ivec2 tile);
+    explicit ItemProduceCarrot(vec2 pos);
 
     void draw(bool bind) override;
     void tick() override;
@@ -25,4 +25,4 @@ public:
 };
 
 
-#endif //ENGINE_2_ITEMCARROT_H
+#endif //ENGINE_2_ITEMPRODUCECARROT_H
