@@ -18,6 +18,7 @@ class TaskRetrieveItem : public Task {
     int goalAmount = 0;
     int amount = 0;
     FarmingObject::TypeID type;
+    ivec2 itemTile = ivec2(0);
 
     TaskTravel *travelTask = nullptr;
     TaskPickupItem *pickupTask = nullptr;
@@ -28,10 +29,13 @@ public:
     ~TaskRetrieveItem() override;
 
     bool update(float dt) override;
+    bool tick() override;
     std::string getName() override;
     float getCost() override;
 
     bool getClosestItem();
+
+    ivec2 getItemTile();
 };
 
 

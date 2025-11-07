@@ -15,11 +15,13 @@ void Task::setWorld(FarmingWorld *w) {
 }
 
 bool Task::update(float dt) {
+    std::cout << "you probably called the wrong task update/tick function! [update]" << std::endl;
     return true;
 }
 
-void Task::tick() {
-
+bool Task::tick() {
+    std::cout << "you probably called the wrong task update/tick function! [tick]" << std::endl;
+    return true;
 }
 
 float Task::getCost() {

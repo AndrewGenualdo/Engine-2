@@ -10,6 +10,7 @@
 #include "items/seeds/ItemSeedCarrot.h"
 #include "items/produce/ItemProduceTomato.h"
 #include "items/seeds/ItemSeedTomato.h"
+#include "tasks/TaskFetchItem.h"
 #include "tasks/TaskRetrieveItem.h"
 #include "tasks/TaskTravel.h"
 #include "tiles/plants/TilePlantCarrot.h"
@@ -44,6 +45,7 @@ void FarmingScene::load() {
     LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 4);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
+    lastTick = window->getTime();
 }
 
 void FarmingScene::draw() {
@@ -65,12 +67,12 @@ void FarmingScene::draw() {
 
     if (window->isInputClicked(GLFW_KEY_F)) {
         for (auto & guy : world->guys) {
-            guy->setTask(new TaskRetrieveItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT));
+            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT, mouseTile));
         }
     }
     if (window->isInputClicked(GLFW_KEY_G)) {
         for (auto & guy : world->guys) {
-            guy->setTask(new TaskRetrieveItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT));
+            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT, mouseTile));
         }
     }
 

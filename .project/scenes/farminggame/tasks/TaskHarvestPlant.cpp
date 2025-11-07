@@ -14,12 +14,11 @@ TaskHarvestPlant::TaskHarvestPlant(LittleGuy *guy, TilePlant *plant) {
 
 TaskHarvestPlant::~TaskHarvestPlant() = default;
 
-bool TaskHarvestPlant::update(float dt) {
+bool TaskHarvestPlant::tick() {
     if (plant != nullptr) {
         ticksUntilHarvest--;
         if (ticksUntilHarvest <= 0) {
             item = world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
-
             plant->destroy();
             return true;
         }

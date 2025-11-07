@@ -12,7 +12,7 @@ TaskPickupItem::TaskPickupItem(LittleGuy *guy, Item *item) : Task(guy) {
 
 TaskPickupItem::~TaskPickupItem() = default;
 
-bool TaskPickupItem::update(float dt) {
+bool TaskPickupItem::tick() {
     guy->giveItem(item);
     for (int i = world->objects.size() - 1; i >= 0; i--) {
         if (world->objects[i] == item) {
@@ -21,7 +21,6 @@ bool TaskPickupItem::update(float dt) {
         }
     }
     return true;
-
 }
 
 std::string TaskPickupItem::getName() {

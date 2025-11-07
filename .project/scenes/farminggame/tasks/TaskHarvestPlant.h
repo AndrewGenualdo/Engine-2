@@ -19,7 +19,7 @@ public:
     TaskHarvestPlant(LittleGuy *guy, TilePlant *plant);
     ~TaskHarvestPlant() override;
 
-    bool update(float dt) override;
+    bool tick() override;
     std::string getName() override;
     float getCost() override;
 

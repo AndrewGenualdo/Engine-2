@@ -58,6 +58,7 @@ public:
 
     void giveItem(Item *item);
 
+    Task* getTask() const;
     void setTask(Task *task);
 };
 

@@ -35,8 +35,8 @@ void FarmingObject::loadData() {
 
     objectData[TypeID::TILE_PLANT] = new Tile::TileData(TypeID::TILE_PLANT, TypeID::TILE);
 
-    objectData[TypeID::TILE_PLANT_TOMATO] = new TilePlant::PlantData(TypeID::TILE_PLANT_TOMATO, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_TOMATO, 4, 4, 25, 50, 1);
-    objectData[TypeID::TILE_PLANT_CARROT] = new TilePlant::PlantData(TypeID::TILE_PLANT_CARROT, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_CARROT, 4, 4, 50, 50, 5);
+    objectData[TypeID::TILE_PLANT_TOMATO] = new TilePlant::PlantData(TypeID::TILE_PLANT_TOMATO, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_TOMATO, 4, 4, 50, 15, 1);
+    objectData[TypeID::TILE_PLANT_CARROT] = new TilePlant::PlantData(TypeID::TILE_PLANT_CARROT, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_CARROT, 4, 4, 50, 10, 5);
 }
 
 void FarmingObject::cleanData() {

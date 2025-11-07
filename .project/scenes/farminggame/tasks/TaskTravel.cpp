@@ -88,6 +88,10 @@ bool TaskTravel::generatePath() {
     }
     std::reverse(path.begin(), path.end());
 
+    //print path points
+    std::cout << "| "; for (auto & i : path) std::cout << i.x << ", " << i.y << " | "; std::cout << std::endl;
+
+
     if (path.size() > 1) pathIndex = 1; //skip first tile
     cost = costSoFar[key(goal)];
     return true;
@@ -100,16 +104,11 @@ TaskTravel::TaskTravel(LittleGuy *guy, ivec2 goal) : Task(guy){
 }
 
 bool TaskTravel::update(float dt) {
-    if (guy == nullptr) {
-        std::cout << "task does not have guy." << std::endl;
-        return false;
-    }
     if (guy->getTile() == goal) return true;
     if (path.empty()) generatePath();
     if (path.empty()) { //pathfinding has failed
         std::cout << "pathfinding has failed." << std::endl;
     }
-
     float travelDist = guy->getSpeed() * dt;
     //if (world->getTile(path[pathIndex].x, path[pathIndex].y).landType == FarmingWorld::FARMLAND) travelDist *= 2;
 

@@ -39,7 +39,23 @@ bool TaskRetrieveItem::update(const float dt) {
             return false;
         }
         if (harvestTask != nullptr) {
-            if (harvestTask->update(dt)) {
+            return false;
+        }
+        if (pickupTask != nullptr) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool TaskRetrieveItem::tick() {
+    if (amount < goalAmount) {
+        if (travelTask != nullptr) {
+            return false;
+        }
+        if (harvestTask != nullptr) {
+            if (harvestTask->tick()) {
                 if (pickupTask != nullptr) {
                     Item *item = harvestTask->getResultItem();
                     pickupTask->setItem(item);
@@ -50,7 +66,7 @@ bool TaskRetrieveItem::update(const float dt) {
             return false;
         }
         if (pickupTask != nullptr) {
-            if (pickupTask->update(dt)) {
+            if (pickupTask->tick()) {
                 delete pickupTask;
                 pickupTask = nullptr;
                 amount++;
@@ -119,11 +135,13 @@ bool TaskRetrieveItem::getClosestItem() {
             delete taskHarvest;
             delete taskTravelHarvest;
             pickupTask = new TaskPickupItem(guy, closestItem);
+            itemTile = closestItem->tile;
         } else {
             travelTask = taskTravelHarvest;
             harvestTask = taskHarvest;
             delete taskTravel;
             pickupTask = new TaskPickupItem(guy, nullptr);
+            itemTile = closestPlant->tile;
         }
 
         return false;
@@ -131,14 +149,20 @@ bool TaskRetrieveItem::getClosestItem() {
     if (taskTravel != nullptr) {
         travelTask = taskTravel;
         pickupTask = new TaskPickupItem(guy, closestItem);
+        itemTile = closestItem->tile;
         return false;
     }
     if (taskHarvest != nullptr) {
         travelTask = taskTravelHarvest;
         harvestTask = taskHarvest;
         pickupTask = new TaskPickupItem(guy, nullptr);
+        itemTile = closestPlant->tile;
         return false;
     }
 
     return true; //no available options
+}
+
+ivec2 TaskRetrieveItem::getItemTile() {
+    return itemTile;
 }
