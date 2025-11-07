@@ -10,7 +10,9 @@ TaskPickupItem::TaskPickupItem(LittleGuy *guy, Item *item) : Task(guy) {
     if (this->item != nullptr) this->item->setBeingUsed(true);
 }
 
-TaskPickupItem::~TaskPickupItem() = default;
+TaskPickupItem::~TaskPickupItem() {
+    if (item != nullptr) item->setBeingUsed(false);
+}
 
 bool TaskPickupItem::tick() {
     guy->giveItem(item);

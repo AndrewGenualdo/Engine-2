@@ -12,7 +12,10 @@ TaskHarvestPlant::TaskHarvestPlant(LittleGuy *guy, TilePlant *plant) {
     this->plant->setBeingUsed(true);
 }
 
-TaskHarvestPlant::~TaskHarvestPlant() = default;
+TaskHarvestPlant::~TaskHarvestPlant() {
+    if (plant != nullptr) plant->setBeingUsed(false);
+    if (item != nullptr) item->setBeingUsed(false);
+};
 
 bool TaskHarvestPlant::tick() {
     if (plant != nullptr) {

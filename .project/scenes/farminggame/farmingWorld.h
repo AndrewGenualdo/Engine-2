@@ -54,6 +54,7 @@ public:
 
     static Tiles2d landTilemap;
     static Tiles2d plantTilemap;
+    static Texture2d barnTexture;
 
     std::string savePath;
 

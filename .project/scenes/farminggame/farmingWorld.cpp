@@ -21,6 +21,7 @@
 
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
 Tiles2d FarmingWorld::plantTilemap = Tiles2d();
+Texture2d FarmingWorld::barnTexture = Texture2d();
 
 FarmingWorld::FarmingWorld() {
     this->savePath = "";
@@ -343,7 +344,7 @@ void FarmingWorld::clearObjects() {
         }
     }
     objects.clear();
-    for (auto & guy : guys) {
+    for (const auto & guy : guys) {
         guy->clearObjects();
     }
     guys.clear();
@@ -358,7 +359,7 @@ vec2 FarmingWorld::getTilePos(int x, int y) {
 void FarmingWorld::draw() const {
     Texture2d::setColor(vec4(1));
     landTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
-    plantTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
+    plantTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y + TILE_HEIGHT * 0.2f, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
 
     Texture2d::setColor(vec4(1));
     for (int i = 0; i < guys.size(); i++) {
@@ -371,6 +372,7 @@ void FarmingWorld::draw() const {
             binded = true;
         }
     }
+    barnTexture.draw(TILE_OFFSET_X - 2 * TILE_WIDTH + TILE_WIDTH * (4.0f / 18.0f), TILE_OFFSET_Y, TILE_WIDTH * 2, TILE_HEIGHT * 6, true);
 }
 
 ivec2 FarmingWorld::getTileFromPos(vec2 pos) {
