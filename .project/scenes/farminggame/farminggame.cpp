@@ -67,12 +67,12 @@ void FarmingScene::draw() {
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
     if (window->isInputClicked(GLFW_KEY_F)) {
-        for (auto & guy : world->guys) {
+        for (const auto & guy : world->guys) {
             guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT, mouseTile));
         }
     }
     if (window->isInputClicked(GLFW_KEY_G)) {
-        for (auto & guy : world->guys) {
+        for (const auto & guy : world->guys) {
             guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT, mouseTile));
         }
     }
@@ -137,7 +137,7 @@ void FarmingScene::draw() {
     }
 
     world->draw();
-    fontRenderer.draw("Pos: " + std::to_string(world->guys[0]->getPos().x) + ", " + std::to_string(world->guys[0]->getPos().y) + "\nTile: " + std::to_string(world->guys[0]->getTile().x) + ", " + std::to_string(world->guys[0]->getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);
+    if(!world->guys.empty()) fontRenderer.draw("Pos: " + std::to_string(world->guys[0]->getPos().x) + ", " + std::to_string(world->guys[0]->getPos().y) + "\nTile: " + std::to_string(world->guys[0]->getTile().x) + ", " + std::to_string(world->guys[0]->getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);
 
 
     const int mouseTileIndex = mouseTile.y * FarmingWorld::TILES_HORIZ + mouseTile.x;

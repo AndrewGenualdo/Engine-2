@@ -89,7 +89,7 @@ bool TaskTravel::generatePath() {
     std::reverse(path.begin(), path.end());
 
     //print path points
-    std::cout << "| "; for (auto & i : path) std::cout << i.x << ", " << i.y << " | "; std::cout << std::endl;
+    //std::cout << "| "; for (auto & i : path) std::cout << i.x << ", " << i.y << " | "; std::cout << std::endl;
 
 
     if (path.size() > 1) pathIndex = 1; //skip first tile
