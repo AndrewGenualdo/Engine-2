@@ -34,7 +34,7 @@ public:
 
 
 
-    vec2 pos;
+    vec2 pos = vec2(0);
 
 
     Item() = default;
