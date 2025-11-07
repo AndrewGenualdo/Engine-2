@@ -38,7 +38,3 @@ void TilePlantTomato::loadConfig(const std::string &line, int i) {
         TilePlantTomato::updatePlantState(); //this one happens last, after all other data has been loaded
     } else TilePlant::loadConfig(line, i);
 }
-
-unsigned int TilePlantTomato::getTextureOffset() {
-    return 1;
-}

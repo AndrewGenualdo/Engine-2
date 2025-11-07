@@ -67,10 +67,8 @@ bool TilePlant::destroy() {
 
 void TilePlant::updatePlantState() {
     if (world != nullptr) {
-        world->plantData[tile.y * FarmingWorld::TILES_HORIZ + tile.x] = getTextureOffset() + stage;
+        world->plantData[tile.y * FarmingWorld::TILES_HORIZ + tile.x] = getData<PlantData>(getType())->textureIndex + stage;
     }
 }
 
-unsigned int TilePlant::getTextureOffset() {
-    return 0;
-}
+

@@ -12,6 +12,7 @@
 #include "items/seeds/ItemSeedTomato.h"
 #include "tasks/TaskRetrieveItem.h"
 #include "tasks/TaskTravel.h"
+#include "tiles/plants/TilePlantCarrot.h"
 #include "tiles/plants/TilePlantTomato.h"
 
 Camera FarmingScene::camera = Camera();
@@ -36,13 +37,13 @@ void FarmingScene::load() {
     camera = Camera(vec3(), vec3(), 60.0f, vec2(window->getWidth(), window->getHeight()));
     fontRenderer = FontRenderer("assets/textures/font/font.png");
     blank = Texture2d("assets/textures/ui/blank.png");
+    FarmingObject::loadData();
     world = new FarmingWorld("saves/farming.txt");
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
     LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 4);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
-    FarmingObject::loadData();
 }
 
 void FarmingScene::draw() {
@@ -63,8 +64,13 @@ void FarmingScene::draw() {
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
     if (window->isInputClicked(GLFW_KEY_F)) {
-        for (int i = 0; i < world->guys.size(); i++) {
-            world->guys[i]->setTask(new TaskRetrieveItem(world->guys[i], FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT));
+        for (auto & guy : world->guys) {
+            guy->setTask(new TaskRetrieveItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT));
+        }
+    }
+    if (window->isInputClicked(GLFW_KEY_G)) {
+        for (auto & guy : world->guys) {
+            guy->setTask(new TaskRetrieveItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT));
         }
     }
 
@@ -78,15 +84,20 @@ void FarmingScene::draw() {
             if (isFarmland) {
                 for (int j = 0; j < world->objects.size(); j++) {
                     FarmingObject *obj = world->objects[j];
-                    const auto *tomato = dynamic_cast<TilePlantTomato*>(obj);
-                    if (tomato && tomato->tile.y * FarmingWorld::TILES_HORIZ + tomato->tile.x == i) {
+                    const auto *plant = dynamic_cast<TilePlant*>(obj);
+                    if (plant && plant->tile.y * FarmingWorld::TILES_HORIZ + plant->tile.x == i) {
                         planted = true;
                         break;
                     }
                 }
             }
             if (!planted) {
-                world->objects.push_back(new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+                switch (static_cast<int>(ew::RandomRange(0, 2))) {
+                    case 0: world->objects.push_back(new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ))); break;
+                    case 1: world->objects.push_back(new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ))); break;
+                    default: break;
+                }
+
                 break;
             }
         }

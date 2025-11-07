@@ -88,6 +88,7 @@ public:
             std::cout << "FAILED TO CAST TO OBJECT TYPE: " << static_cast<int>(type) << std::endl;
             return nullptr;
         }
+
         std::cout << "FAILED TO FIND OBJECT TYPE: " << static_cast<int>(type) << std::endl;
         return nullptr;
     }

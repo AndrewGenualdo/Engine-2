@@ -1,16 +1,16 @@
 //
-// Created by cobble on 11/5/2025.
+// Created by andrew.genualdo on 11/7/2025.
 //
 
-#ifndef ENGINE_2_TILEPLANTTOMATO_H
-#define ENGINE_2_TILEPLANTTOMATO_H
+#ifndef ENGINE_2_TILEPLANTCARROT_H
+#define ENGINE_2_TILEPLANTCARROT_H
 #include "TilePlant.h"
 
 
-class TilePlantTomato : public TilePlant {
+class TilePlantCarrot : public TilePlant {
 public:
-    TilePlantTomato() = default;
-    explicit TilePlantTomato(ivec2 tile);
+    TilePlantCarrot() = default;
+    explicit TilePlantCarrot(ivec2 tile);
 
     void update(float dt) override;
     void tick() override;
@@ -20,8 +20,7 @@ public:
     std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
-
 };
 
 
-#endif //ENGINE_2_TILEPLANTTOMATO_H
+#endif //ENGINE_2_TILEPLANTCARROT_H

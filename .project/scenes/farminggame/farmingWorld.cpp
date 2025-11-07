@@ -16,6 +16,7 @@
 #include "items/seeds/ItemSeedTomato.h"
 #include "tiles/Tile.h"
 #include "tiles/plants/TilePlant.h"
+#include "tiles/plants/TilePlantCarrot.h"
 #include "tiles/plants/TilePlantTomato.h"
 
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
@@ -53,6 +54,8 @@ void FarmingWorld::load() {
     types.push_back(LittleGuy().getConfigKey()); //7
     types.push_back(ItemProduceCarrot().getConfigKey()); //8
     types.push_back(ItemSeedCarrot().getConfigKey()); //9
+    types.push_back(TilePlantCarrot().getConfigKey()); //10
+
 
     bool inGuy = false;
 
@@ -147,6 +150,7 @@ void FarmingWorld::load() {
                                 case 7: break; //skip cuz little guy
                                 case 8: currentObject = new ItemProduceCarrot(); break;
                                 case 9: currentObject = new ItemSeedCarrot(); break;
+                                case 10:currentObject = new TilePlantCarrot(); break;
                                 default: {
                                     std::cout << "UNKNOWN OBJECT IS BEING LOADED!!" << std::endl << "Object: '" << line << "'" << std::endl;
                                     break;

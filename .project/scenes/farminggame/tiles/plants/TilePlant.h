@@ -19,13 +19,15 @@ public:
         int ripeStage = 1;
         int ticksBetweenStage = 1;
         int ticksToHarvest = 1;
+        int textureIndex = 1;
         PlantData() : TileData() {}
-        explicit PlantData(const TypeID type, const TypeID parent, const TypeID produces, int stageCount, int ripeStage, int ticksBetweenStage, int ticksToHarvest) : TileData(type, parent) {
+        explicit PlantData(const TypeID type, const TypeID parent, const TypeID produces, const int stageCount, const int ripeStage, const int ticksBetweenStage, const int ticksToHarvest, const int textureIndex) : TileData(type, parent) {
             this->produces = produces;
             this->stageCount = stageCount;
             this->ripeStage = ripeStage - 1;
             this->ticksBetweenStage = ticksBetweenStage;
             this->ticksToHarvest = ticksToHarvest;
+            this->textureIndex = textureIndex;
         }
         ~PlantData() override = default;
 
@@ -52,8 +54,6 @@ public:
 
     bool destroy() override;
     virtual void updatePlantState();
-
-    virtual unsigned int getTextureOffset();
 
 };
 
