@@ -19,33 +19,29 @@ public:
 
     static void setTexture(const std::string &path, int width, int height, int items);
 
-    enum ItemType {
-        NONE,
-        SEED,
-        PRODUCE
-    };
-
     class ItemData : public ObjectData {
     public:
-        ItemType itemType = NONE;
+
+        int textureIndex = 63;
 
         ItemData() : ObjectData() {}
-        explicit ItemData(const ItemType itemType) : ObjectData(ITEM) {
-            this->itemType = itemType;
-        };
+        explicit ItemData(const TypeID type, const TypeID parent, const int textureIndex) : ObjectData(type, parent) {
+            this->textureIndex = textureIndex;
+        }
+        ~ItemData() override = default;
     };
 
 
 
 
     vec2 pos;
-    ItemType itemType = NONE;
+
 
     Item() = default;
-
-    Item(ItemType itemType, ivec2 tile);
-    Item(ItemType itemType, vec2 pos);
+    explicit Item(ivec2 tile);
+    explicit Item(vec2 pos);
     ~Item() override = default;
+    [[nodiscard]] TypeID getType() const override;
 
     void update(float dt) override;
     void tick() override;

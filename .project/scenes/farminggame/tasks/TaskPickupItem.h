@@ -10,15 +10,17 @@
 class TaskPickupItem : Task {
     constexpr static float PICKUP_DISTANCE = (FarmingWorld::TILE_WIDTH + FarmingWorld::TILE_HEIGHT) * 0.5f;
 
-    FarmingObject::ObjectType type;
+    Item *item;
 
 public:
-    TaskPickupItem(LittleGuy *guy, FarmingObject::ObjectType type);
+    TaskPickupItem(LittleGuy *guy, Item *item);
     ~TaskPickupItem() override;
 
     bool update(float dt) override;
     std::string getName() override;
     float getCost() override;
+
+    void setItem(Item *item);
 };
 
 

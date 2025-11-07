@@ -110,7 +110,7 @@ GLint cobb::Shader::getUniformLocation(const std::string &name) {
 
     GLint location = glGetUniformLocation(ID, name.c_str());
     uniformCache[name] = location;
-    std::cout << "[" << ID << "][" << name << "] = " << std::to_string(location) << std::endl;
+    //std::cout << "[" << ID << "][" << name << "] = " << std::to_string(location) << std::endl;
     return location;
 
     //return glGetUniformLocation(ID, name.c_str());

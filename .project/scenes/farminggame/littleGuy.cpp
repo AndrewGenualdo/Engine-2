@@ -11,7 +11,7 @@ MultiTexture2d LittleGuy::texture = MultiTexture2d();
 int LittleGuy::width = 1;
 int LittleGuy::height = 1;
 
-LittleGuy::LittleGuy(ivec2 tile) {
+LittleGuy::LittleGuy(const ivec2 tile) {
     this->pos = FarmingWorld::getTilePos(tile.x, tile.y);
     this->tile = tile;
 }
@@ -21,7 +21,7 @@ LittleGuy::LittleGuy() {
     pos = FarmingWorld::getTilePos(0, 0);
 }
 
-LittleGuy::LittleGuy(vec2 pos) {
+LittleGuy::LittleGuy(const vec2 pos) {
     this->tile = FarmingWorld::getTileFromPos(pos);
     this->pos = pos;
 }
@@ -38,7 +38,7 @@ void LittleGuy::setWorld(FarmingWorld *w) {
     world = w;
 }
 
-void LittleGuy::setTexture(const std::string &path, int width, int height, int frames) {
+void LittleGuy::setTexture(const std::string &path,const  int width, const int height, const int frames) {
     LittleGuy::width = width;
     LittleGuy::height = height;
     texture = MultiTexture2d(path, frames);
@@ -68,10 +68,12 @@ void LittleGuy::tick() {
     }
 }
 
-void LittleGuy::draw(bool bind) {
-    texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, items.empty() ? 0 : 1, bind);
+void LittleGuy::draw(const bool bind) {
+    int frame = wasLastDirLeft ? 0 : 1;
+    frame += items.empty() ? 0 : 2;
+    texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, frame, bind);
     for (int i = items.size() - 1; i >= 0; i--) {
-        items[i]->draw(-items[i]->pos.x + pos.x, -items[i]->pos.y + pos.y + (0.722f * height) + (items.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, i == items.size() - 1);
+        items[i]->draw(-items[i]->pos.x + pos.x, -items[i]->pos.y + pos.y + (0.722f * 0.772f * height) + (items.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, i == items.size() - 1);
     }
 }
 
@@ -89,7 +91,7 @@ std::string LittleGuy::getConfig() {
     return output;
 }
 
-void LittleGuy::loadConfig(const std::string &line, int i) {
+void LittleGuy::loadConfig(const std::string &line, const int i) {
     if (i == 1) {
         std::istringstream iss(line);
         iss >> pos.x >> pos.y >> speed;
@@ -111,10 +113,12 @@ vec2 LittleGuy::getPos() const {
 }
 
 void LittleGuy::move(vec2 diff) {
+    if (diff.x < 0) wasLastDirLeft = true;
+    else if (diff.x > 0) wasLastDirLeft = false;
     pos += diff;
 }
 
-void LittleGuy::setPos(vec2 pos) {
+void LittleGuy::setPos(const vec2 pos) {
     this->pos = pos;
 }
 
@@ -130,7 +134,7 @@ float LittleGuy::getSpeed() const {
     return speed;
 }
 
-void LittleGuy::setSpeed(float speed) {
+void LittleGuy::setSpeed(const float speed) {
     this->speed = speed;
 }
 

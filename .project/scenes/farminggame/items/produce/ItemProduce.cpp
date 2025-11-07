@@ -5,12 +5,16 @@
 #include "ItemProduce.h"
 #include "../../farmingWorld.h"
 
-ItemProduce::ItemProduce(const ProduceType produceType, const ivec2 tile) : Item(PRODUCE, tile) {
-    this->produceType = produceType;
+ItemProduce::ItemProduce(const ivec2 tile) : Item(tile) {
+
 }
 
-ItemProduce::ItemProduce(const ProduceType produceType, const vec2 pos) : Item(PRODUCE, pos) {
-    this->produceType = produceType;
+ItemProduce::ItemProduce(const vec2 pos) : Item(pos) {
+
+}
+
+FarmingObject::TypeID ItemProduce::getType() const {
+    return TypeID::ITEM_PRODUCE;
 }
 
 void ItemProduce::update(const float dt) {

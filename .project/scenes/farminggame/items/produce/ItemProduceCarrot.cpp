@@ -4,15 +4,19 @@
 
 #include "ItemProduceCarrot.h"
 
-ItemProduceCarrot::ItemProduceCarrot(const ivec2 tile) : ItemProduce(CARROT, tile) {
+ItemProduceCarrot::ItemProduceCarrot(const ivec2 tile) : ItemProduce(tile) {
 }
 
-ItemProduceCarrot::ItemProduceCarrot(const vec2 pos) : ItemProduce(CARROT, pos) {
+ItemProduceCarrot::ItemProduceCarrot(const vec2 pos) : ItemProduce(pos) {
 
 }
 
 void ItemProduceCarrot::draw(const bool bind) {
     ItemProduce::draw(bind);
+}
+
+FarmingObject::TypeID ItemProduceCarrot::getType() const {
+    return TypeID::ITEM_PRODUCE_CARROT;
 }
 
 void ItemProduceCarrot::tick() {

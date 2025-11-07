@@ -6,16 +6,9 @@
 
 #include "../../farmingWorld.h"
 
-FarmingWorld *TilePlant::world = nullptr;
-
-void TilePlant::setWorld(FarmingWorld *world) {
-    TilePlant::world = world;
-}
-
-TilePlant::TilePlant(const PlantType plantType, const ivec2 tile) : Tile(PLANT, tile) {
-    this->plantType = plantType;
+TilePlant::TilePlant(const TypeID type, const ivec2 tile) : Tile(tile) {
     this->stage = 0;
-    this->ticksUntilStage = 100;//ticksBetweenStage;
+    this->ticksUntilStage = getData<PlantData>(type)->ticksBetweenStage;
 }
 
 void TilePlant::update(float dt) {
@@ -23,18 +16,22 @@ void TilePlant::update(float dt) {
 }
 
 void TilePlant::tick() {
-    /*if (stage == stageCount - 1) return;
+    auto* data = getData<PlantData>(getType());
+    if (stage == data->stageCount - 1) return;
     ticksUntilStage--;
-    if (ticksUntilStage <= 0) {
+    if (ticksUntilStage == 0) {
         stage++;
-        ticksUntilStage = ticksBetweenStage;
+        ticksUntilStage = data->ticksBetweenStage;
         updatePlantState();
     }
-    if (stage >= stageCount) stage = stageCount - 1;*/
 }
 
 void TilePlant::draw(bool bind) {
 
+}
+
+FarmingObject::TypeID TilePlant::getType() const {
+    return TypeID::TILE_PLANT;
 }
 
 std::string TilePlant::getConfigKey() {
@@ -42,21 +39,30 @@ std::string TilePlant::getConfigKey() {
 }
 
 std::string TilePlant::getConfig() {
-    return Tile::getConfig() + std::to_string(type) + " " + std::to_string(stage) + " " + std::to_string(ticksUntilStage) + "\n";
+    return Tile::getConfig() + std::to_string(stage) + " " + std::to_string(ticksUntilStage) + "\n";
 }
 
 void TilePlant::loadConfig(const std::string &line, const int i) {
     if (i == 2) {
         std::istringstream iss(line);
-        int value;
-        iss >> value >> stage >> ticksUntilStage;
-        type = static_cast<ObjectType>(value);
+        iss >> stage >> ticksUntilStage;
     } else Tile::loadConfig(line, i);
 }
 
 bool TilePlant::isRipe() const {
-    return stage == 4;
-    //return stage == ripeStage;
+    //if (stage == getData<PlantData>(getType())->ripeStage) std::cout << "ripe" << std::endl;
+    return stage == getData<PlantData>(getType())->ripeStage;
+}
+
+bool TilePlant::destroy() {
+    if (world != nullptr) {
+        ivec2 t = tile;
+        if (FarmingObject::destroy()) {
+            world->plantData[t.y * FarmingWorld::TILES_HORIZ + t.x] = FarmingWorld::EMPTY;
+            return true;
+        }
+    }
+    return false;
 }
 
 void TilePlant::updatePlantState() {

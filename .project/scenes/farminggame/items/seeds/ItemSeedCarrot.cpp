@@ -4,11 +4,11 @@
 
 #include "ItemSeedCarrot.h"
 
-ItemSeedCarrot::ItemSeedCarrot(const ivec2 tile) : ItemSeed(CARROT, tile) {
+ItemSeedCarrot::ItemSeedCarrot(const ivec2 tile) : ItemSeed(tile) {
 
 }
 
-ItemSeedCarrot::ItemSeedCarrot(const vec2 pos) : ItemSeed(CARROT, pos) {
+ItemSeedCarrot::ItemSeedCarrot(const vec2 pos) : ItemSeed(pos) {
 
 }
 
@@ -24,6 +24,10 @@ void ItemSeedCarrot::tick() {
 
 void ItemSeedCarrot::update(const float dt) {
 
+}
+
+FarmingObject::TypeID ItemSeedCarrot::getType() const {
+    return TypeID::ITEM_SEED_CARROT;
 }
 
 std::string ItemSeedCarrot::getConfigKey() {

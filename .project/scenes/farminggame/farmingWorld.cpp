@@ -27,8 +27,8 @@ FarmingWorld::FarmingWorld() {
 
 FarmingWorld::FarmingWorld(const std::string &savePath) {
     this->savePath = savePath;
-    TilePlant::setWorld(this);
     LittleGuy::setWorld(this);
+    FarmingObject::setWorld(this);
     load();
 }
 
@@ -38,7 +38,7 @@ FarmingWorld::~FarmingWorld() {
 
 void FarmingWorld::load() {
     for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
-        landData[i] = EMPTY;
+        landData[i] = FARMLAND;
         plantData[i] = EMPTY;
     }
 
@@ -351,18 +351,20 @@ vec2 FarmingWorld::getTilePos(int x, int y) {
     return {TILE_OFFSET_X + (x + 0.5f) * TILE_WIDTH, TILE_OFFSET_Y + (y + 0.5f) * TILE_HEIGHT};
 }
 
-void FarmingWorld::draw() {
+void FarmingWorld::draw() const {
     Texture2d::setColor(vec4(1));
     landTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
     plantTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
 
     Texture2d::setColor(vec4(1));
     for (int i = 0; i < guys.size(); i++) {
-        guys[i]->draw(i == 0);
+        guys[i]->draw(true);
     }
+    bool binded = false;
     for (int i = 0; i < objects.size(); i++) {
         if (dynamic_cast<Item*>(objects[i])) {
-            objects[i]->draw(i == 0);
+            objects[i]->draw(!binded);
+            binded = true;
         }
     }
 }

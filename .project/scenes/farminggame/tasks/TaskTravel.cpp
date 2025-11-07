@@ -96,6 +96,7 @@ bool TaskTravel::generatePath() {
 TaskTravel::TaskTravel(LittleGuy *guy, ivec2 goal) : Task(guy){
     this->guy = guy;
     this->goal = goal;
+    generatePath();
 }
 
 bool TaskTravel::update(float dt) {

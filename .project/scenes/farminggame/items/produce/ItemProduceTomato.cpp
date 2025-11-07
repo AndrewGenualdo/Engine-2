@@ -6,16 +6,20 @@
 #include "../../farmingWorld.h"
 
 
-ItemProduceTomato::ItemProduceTomato(const ivec2 tile) : ItemProduce(TOMATO, tile) {
+ItemProduceTomato::ItemProduceTomato(const ivec2 tile) : ItemProduce(tile) {
 
 }
 
-ItemProduceTomato::ItemProduceTomato(const vec2 pos) : ItemProduce(TOMATO, pos) {
+ItemProduceTomato::ItemProduceTomato(const vec2 pos) : ItemProduce(pos) {
 
 }
 
 void ItemProduceTomato::draw(const bool bind) {
     ItemProduce::draw(bind);
+}
+
+FarmingObject::TypeID ItemProduceTomato::getType() const {
+    return TypeID::ITEM_PRODUCE_TOMATO;
 }
 
 void ItemProduceTomato::tick() {

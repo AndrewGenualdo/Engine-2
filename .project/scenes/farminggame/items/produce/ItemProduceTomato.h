@@ -16,9 +16,10 @@ public:
     explicit ItemProduceTomato(ivec2 tile);
     explicit ItemProduceTomato(vec2 pos);
 
-    void draw(bool bind) override;
-    void tick() override;
     void update(float dt) override;
+    void tick() override;
+    void draw(bool bind) override;
+    [[nodiscard]] TypeID getType() const override;
 
     std::string getConfigKey() override;
     std::string getConfig() override;

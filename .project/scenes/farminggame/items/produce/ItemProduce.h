@@ -11,30 +11,25 @@
 class ItemProduce : public Item {
 
 public:
-    enum ProduceType {
-        NONE,
-        TOMATO,
-        CARROT,
-    };
-
     class ProduceData : public ItemData {
     public:
-        ProduceType produceType = NONE;
-        TilePlant::PlantType producedFrom = TilePlant::PlantType::NONE;
+        TypeID producedFrom = TypeID::NONE;
 
         ProduceData() : ItemData() {}
-        explicit ProduceData(const ProduceType produceType, const TilePlant::PlantType producedFrom) : ItemData(PRODUCE) {
-            this->produceType = produceType;
+        explicit ProduceData(const TypeID type, const TypeID parent, const TypeID producedFrom, int textureIndex) : ItemData(type, parent, textureIndex) {
             this->producedFrom = producedFrom;
         }
+        ~ProduceData() override = default;
+
     };
 
-    ProduceType produceType = NONE;
+
 
     ItemProduce() : Item() {}
-    ItemProduce(ProduceType produceType, ivec2 tile);
-    ItemProduce(ProduceType produceType, vec2 pos);
+    explicit ItemProduce(ivec2 tile);
+    explicit ItemProduce(vec2 pos);
     ~ItemProduce() override = default;
+    [[nodiscard]] TypeID getType() const override;
 
     void update(float dt) override;
     void tick() override;

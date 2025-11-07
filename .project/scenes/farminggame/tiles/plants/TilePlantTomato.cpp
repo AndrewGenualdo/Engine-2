@@ -5,7 +5,7 @@
 #include "TilePlantTomato.h"
 #include "../../farmingWorld.h"
 
-TilePlantTomato::TilePlantTomato(const ivec2 tile) : TilePlant(TOMATO, tile) {
+TilePlantTomato::TilePlantTomato(const ivec2 tile) : TilePlant(TypeID::TILE_PLANT_TOMATO, tile) {
     TilePlantTomato::updatePlantState();
 }
 
@@ -19,6 +19,10 @@ void TilePlantTomato::tick() {
 
 void TilePlantTomato::draw(bool bind) {
 
+}
+
+FarmingObject::TypeID TilePlantTomato::getType() const {
+    return TypeID::TILE_PLANT_TOMATO;
 }
 
 std::string TilePlantTomato::getConfigKey() {

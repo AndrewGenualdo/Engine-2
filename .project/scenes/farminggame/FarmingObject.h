@@ -8,57 +8,97 @@
 #include "cobb/misc/multiTexture2d.h"
 #include <sstream>
 
+class FarmingWorld;
 using namespace glm;
 using namespace cobb;
 
 class FarmingObject {
 
 public:
-    enum ObjectType {
-        NONE,
+    enum class TypeID {
+        NONE = 0,
+
+
         ITEM,
+
+        ITEM_SEED,
+        ITEM_SEED_TOMATO,
+        ITEM_SEED_CARROT,
+
+        ITEM_PRODUCE,
+        ITEM_PRODUCE_TOMATO,
+        ITEM_PRODUCE_CARROT,
+
+
         TILE,
-        MISC
+
+        TILE_PLANT,
+        TILE_PLANT_TOMATO,
+        TILE_PLANT_CARROT,
+
+
+        LITTLE_GUY
     };
 
     class ObjectData {
     public:
-        ObjectType objectType;
-
+        TypeID type = TypeID::NONE;
+        TypeID parent = TypeID::NONE;
         ObjectData() = default;
-        explicit ObjectData(const ObjectType objectType) {
-            this->objectType = objectType;
+        explicit ObjectData(TypeID type, TypeID parent) {
+            this->type = type;
+            this->parent = parent;
         }
+        virtual ~ObjectData();
     };
 
-    static std::vector<ObjectData*> objectData;
+    static std::map<TypeID, ObjectData*> objectData;
 
     static void loadData();
     static void cleanData();
+    static FarmingWorld *world;
+    static void setWorld(FarmingWorld *world);
 
     ivec2 tile = ivec2(0);
-    ObjectType type = NONE;
     bool beingUsed = false;
 
     FarmingObject() = default;
-    FarmingObject(ObjectType type, ivec2 tile);
-    virtual ~FarmingObject() = default;
+    explicit FarmingObject(ivec2 tile);
+    virtual ~FarmingObject();
 
     virtual void update(float deltaTime);
     virtual void tick();
     virtual void draw(bool bind);
     virtual void draw(float offsetX, float offsetY, bool bind);
+    [[nodiscard]] virtual TypeID getType() const;
+    virtual bool destroy();
 
-    void setUsed(bool isBeingUsed);
+    void setBeingUsed(bool isBeingUsed);
     [[nodiscard]] bool isBeingUsed() const;
 
     virtual std::string getConfigKey();
     virtual std::string getConfig();
     virtual void loadConfig(const std::string &line, int i);
 
-    template <class T>
-    static T* getObjectData(T objectType);
+    template <typename T>
+    static T* getData(TypeID type) {
+        if (objectData.find(type) != objectData.end()) {
+            T* out = dynamic_cast<T*>(objectData[type]);
+            if (out) return out;
+            std::cout << "FAILED TO CAST TO OBJECT TYPE: " << static_cast<int>(type) << std::endl;
+            return nullptr;
+        }
+        std::cout << "FAILED TO FIND OBJECT TYPE: " << static_cast<int>(type) << std::endl;
+        return nullptr;
+    }
+
+    static bool isType(TypeID type) {
+
+
+        return false;
+    }
 };
+
 
 
 #endif //ENGINE_2_FARMINGOBJECT_H

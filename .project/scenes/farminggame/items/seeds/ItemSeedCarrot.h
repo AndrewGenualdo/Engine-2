@@ -18,6 +18,7 @@ public:
     void draw(bool bind) override;
     void tick() override;
     void update(float dt) override;
+    [[nodiscard]] TypeID getType() const override;
 
     std::string getConfigKey() override;
     std::string getConfig() override;

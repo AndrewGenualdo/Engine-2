@@ -15,6 +15,10 @@
 #include "glm/vec2.hpp"
 #include "cobb/misc/texture2d.h"
 #include "cobb/misc/tiles2d.h"
+#include "items/produce/ItemProduceCarrot.h"
+#include "items/produce/ItemProduceTomato.h"
+#include "items/seeds/ItemSeedCarrot.h"
+#include "items/seeds/ItemSeedTomato.h"
 #include "tiles/Tile.h"
 
 using namespace cobb;
@@ -66,7 +70,7 @@ public:
 
     void update(float dt);
     void tick();
-    void draw();
+    void draw() const;
 
     void updateTileTypes();
     void clearObjects();
@@ -76,6 +80,23 @@ public:
 
     [[nodiscard]] static vec2 getTilePos(int x, int y);
     [[nodiscard]] static ivec2 getTileFromPos(vec2 pos);
+
+    Item* createItem(FarmingObject::TypeID type, ivec2 tile) {
+        return createItem(type, getTilePos(tile.x, tile.y));
+    }
+    Item* createItem(FarmingObject::TypeID type, vec2 pos) {
+        bool made = true;
+        switch (type) {
+            case FarmingObject::TypeID::ITEM_PRODUCE_TOMATO: objects.push_back(new ItemProduceTomato(pos)); break;
+            case FarmingObject::TypeID::ITEM_PRODUCE_CARROT: objects.push_back(new ItemProduceCarrot(pos)); break;
+            case FarmingObject::TypeID::ITEM_SEED_TOMATO: objects.push_back(new ItemSeedTomato(pos)); break;
+            case FarmingObject::TypeID::ITEM_SEED_CARROT: objects.push_back(new ItemSeedCarrot(pos)); break;
+            default: made = false; break;
+        }
+        if (made) return dynamic_cast<Item *>(objects[objects.size()-1]);
+        return nullptr;
+    }
+
 };
 
 

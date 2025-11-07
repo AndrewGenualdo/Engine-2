@@ -24,6 +24,7 @@ class LittleGuy : public FarmingObject {
 
     vec2 pos;
     float speed = 300;
+    bool wasLastDirLeft = true;
 
 public:
 

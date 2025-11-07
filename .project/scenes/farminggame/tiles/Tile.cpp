@@ -4,8 +4,7 @@
 
 #include "Tile.h"
 
-Tile::Tile(const TileType tileType, const ivec2 tile) : FarmingObject(TILE, tile) {
-    this->tileType = tileType;
+Tile::Tile(const ivec2 tile) : FarmingObject(tile) {
 }
 
 void Tile::update(float dt) {
@@ -18,6 +17,10 @@ void Tile::tick() {
 
 void Tile::draw(bool bind) {
 
+}
+
+FarmingObject::TypeID Tile::getType() const {
+    return TypeID::TILE;
 }
 
 std::string Tile::getConfigKey() {

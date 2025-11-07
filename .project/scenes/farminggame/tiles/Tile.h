@@ -12,31 +12,23 @@ using namespace cobb;
 
 class Tile : public FarmingObject {
 public:
-    enum TileType {
-        NONE,
-        PLANT,
-        MISC
-    };
 
     class TileData : public ObjectData {
     public:
-        TileType tileType = NONE;
 
         TileData() : ObjectData() {}
-        explicit TileData(const TileType tileType) : ObjectData(TILE) {
-            this->tileType = tileType;
-        }
+        explicit TileData(const TypeID type, const TypeID parent) : ObjectData(type, parent) {}
+        ~TileData() override = default;
 
     };
 
-    TileType tileType = NONE;
-
     Tile() = default;
-    Tile(TileType tileType, ivec2 tile);
+    explicit Tile(ivec2 tile);
 
     void update(float dt) override;
     void tick() override;
     void draw(bool bind) override;
+    [[nodiscard]] TypeID getType() const override;
 
     std::string getConfigKey() override;
     std::string getConfig() override;

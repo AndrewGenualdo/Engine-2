@@ -9,30 +9,25 @@
 
 class ItemSeed : public Item {
 public:
-    enum SeedType {
-        NONE,
-        TOMATO,
-        CARROT,
-    };
 
     class SeedData : public ItemData {
     public:
-        SeedType seedType = NONE;
-        ItemProduce::ProduceType produces = ItemProduce::ProduceType::NONE;
+        TypeID produces = TypeID::NONE;
 
         SeedData() : ItemData() {}
-        explicit SeedData(const SeedType seedType, const ItemProduce::ProduceType produces) : ItemData(SEED) {
-            this->seedType = seedType;
+        explicit SeedData(const TypeID type, const TypeID parent, const TypeID produces, int textureIndex) : ItemData(type, parent, textureIndex) {
             this->produces = produces;
         }
+        ~SeedData() override = default;
     };
 
-    SeedType seedType = NONE;
+
 
     ItemSeed() : Item() {}
-    ItemSeed(SeedType seedType, ivec2 tile);
-    ItemSeed(SeedType seedType, vec2 pos);
+    explicit ItemSeed(ivec2 tile);
+    explicit ItemSeed(vec2 pos);
     ~ItemSeed() override = default;
+    [[nodiscard]] TypeID getType() const override;
 
     void update(float dt) override;
     void tick() override;

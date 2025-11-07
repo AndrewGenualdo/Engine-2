@@ -5,12 +5,16 @@
 #include "ItemSeed.h"
 #include "../../farmingWorld.h"
 
-ItemSeed::ItemSeed(const SeedType seedType, const ivec2 tile) : Item(SEED, tile) {
-    this->seedType = seedType;
+ItemSeed::ItemSeed(const ivec2 tile) : Item(tile) {
+
 }
 
-ItemSeed::ItemSeed(const SeedType seedType, const vec2 pos) : Item(SEED, pos) {
-    this->seedType = seedType;
+ItemSeed::ItemSeed(const vec2 pos) : Item(pos) {
+
+}
+
+FarmingObject::TypeID ItemSeed::getType() const {
+    return TypeID::ITEM_SEED;
 }
 
 void ItemSeed::update(const float dt) {

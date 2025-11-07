@@ -39,7 +39,7 @@ void FarmingScene::load() {
     world = new FarmingWorld("saves/farming.txt");
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
-    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 2);
+    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 4);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
     FarmingObject::loadData();
@@ -63,8 +63,13 @@ void FarmingScene::draw() {
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
     if (window->isInputClicked(GLFW_KEY_F)) {
-        //world->guys[0]->setTask(new TaskTravel(world->guys[0], mouseTile));
-        world->guys[0]->setTask(new TaskRetrieveItem(world->guys[0], FarmingObject::getObjectData(TilePlant::PlantType()), 5));
+        for (int i = 0; i < world->guys.size(); i++) {
+            world->guys[i]->setTask(new TaskRetrieveItem(world->guys[i], FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT));
+        }
+    }
+
+    if (window->isInputClicked(GLFW_KEY_U)) {
+        world->guys.emplace_back(new LittleGuy(mouseTile));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {

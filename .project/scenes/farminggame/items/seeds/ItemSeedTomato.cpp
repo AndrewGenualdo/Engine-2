@@ -4,16 +4,20 @@
 
 #include "ItemSeedTomato.h"
 
-ItemSeedTomato::ItemSeedTomato(const ivec2 tile) : ItemSeed(TOMATO, tile) {
+ItemSeedTomato::ItemSeedTomato(const ivec2 tile) : ItemSeed(tile) {
 
 }
 
-ItemSeedTomato::ItemSeedTomato(const vec2 pos) : ItemSeed(TOMATO, pos) {
+ItemSeedTomato::ItemSeedTomato(const vec2 pos) : ItemSeed(pos) {
 
 }
 
 void ItemSeedTomato::draw(const bool bind) {
     ItemSeed::draw(bind);
+}
+
+FarmingObject::TypeID ItemSeedTomato::getType() const {
+    return TypeID::ITEM_SEED_TOMATO;
 }
 
 void ItemSeedTomato::tick() {

@@ -18,14 +18,16 @@ void Item::setTexture(const std::string &path, const int width, const int height
     Item::height = height;
 }
 
-Item::Item(const ItemType itemType, const ivec2 tile) : FarmingObject(ITEM, tile) {
+Item::Item(const ivec2 tile) : FarmingObject(tile) {
     this->pos = FarmingWorld::getTilePos(tile.x, tile.y);
-    this->itemType = itemType;
 }
 
-Item::Item(const ItemType itemType, const vec2 pos) : FarmingObject(ITEM, FarmingWorld::getTileFromPos(pos)){
+Item::Item(const vec2 pos) : FarmingObject(FarmingWorld::getTileFromPos(pos)){
     this->pos = pos;
-    this->itemType = itemType;
+}
+
+FarmingObject::TypeID Item::getType() const {
+    return TypeID::ITEM;
 }
 
 void Item::update(float dt) {
@@ -41,7 +43,7 @@ void Item::draw(bool bind) {
 }
 
 void Item::draw(float offsetX, float offsetY, bool bind) {
-    itemsTexture.draw(pos.x + offsetX - (width * 0.5f), pos.y + offsetY - (height * 0.5f), width, height, type, bind);
+    itemsTexture.draw(pos.x + offsetX - (width * 0.5f), pos.y + offsetY - (height * 0.5f), width, height, getData<ItemData>(getType())->textureIndex, bind);
 }
 
 std::string Item::getConfigKey() {
@@ -49,15 +51,13 @@ std::string Item::getConfigKey() {
 }
 
 std::string Item::getConfig() {
-    return FarmingObject::getConfig() + std::to_string(type) + " " + std::to_string(pos.x) + " " + std::to_string(pos.y) + "\n";
+    return FarmingObject::getConfig() + " " + std::to_string(pos.x) + " " + std::to_string(pos.y) + "\n";
 }
 
 void Item::loadConfig(const std::string &line, int i) {
     if (i == 1) {
         std::istringstream iss(line);
-        int value;
-        iss >> value >> pos.x >> pos.y;
-        type = static_cast<ObjectType>(value);
+        iss >> pos.x >> pos.y;
     } else {
         FarmingObject::loadConfig(line, i);
     }
