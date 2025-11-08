@@ -19,7 +19,6 @@ public:
         TileData() : ObjectData() {}
         explicit TileData(const TypeID type, const TypeID parent) : ObjectData(type, parent) {}
         ~TileData() override = default;
-
     };
 
     Tile() = default;

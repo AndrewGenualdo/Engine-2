@@ -56,6 +56,7 @@ public:
     [[nodiscard]] float getSpeed() const;
     void setSpeed(float speed);
 
+    Item* takeItem(TypeID type);
     void giveItem(Item *item);
 
     Task* getTask() const;

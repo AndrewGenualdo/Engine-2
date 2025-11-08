@@ -15,14 +15,16 @@ public:
     class PlantData : public TileData {
     public:
         TypeID produces = TypeID::TILE_PLANT;
+        TypeID seed = TypeID::ITEM_SEED;
         int stageCount = 1;
         int ripeStage = 1;
         int ticksBetweenStage = 1;
         int ticksToHarvest = 1;
         int textureIndex = 1;
         PlantData() : TileData() {}
-        explicit PlantData(const TypeID type, const TypeID parent, const TypeID produces, const int stageCount, const int ripeStage, const int ticksBetweenStage, const int ticksToHarvest, const int textureIndex) : TileData(type, parent) {
+        explicit PlantData(const TypeID type, const TypeID parent, const TypeID produces, const TypeID seed, const int stageCount, const int ripeStage, const int ticksBetweenStage, const int ticksToHarvest, const int textureIndex) : TileData(type, parent) {
             this->produces = produces;
+            this->seed = seed;
             this->stageCount = stageCount;
             this->ripeStage = ripeStage - 1;
             this->ticksBetweenStage = ticksBetweenStage;

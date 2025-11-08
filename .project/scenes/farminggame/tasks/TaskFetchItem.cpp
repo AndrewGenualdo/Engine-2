@@ -9,6 +9,9 @@ TaskFetchItem::TaskFetchItem(LittleGuy *guy, FarmingObject::TypeID type, int amo
     this->returnToTile = returnToTile;
     this->taskRetrieveItem = new TaskRetrieveItem(guy, type, amount);
     this->taskTravel = nullptr;
+    if (returnToTile == FarmingWorld::INVENTORY_TILE) taskDepositItem = new TaskDepositItem(guy, type, amount);
+    else this->taskDepositItem = nullptr;
+
 }
 
 TaskFetchItem::~TaskFetchItem() {
@@ -17,7 +20,12 @@ TaskFetchItem::~TaskFetchItem() {
         taskRetrieveItem = nullptr;
     }
     if (taskTravel != nullptr) {
+        delete taskTravel;
         taskTravel = nullptr;
+    }
+    if (taskDepositItem != nullptr) {
+        delete taskDepositItem;
+        taskDepositItem = nullptr;
     }
 }
 
@@ -37,6 +45,9 @@ bool TaskFetchItem::update(float dt) {
         }
         return false;
     }
+    if (taskDepositItem != nullptr) {
+        return false;
+    }
     return true;
 }
 
@@ -52,14 +63,31 @@ bool TaskFetchItem::tick() {
     if (taskTravel != nullptr) {
         return false;
     }
-
+    if (taskDepositItem != nullptr) {
+        if (taskDepositItem->tick()) {
+            delete taskDepositItem;
+            taskDepositItem = nullptr;
+        }
+        return false;
+    }
     return true;
 }
 
 std::string TaskFetchItem::getName() {
-    return "Fetch Item";
+    std::string out = "Fetch Item: {";
+    if (taskRetrieveItem != nullptr) out += taskRetrieveItem->getName();
+    if (taskTravel != nullptr) out += taskTravel->getName();
+    if (taskDepositItem != nullptr) out += taskDepositItem->getName();
+    out += "} ";
+    return out;
 }
 
 float TaskFetchItem::getCost() {
     return Task::getCost();
+}
+
+void TaskFetchItem::clear() {
+    if (taskRetrieveItem != nullptr) taskRetrieveItem->clear();
+    if (taskTravel != nullptr) taskTravel->clear();
+    if (taskDepositItem != nullptr) taskDepositItem->clear();
 }

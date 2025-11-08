@@ -15,7 +15,7 @@ public:
         TypeID produces = TypeID::NONE;
 
         SeedData() : ItemData() {}
-        explicit SeedData(const TypeID type, const TypeID parent, const TypeID produces, int textureIndex) : ItemData(type, parent, textureIndex) {
+        explicit SeedData(const TypeID type, const TypeID parent, const TypeID produces, int textureIndex, bool isItem) : ItemData(type, parent, textureIndex, isItem) {
             this->produces = produces;
         }
         ~SeedData() override = default;

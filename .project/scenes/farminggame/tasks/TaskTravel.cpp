@@ -14,11 +14,6 @@ bool TaskTravel::generatePath() {
     pathIndex = 0;
     path.clear();
 
-    ivec2 start = guy->getTile();
-    ivec2 goal = this->goal;
-
-
-
     constexpr ivec2 directions[4] = {
         { 0, -1 },
         { 0,  1 },
@@ -99,6 +94,14 @@ bool TaskTravel::generatePath() {
 
 TaskTravel::TaskTravel(LittleGuy *guy, ivec2 goal) : Task(guy){
     this->guy = guy;
+    this->start = guy->tile;
+    this->goal = goal;
+    generatePath();
+}
+
+TaskTravel::TaskTravel(LittleGuy *guy, ivec2 start, ivec2 goal) {
+    this->guy = guy;
+    this->start = start;
     this->goal = goal;
     generatePath();
 }
@@ -140,5 +143,5 @@ float TaskTravel::getCost() {
 }
 
 std::string TaskTravel::getName() {
-    return "Traveling to: "+std::to_string(goal.x) + ", " + std::to_string(goal.y);
+    return "Travel: {"+std::to_string(goal.x) + ", " + std::to_string(goal.y) + "} ";
 }

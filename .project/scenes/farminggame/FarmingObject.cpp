@@ -17,16 +17,16 @@ void FarmingObject::loadData() {
     objectData[TypeID::ITEM] = new ObjectData(TypeID::ITEM, TypeID::NONE);
 
 
-    objectData[TypeID::ITEM_PRODUCE] = new Item::ItemData(TypeID::ITEM_PRODUCE, TypeID::ITEM, 63);
+    objectData[TypeID::ITEM_PRODUCE] = new Item::ItemData(TypeID::ITEM_PRODUCE, TypeID::ITEM, 63, false);
 
-    objectData[TypeID::ITEM_PRODUCE_TOMATO] = new ItemProduce::ProduceData(TypeID::ITEM_PRODUCE_TOMATO, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_TOMATO, 1);
-    objectData[TypeID::ITEM_PRODUCE_CARROT] = new ItemProduce::ProduceData(TypeID::ITEM_PRODUCE_CARROT, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_CARROT, 3);
+    objectData[TypeID::ITEM_PRODUCE_TOMATO] = new ItemProduce::ProduceData(TypeID::ITEM_PRODUCE_TOMATO, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_TOMATO, 1, true);
+    objectData[TypeID::ITEM_PRODUCE_CARROT] = new ItemProduce::ProduceData(TypeID::ITEM_PRODUCE_CARROT, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_CARROT, 3, true);
 
 
-    objectData[TypeID::ITEM_SEED] = new Item::ItemData(TypeID::ITEM_SEED, TypeID::ITEM, 63);
+    objectData[TypeID::ITEM_SEED] = new Item::ItemData(TypeID::ITEM_SEED, TypeID::ITEM, 63, false);
 
-    objectData[TypeID::ITEM_SEED_TOMATO] = new ItemSeed::SeedData(TypeID::ITEM_SEED_TOMATO, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_TOMATO, 0);
-    objectData[TypeID::ITEM_SEED_CARROT] = new ItemSeed::SeedData(TypeID::ITEM_SEED_CARROT, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_CARROT, 2);
+    objectData[TypeID::ITEM_SEED_TOMATO] = new ItemSeed::SeedData(TypeID::ITEM_SEED_TOMATO, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_TOMATO, 0, true);
+    objectData[TypeID::ITEM_SEED_CARROT] = new ItemSeed::SeedData(TypeID::ITEM_SEED_CARROT, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_CARROT, 2, true);
 
 
 
@@ -35,8 +35,10 @@ void FarmingObject::loadData() {
 
     objectData[TypeID::TILE_PLANT] = new Tile::TileData(TypeID::TILE_PLANT, TypeID::TILE);
 
-    objectData[TypeID::TILE_PLANT_TOMATO] = new TilePlant::PlantData(TypeID::TILE_PLANT_TOMATO, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_TOMATO, 4, 4, 50, 15, 1);
-    objectData[TypeID::TILE_PLANT_CARROT] = new TilePlant::PlantData(TypeID::TILE_PLANT_CARROT, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_CARROT, 4, 4, 50, 10, 5);
+    objectData[TypeID::TILE_PLANT_TOMATO] = new TilePlant::PlantData(TypeID::TILE_PLANT_TOMATO, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_TOMATO, TypeID::ITEM_SEED_TOMATO, 4, 4, 50, 10, 1);
+    objectData[TypeID::TILE_PLANT_CARROT] = new TilePlant::PlantData(TypeID::TILE_PLANT_CARROT, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_CARROT, TypeID::ITEM_SEED_CARROT, 4, 4, 50, 10, 5);
+
+
 }
 
 void FarmingObject::cleanData() {
@@ -48,6 +50,21 @@ void FarmingObject::cleanData() {
 
 void FarmingObject::setWorld(FarmingWorld *world) {
     FarmingObject::world = world;
+}
+
+void FarmingObject::loadInventory() {
+    std::cout << "Ignore the following warnings, it's looping through all FarmingObject types" << std::endl;
+    for (const auto&[fst, snd] : objectData) {
+        auto *data = getData<Item::ItemData>(fst);
+        if (data) {
+            if (data->isItem) {
+                world->inventory[fst] = 0;
+            }
+        }
+    }
+
+    world->inventory[TypeID::ITEM_SEED_TOMATO] = 100;
+    world->inventory[TypeID::ITEM_SEED_CARROT] = 100;
 }
 
 FarmingObject::FarmingObject(const ivec2 tile) {

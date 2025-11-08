@@ -2,8 +2,10 @@
 // Created by cobble on 12/30/2024.
 //
 
-#include <bits/stdc++.h>
 #include "fontRenderer.h"
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 FontRenderer::FontRenderer(const std::string &fontTexture) {
     font = Texture2d(fontTexture, GL_NEAREST, GL_REPEAT);

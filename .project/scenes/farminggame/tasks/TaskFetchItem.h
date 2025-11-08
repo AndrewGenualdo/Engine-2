@@ -5,6 +5,7 @@
 #ifndef ENGINE_2_TASKFETCHITEM_H
 #define ENGINE_2_TASKFETCHITEM_H
 #include "Task.h"
+#include "TaskDepositItem.h"
 #include "TaskRetrieveItem.h"
 
 
@@ -14,6 +15,7 @@ class TaskFetchItem : public Task {
 
     TaskRetrieveItem *taskRetrieveItem = nullptr;
     TaskTravel *taskTravel = nullptr;
+    TaskDepositItem *taskDepositItem = nullptr;
 
 public:
     TaskFetchItem(LittleGuy *guy, FarmingObject::TypeID type, int amount, ivec2 returnToTile);
@@ -23,6 +25,7 @@ public:
     bool tick() override;
     std::string getName() override;
     float getCost() override;
+    void clear() override;
 };
 
 

@@ -19,6 +19,7 @@ public:
     bool tick() override;
     std::string getName() override;
     float getCost() override;
+    void clear() override;
 
     void setItem(Item *item);
 };

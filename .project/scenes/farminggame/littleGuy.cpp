@@ -56,6 +56,7 @@ void LittleGuy::update(float dt) {
 void LittleGuy::tick() {
     if (task != nullptr) {
         if (task->tick()) {
+            task->clear();
             delete task;
             task = nullptr;
         }
@@ -77,7 +78,7 @@ std::string LittleGuy::getConfigKey() {
 
 std::string LittleGuy::getConfig() {
     std::string output = FarmingObject::getConfig();
-    output += std::to_string(pos.x) + " " + std::to_string(pos.y) + " " + std::to_string(speed) + "\n";
+    //output += std::to_string(pos.x) + " " + std::to_string(pos.y) + " " + std::to_string(speed) + "\n";
     for (auto & item : items) {
         output += "="+item->getConfigKey() + "\n";
         output += item->getConfig();
@@ -132,6 +133,17 @@ void LittleGuy::setSpeed(const float speed) {
     this->speed = speed;
 }
 
+Item* LittleGuy::takeItem(TypeID type) {
+    for (int i = items.size() - 1; i >= 0; i--) {
+        if (items[i]->getType() == type) {
+            Item* item = items[i];
+            items.erase(items.begin() + i);
+            return item;
+        }
+    }
+    return nullptr;
+}
+
 void LittleGuy::giveItem(Item *item) {
     items.push_back(item);
 }
@@ -142,6 +154,7 @@ Task * LittleGuy::getTask() const {
 
 void LittleGuy::setTask(Task *task) {
     if (this->task != nullptr) {
+        this->task->clear();
         delete this->task;
         this->task = nullptr;
     }

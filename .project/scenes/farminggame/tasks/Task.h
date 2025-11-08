@@ -26,6 +26,7 @@ public:
     virtual bool update(float dt);
     virtual bool tick();
     virtual float getCost();
+    virtual void clear();
 
     virtual bool isActive();
 

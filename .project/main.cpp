@@ -50,7 +50,6 @@ void framebuffer_size_callback(GLFWwindow *w, int width, int height) {
 
 int main() {
     window = Window("Loading...");
-
     Window::setVsync(true);
     glfwSetKeyCallback(window.window, key_callback);
     glfwSetCursorPosCallback(window.window, mouse_position_callback);

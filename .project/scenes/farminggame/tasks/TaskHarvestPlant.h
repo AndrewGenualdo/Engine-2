@@ -13,16 +13,21 @@ class TaskHarvestPlant : public Task {
 
     int ticksUntilHarvest = 1;
     TilePlant *plant = nullptr;
-    Item *item = nullptr;
+    Item *itemPromise = nullptr;
 
 public:
     TaskHarvestPlant(LittleGuy *guy, TilePlant *plant);
+    /*WARNING, ONLY FOR COMPUTING COST TIMES*/
+    TaskHarvestPlant(LittleGuy *guy, FarmingObject::TypeID type);
     ~TaskHarvestPlant() override;
+
 
     bool tick() override;
     std::string getName() override;
     float getCost() override;
+    void clear() override;
 
+    void setPlant(TilePlant *plant);
     Item* getResultItem() const;
 
 };

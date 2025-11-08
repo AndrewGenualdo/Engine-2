@@ -13,6 +13,7 @@
 #include "tasks/TaskFetchItem.h"
 #include "tasks/TaskRetrieveItem.h"
 #include "tasks/TaskTravel.h"
+#include "tasks/TaskWithdrawItem.h"
 #include "tiles/plants/TilePlantCarrot.h"
 #include "tiles/plants/TilePlantTomato.h"
 
@@ -40,9 +41,12 @@ void FarmingScene::load() {
     blank = Texture2d("assets/textures/ui/blank.png");
     FarmingObject::loadData();
     world = new FarmingWorld("saves/farming.txt");
+    FarmingObject::loadInventory();
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
     FarmingWorld::barnTexture = Texture2d("assets/farminggame/barn.png", GL_NEAREST, GL_TEXTURE_WRAP_S);
+    FarmingWorld::uiTexture = MultiTexture2d("assets/farminggame/ui.png", 64);
+    FarmingWorld::fontRenderer = &fontRenderer;
     LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 4);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
@@ -68,12 +72,14 @@ void FarmingScene::draw() {
 
     if (window->isInputClicked(GLFW_KEY_F)) {
         for (const auto & guy : world->guys) {
-            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT, mouseTile));
+            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, 1, mouseTile));
+            //guy->setTask(new TaskWithdrawItem(guy, FarmingObject::TypeID::ITEM_SEED_TOMATO, 50));
         }
     }
     if (window->isInputClicked(GLFW_KEY_G)) {
         for (const auto & guy : world->guys) {
-            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT, mouseTile));
+            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, 1, mouseTile));
+            //guy->setTask(new TaskWithdrawItem(guy, FarmingObject::TypeID::ITEM_SEED_CARROT, 50));
         }
     }
 

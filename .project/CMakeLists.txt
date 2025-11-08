@@ -1,3 +1,6 @@
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 file(
         GLOB_RECURSE PROJECT_INC CONFIGURE_DEPENDS
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -56,6 +59,14 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/tiles/plants/TilePlantCarrot.h
         scenes/farminggame/tasks/TaskFetchItem.cpp
         scenes/farminggame/tasks/TaskFetchItem.h
+        scenes/farminggame/tasks/TaskDepositItem.cpp
+        scenes/farminggame/tasks/TaskDepositItem.h
+        scenes/farminggame/tasks/TaskWithdrawItem.cpp
+        scenes/farminggame/tasks/TaskWithdrawItem.h
+        scenes/farminggame/tasks/TaskWait.cpp
+        scenes/farminggame/tasks/TaskWait.h
+        scenes/farminggame/tasks/TaskPlantSeed.cpp
+        scenes/farminggame/tasks/TaskPlantSeed.h
 )
 
 target_link_libraries(project PUBLIC core IMGUI glm assimp enet)

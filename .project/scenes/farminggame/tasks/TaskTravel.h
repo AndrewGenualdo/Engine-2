@@ -13,13 +13,14 @@ class TaskTravel : public Task {
 
     bool generatePath();
 public:
-    ivec2 goal;
+    ivec2 start, goal;
     std::vector<ivec2> path;
     float cost = 0;
     int pathIndex = 0;
 
     TaskTravel() = default;
     TaskTravel(LittleGuy *guy, ivec2 goal);
+    TaskTravel(LittleGuy *guy, ivec2 start, ivec2 goal);
     bool update(float dt) override;
     float getCost() override;
 

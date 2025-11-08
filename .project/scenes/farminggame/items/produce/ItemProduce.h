@@ -16,7 +16,7 @@ public:
         TypeID producedFrom = TypeID::NONE;
 
         ProduceData() : ItemData() {}
-        explicit ProduceData(const TypeID type, const TypeID parent, const TypeID producedFrom, int textureIndex) : ItemData(type, parent, textureIndex) {
+        explicit ProduceData(const TypeID type, const TypeID parent, const TypeID producedFrom, int textureIndex, bool isItem) : ItemData(type, parent, textureIndex, isItem) {
             this->producedFrom = producedFrom;
         }
         ~ProduceData() override = default;

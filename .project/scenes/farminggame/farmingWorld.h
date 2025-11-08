@@ -5,13 +5,11 @@
 #ifndef ENGINE_2_WORLD_H
 #define ENGINE_2_WORLD_H
 #include <string>
-#include <fstream>
-#include <cstdint>
-#include <iostream>
 #include <bitset>
 #include <vector>
 
 #include "FarmingObject.h"
+#include "cobb/misc/fontRenderer.h"
 #include "glm/vec2.hpp"
 #include "cobb/misc/texture2d.h"
 #include "cobb/misc/tiles2d.h"
@@ -19,7 +17,8 @@
 #include "items/produce/ItemProduceTomato.h"
 #include "items/seeds/ItemSeedCarrot.h"
 #include "items/seeds/ItemSeedTomato.h"
-#include "tiles/Tile.h"
+#include "tiles/plants/TilePlantCarrot.h"
+#include "tiles/plants/TilePlantTomato.h"
 
 using namespace cobb;
 using namespace glm;
@@ -49,17 +48,22 @@ public:
 
     constexpr static int TICKS_PER_SECOND = 10;
 
+    constexpr static ivec2 INVENTORY_TILE = ivec2(0,1);
+
     unsigned int landData[TILES_HORIZ * TILES_VERT];
     unsigned int plantData[TILES_HORIZ * TILES_VERT];
 
     static Tiles2d landTilemap;
     static Tiles2d plantTilemap;
     static Texture2d barnTexture;
+    static MultiTexture2d uiTexture;
+    static FontRenderer *fontRenderer;
 
     std::string savePath;
 
     std::vector<LittleGuy*> guys;
     std::vector<FarmingObject*> objects;
+    std::map<FarmingObject::TypeID, int> inventory;
 
     FarmingWorld();
     explicit FarmingWorld(const std::string &savePath);
@@ -82,20 +86,34 @@ public:
     [[nodiscard]] static vec2 getTilePos(int x, int y);
     [[nodiscard]] static ivec2 getTileFromPos(vec2 pos);
 
+    static Item* createItem(FarmingObject::TypeID type) {
+        switch (type) {
+            case FarmingObject::TypeID::ITEM_PRODUCE_TOMATO: return new ItemProduceTomato();
+            case FarmingObject::TypeID::ITEM_PRODUCE_CARROT: return new ItemProduceCarrot();
+            case FarmingObject::TypeID::ITEM_SEED_TOMATO: return new ItemSeedTomato();
+            case FarmingObject::TypeID::ITEM_SEED_CARROT: return new ItemSeedCarrot();
+            default: return nullptr;
+        }
+    }
+
     Item* createItem(FarmingObject::TypeID type, ivec2 tile) {
         return createItem(type, getTilePos(tile.x, tile.y));
     }
     Item* createItem(FarmingObject::TypeID type, vec2 pos) {
-        bool made = true;
-        switch (type) {
-            case FarmingObject::TypeID::ITEM_PRODUCE_TOMATO: objects.push_back(new ItemProduceTomato(pos)); break;
-            case FarmingObject::TypeID::ITEM_PRODUCE_CARROT: objects.push_back(new ItemProduceCarrot(pos)); break;
-            case FarmingObject::TypeID::ITEM_SEED_TOMATO: objects.push_back(new ItemSeedTomato(pos)); break;
-            case FarmingObject::TypeID::ITEM_SEED_CARROT: objects.push_back(new ItemSeedCarrot(pos)); break;
-            default: made = false; break;
+        Item *item = createItem(type);
+        if (item != nullptr) {
+            item->pos = pos;
+            objects.push_back(item);
         }
-        if (made) return dynamic_cast<Item *>(objects[objects.size()-1]);
-        return nullptr;
+        return item;
+    }
+
+    static Tile* createTile(FarmingObject::TypeID type, ivec2 tile) {
+        switch (type) {
+            case FarmingObject::TypeID::TILE_PLANT_TOMATO: return new TilePlantTomato(tile);
+            case FarmingObject::TypeID::TILE_PLANT_CARROT: return new TilePlantCarrot(tile);
+            default: return nullptr;
+        }
     }
 
 };

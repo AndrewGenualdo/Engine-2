@@ -18,15 +18,18 @@ class Item : public FarmingObject {
 public:
 
     static void setTexture(const std::string &path, int width, int height, int items);
+    static void draw(float x, float y, float width, float height, int frame, bool bind = true);
 
     class ItemData : public ObjectData {
     public:
 
         int textureIndex = 63;
+        bool isItem = false;
 
         ItemData() : ObjectData() {}
-        explicit ItemData(const TypeID type, const TypeID parent, const int textureIndex) : ObjectData(type, parent) {
+        explicit ItemData(const TypeID type, const TypeID parent, const int textureIndex, bool isItem) : ObjectData(type, parent) {
             this->textureIndex = textureIndex;
+            this->isItem = isItem;
         }
         ~ItemData() override = default;
     };

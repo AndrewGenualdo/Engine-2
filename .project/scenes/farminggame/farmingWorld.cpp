@@ -4,9 +4,9 @@
 
 #include "farmingWorld.h"
 
-#include <filesystem>
 #include <iostream>
-
+#include <filesystem>
+#include <fstream>
 #include "FarmingObject.h"
 #include "littleGuy.h"
 #include "items/Item.h"
@@ -22,6 +22,8 @@
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
 Tiles2d FarmingWorld::plantTilemap = Tiles2d();
 Texture2d FarmingWorld::barnTexture = Texture2d();
+MultiTexture2d FarmingWorld::uiTexture = MultiTexture2d();
+FontRenderer *FarmingWorld::fontRenderer = nullptr;
 
 FarmingWorld::FarmingWorld() {
     this->savePath = "";
@@ -231,7 +233,9 @@ void FarmingWorld::update(float dt) {
 }
 
 void FarmingWorld::tick() {
+    std::cout << "\n==========================================================================\n" << std::endl;
     for (auto & guy : guys) {
+        if (guy->getTask() != nullptr) std::cout << guy->getTask()->getName() << std::endl;
         guy->tick();
     }
     for (auto & object : objects) {
@@ -373,6 +377,18 @@ void FarmingWorld::draw() const {
         }
     }
     barnTexture.draw(TILE_OFFSET_X - 2 * TILE_WIDTH + TILE_WIDTH * (4.0f / 18.0f), TILE_OFFSET_Y, TILE_WIDTH * 2, TILE_HEIGHT * 6, true);
+
+
+    int inventoryIndex = 0;
+    for (const auto&[fst, snd] : inventory) {
+        uiTexture.draw(inventoryIndex * TILE_WIDTH, Window::GAME_HEIGHT - TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0);
+        Item::draw(inventoryIndex * TILE_WIDTH, Window::GAME_HEIGHT - TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, FarmingObject::getData<Item::ItemData>(fst)->textureIndex);
+        fontRenderer->setColor(vec4(1));
+        fontRenderer->draw(std::to_string(snd), inventoryIndex * TILE_WIDTH + (TILE_WIDTH - fontRenderer->getWidth(std::to_string(snd)) * 3) - (TILE_WIDTH / 18.0f), Window::GAME_HEIGHT - TILE_HEIGHT + (TILE_HEIGHT / 18.0f), 3);
+        inventoryIndex++;
+    }
+
+
 }
 
 ivec2 FarmingWorld::getTileFromPos(vec2 pos) {

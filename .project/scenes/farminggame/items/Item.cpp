@@ -18,6 +18,10 @@ void Item::setTexture(const std::string &path, const int width, const int height
     Item::height = height;
 }
 
+void Item::draw(float x, float y, float width, float height, int frame, bool bind) {
+    itemsTexture.draw(x, y, width, height, frame, bind);
+}
+
 Item::Item(const ivec2 tile) : FarmingObject(tile) {
     this->pos = FarmingWorld::getTilePos(tile.x, tile.y);
 }

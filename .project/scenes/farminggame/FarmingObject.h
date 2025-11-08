@@ -58,6 +58,7 @@ public:
     static void cleanData();
     static FarmingWorld *world;
     static void setWorld(FarmingWorld *world);
+    static void loadInventory();
 
     ivec2 tile = ivec2(0);
     bool beingUsed = false;
@@ -85,6 +86,7 @@ public:
         if (objectData.find(type) != objectData.end()) {
             T* out = dynamic_cast<T*>(objectData[type]);
             if (out) return out;
+
             std::cout << "FAILED TO CAST TO OBJECT TYPE: " << static_cast<int>(type) << std::endl;
             return nullptr;
         }

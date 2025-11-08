@@ -10,9 +10,7 @@ TaskPickupItem::TaskPickupItem(LittleGuy *guy, Item *item) : Task(guy) {
     if (this->item != nullptr) this->item->setBeingUsed(true);
 }
 
-TaskPickupItem::~TaskPickupItem() {
-    if (item != nullptr) item->setBeingUsed(false);
-}
+TaskPickupItem::~TaskPickupItem() = default;
 
 bool TaskPickupItem::tick() {
     guy->giveItem(item);
@@ -26,11 +24,19 @@ bool TaskPickupItem::tick() {
 }
 
 std::string TaskPickupItem::getName() {
-    return "Pickup Item";
+    std::string out = "Pickup Item: {";
+    if (item == nullptr) out += "NULL";
+    else out += std::to_string(item->tile.x ) + ", " + std::to_string(item->tile.y) + " ; " + std::to_string(static_cast<int>(item->getType()));
+    out +="} ";
+    return out;
 }
 
 float TaskPickupItem::getCost() {
     return 1;
+}
+
+void TaskPickupItem::clear() {
+    if (item != nullptr) item->setBeingUsed(false);
 }
 
 void TaskPickupItem::setItem(Item *item) {

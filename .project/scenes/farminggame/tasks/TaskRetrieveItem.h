@@ -8,10 +8,9 @@
 #include "TaskHarvestPlant.h"
 #include "TaskPickupItem.h"
 #include "TaskTravel.h"
+#include "TaskWithdrawItem.h"
 #include "../items/Item.h"
 
-
-class Item;
 
 class TaskRetrieveItem : public Task {
 
@@ -20,9 +19,11 @@ class TaskRetrieveItem : public Task {
     FarmingObject::TypeID type;
     ivec2 itemTile = ivec2(0);
 
-    TaskTravel *travelTask = nullptr;
+    /*TaskTravel *travelTask = nullptr;
     TaskPickupItem *pickupTask = nullptr;
     TaskHarvestPlant *harvestTask = nullptr;
+    TaskWithdrawItem *withdrawTask = nullptr;*/
+    std::vector<Task *> tasks = std::vector<Task *>();
 
 public:
     TaskRetrieveItem(LittleGuy *guy, FarmingObject::TypeID type, int amount);
@@ -32,10 +33,11 @@ public:
     bool tick() override;
     std::string getName() override;
     float getCost() override;
+    void clear() override;
 
     bool getClosestItem();
 
-    ivec2 getItemTile();
+    ivec2 getItemTile() const;
 };
 
 
