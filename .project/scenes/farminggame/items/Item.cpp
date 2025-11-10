@@ -34,6 +34,19 @@ FarmingObject::TypeID Item::getType() const {
     return TypeID::ITEM;
 }
 
+bool Item::destroy() {
+    if (world != nullptr) {
+        for (int i = 0; i < world->items.size(); i++) {
+            if (world->items[i] == this) {
+                delete world->items[i];
+                world->items.erase(world->items.begin() + i);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void Item::update(float dt) {
 
 }
@@ -47,11 +60,11 @@ void Item::draw(bool bind) {
 }
 
 void Item::draw(float offsetX, float offsetY, bool bind) {
-    itemsTexture.draw(pos.x + offsetX - (width * 0.5f), pos.y + offsetY - (height * 0.5f), width, height, getData<ItemData>(getType())->textureIndex, bind);
+    draw(pos.x + offsetX, pos.y + offsetY, getType(), bind);
 }
 
-std::string Item::getConfigKey() {
-    return FarmingObject::getConfigKey() + "ITEM";
+void Item::draw(float x, float y, TypeID type, bool bind) {
+    itemsTexture.draw(x - (width * 0.5f), y - (height * 0.5f), width, height, getData<ItemData>(type)->textureIndex, bind);
 }
 
 std::string Item::getConfig() {

@@ -62,7 +62,10 @@ public:
     std::string savePath;
 
     std::vector<LittleGuy*> guys;
-    std::vector<FarmingObject*> objects;
+private:
+    std::vector<Tile*> tiles;
+public:
+    std::vector<Item*> items;
     std::map<FarmingObject::TypeID, int> inventory;
 
     FarmingWorld();
@@ -103,7 +106,7 @@ public:
         Item *item = createItem(type);
         if (item != nullptr) {
             item->pos = pos;
-            objects.push_back(item);
+            items.push_back(item);
         }
         return item;
     }
@@ -114,6 +117,34 @@ public:
             case FarmingObject::TypeID::TILE_PLANT_CARROT: return new TilePlantCarrot(tile);
             default: return nullptr;
         }
+    }
+
+    [[nodiscard]] Tile* getTile(int index) const {
+        if (index >= 0 && index < TILES_HORIZ * TILES_VERT) {
+            return tiles[index];
+        }
+        return nullptr;
+
+    }
+
+    [[nodiscard]] Tile* getTile(ivec2 tile) const {
+        return getTile(tile.y * TILES_HORIZ + tile.x);
+    }
+
+    void setTile(ivec2 tile, Tile* data) {
+        tiles[tile.y * TILES_HORIZ + tile.x] = data;
+    }
+
+    void clearTile(ivec2 tile) {
+        updateTile(tile, new Tile(tile));
+    }
+
+    void updateTile(ivec2 tile, Tile* data) {
+        if (tiles[tile.y * TILES_HORIZ + tile.x] != nullptr) {
+            delete tiles[tile.y * TILES_HORIZ + tile.x];
+            tiles[tile.y * TILES_HORIZ + tile.x] = nullptr;
+        }
+        tiles[tile.y * TILES_HORIZ + tile.x] = data;
     }
 
 };

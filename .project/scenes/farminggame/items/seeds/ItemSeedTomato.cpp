@@ -28,10 +28,6 @@ void ItemSeedTomato::update(float dt) {
 
 }
 
-std::string ItemSeedTomato::getConfigKey() {
-    return ItemSeed::getConfigKey() + "_TOMATO";
-}
-
 std::string ItemSeedTomato::getConfig() {
     return ItemSeed::getConfig() + "-\n";
 }

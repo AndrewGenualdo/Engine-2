@@ -28,7 +28,8 @@ float Task::getCost() {
     return 0.0f;
 }
 
-void Task::clear() {
+void Task::setActive(bool active) {
+
 }
 
 bool Task::isActive() {

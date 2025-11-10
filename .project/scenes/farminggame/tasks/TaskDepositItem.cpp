@@ -33,7 +33,3 @@ std::string TaskDepositItem::getName() {
 float TaskDepositItem::getCost() {
     return amount;
 }
-
-void TaskDepositItem::clear() {
-
-}

@@ -33,10 +33,6 @@ void ItemSeed::draw(const float offsetX, const float offsetY, const bool bind) {
     Item::draw(offsetX, offsetY, bind);
 }
 
-std::string ItemSeed::getConfigKey() {
-    return Item::getConfigKey() + "_SEED";
-}
-
 std::string ItemSeed::getConfig() {
     return Item::getConfig() + "-\n";
 }

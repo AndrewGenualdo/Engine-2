@@ -87,7 +87,22 @@ void FarmingScene::draw() {
         world->guys.emplace_back(new LittleGuy(mouseTile));
     }
     if (window->isInputPressed(GLFW_KEY_P)) {
+
+        auto tileToPlant = ivec2(-1);
+
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
+            //bool isFarmland = true;//FarmingWorld::isFarmland(i);
+
+            //ADD A CHECK TO MAKE SURE THE TILE IS FARMLAND
+
+            //ADD A CHECK TO MAKE SURE THERE ISN'T ANOTHER PLANT THERE
+
+            if (!world->getTile(i)->exists() && !world->getTile(i)->isBeingUsed()) {
+                tileToPlant = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
+                break;
+            }
+        }
+        /*for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
             bool isFarmland = true;//FarmingWorld::isFarmland(i);
             bool planted = false;
             if (isFarmland) {
@@ -102,14 +117,14 @@ void FarmingScene::draw() {
             }
             if (!planted) {
                 switch (static_cast<int>(ew::RandomRange(0, 2))) {
-                    case 0: world->objects.push_back(new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ))); break;
-                    case 1: world->objects.push_back(new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ))); break;
+                    FarmingWorld::createTile(FarmingObject::TypeID::TILE_PLANT_TOMATO, ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)); break;
+                    FarmingWorld::createTile(FarmingObject::TypeID::TILE_PLANT_CARROT, ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)); break;
                     default: break;
                 }
 
                 break;
             }
-        }
+        }*/
     }
     if (window->isInputClicked(GLFW_KEY_O)) {
         world->clearObjects();
@@ -128,9 +143,10 @@ void FarmingScene::draw() {
         }
 
         if (length(vec2(mx, my) - world->guys[0]->getPos()) < FarmingWorld::TILE_WIDTH) {
-            world->guys[0]->giveItem(item);
+            world->guys[0]->giveItem(item->getType());
+            delete item;
         } else {
-            world->objects.push_back(item);
+            world->items.push_back(item);
         }
     }
 

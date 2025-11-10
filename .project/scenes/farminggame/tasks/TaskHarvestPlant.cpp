@@ -28,6 +28,7 @@ bool TaskHarvestPlant::tick() {
     if (plant != nullptr) {
         ticksUntilHarvest--;
         if (ticksUntilHarvest <= 0) {
+
             itemPromise = world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
             plant->destroy();
             return true;
@@ -49,13 +50,14 @@ float TaskHarvestPlant::getCost() {
     return ticksUntilHarvest;
 }
 
-void TaskHarvestPlant::clear() {
-    if (plant != nullptr) plant->setBeingUsed(false);
-    if (itemPromise != nullptr) itemPromise->setBeingUsed(false);
+void TaskHarvestPlant::setActive(bool active) {
+    if (plant != nullptr) plant->setBeingUsed(active);
+    if (itemPromise != nullptr) itemPromise->setBeingUsed(active);
 }
 
 void TaskHarvestPlant::setPlant(TilePlant *plant) {
     this->plant = plant;
+    if (plant != nullptr) plant->setBeingUsed(true);
 }
 
 Item * TaskHarvestPlant::getResultItem() const {

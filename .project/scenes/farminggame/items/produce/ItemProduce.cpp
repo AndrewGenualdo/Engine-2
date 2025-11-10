@@ -33,10 +33,6 @@ void ItemProduce::draw(const float offsetX, const float offsetY, const bool bind
     Item::draw(offsetX, offsetY, bind);
 }
 
-std::string ItemProduce::getConfigKey() {
-    return Item::getConfigKey() + "_PRODUCE";
-}
-
 std::string ItemProduce::getConfig() {
     return Item::getConfig() + "-\n";
 }

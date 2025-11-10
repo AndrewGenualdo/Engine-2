@@ -22,7 +22,7 @@ public:
         int ticksToHarvest = 1;
         int textureIndex = 1;
         PlantData() : TileData() {}
-        explicit PlantData(const TypeID type, const TypeID parent, const TypeID produces, const TypeID seed, const int stageCount, const int ripeStage, const int ticksBetweenStage, const int ticksToHarvest, const int textureIndex) : TileData(type, parent) {
+        explicit PlantData(const std::string &configKey, const TypeID type, const TypeID parent, const TypeID produces, const TypeID seed, const int stageCount, const int ripeStage, const int ticksBetweenStage, const int ticksToHarvest, const int textureIndex) : TileData(configKey, type, parent) {
             this->produces = produces;
             this->seed = seed;
             this->stageCount = stageCount;
@@ -48,7 +48,6 @@ public:
     void draw(bool bind) override;
     [[nodiscard]] TypeID getType() const override;
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
 

@@ -25,10 +25,6 @@ FarmingObject::TypeID TilePlantCarrot::getType() const {
     return TypeID::TILE_PLANT_CARROT;
 }
 
-std::string TilePlantCarrot::getConfigKey() {
-    return TilePlant::getConfigKey() + "_CARROT";
-}
-
 std::string TilePlantCarrot::getConfig() {
     return TilePlant::getConfig() + "-\n";
 }

@@ -19,7 +19,6 @@ public:
     void draw(bool bind) override;
     [[nodiscard]] TypeID getType() const override;
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
 

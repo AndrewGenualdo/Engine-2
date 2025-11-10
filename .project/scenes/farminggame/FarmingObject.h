@@ -42,10 +42,12 @@ public:
 
     class ObjectData {
     public:
+        std::string configKey;
         TypeID type = TypeID::NONE;
         TypeID parent = TypeID::NONE;
         ObjectData() = default;
-        explicit ObjectData(TypeID type, TypeID parent) {
+        explicit ObjectData(const std::string &configKey, TypeID type, TypeID parent) {
+            this->configKey = configKey;
             this->type = type;
             this->parent = parent;
         }
@@ -77,7 +79,6 @@ public:
     void setBeingUsed(bool isBeingUsed);
     [[nodiscard]] bool isBeingUsed() const;
 
-    virtual std::string getConfigKey();
     virtual std::string getConfig();
     virtual void loadConfig(const std::string &line, int i);
 

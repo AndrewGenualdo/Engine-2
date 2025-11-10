@@ -44,31 +44,41 @@ void FarmingWorld::load() {
     for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
         landData[i] = FARMLAND;
         plantData[i] = EMPTY;
+        tiles.push_back(nullptr);
     }
 
-    std::vector<std::string> types;
-    types.push_back(FarmingObject().getConfigKey()); //0
-    types.push_back(Tile().getConfigKey()); //1
-    types.push_back(TilePlant().getConfigKey()); //2
-    types.push_back(Item().getConfigKey()); //3
-    types.push_back(ItemProduceTomato().getConfigKey()); //4
-    types.push_back(ItemSeedTomato().getConfigKey()); //5
-    types.push_back(TilePlantTomato().getConfigKey()); //6
-    types.push_back(LittleGuy().getConfigKey()); //7
-    types.push_back(ItemProduceCarrot().getConfigKey()); //8
-    types.push_back(ItemSeedCarrot().getConfigKey()); //9
-    types.push_back(TilePlantCarrot().getConfigKey()); //10
+    std::map<FarmingObject::TypeID, std::string> itemTypes;
 
+    /*for (auto const& [type, data] : FarmingObject::objectData) {
+        if (dynamic_cast<Item::ItemData*>(data)) { //check if item
 
-    bool inGuy = false;
+        }
+    }*/
+
+    /*std::vector<std::string> itemTypes;
+    itemTypes.push_back(Item().getConfigKey()); //0
+    itemTypes.push_back(ItemProduceTomato().getConfigKey()); //1
+    itemTypes.push_back(ItemSeedTomato().getConfigKey()); //2
+    itemTypes.push_back(LittleGuy().getConfigKey()); //3
+    itemTypes.push_back(ItemProduceCarrot().getConfigKey()); //4
+    itemTypes.push_back(ItemSeedCarrot().getConfigKey()); //5
+    std::vector<std::string> tileTypes;
+    tileTypes.push_back(Tile().getConfigKey()); //1
+    tileTypes.push_back(TilePlant().getConfigKey()); //2
+    tileTypes.push_back(TilePlantTomato().getConfigKey()); //6
+    tileTypes.push_back(TilePlantCarrot().getConfigKey()); //10*/
+
+    //bool inGuy = false;
 
     enum LoadState {
         LAND,
-        OBJECTS
+        TILES,
+        ITEMS,
+        LITTLE_GUYS
     };
 
     LoadState state = LAND;
-    int object = -1;
+    FarmingObject *object = nullptr;
 
     if (!savePath.empty()) {
         std::ifstream saveFileData(savePath);
@@ -82,8 +92,21 @@ void FarmingWorld::load() {
                 LoadState prevState = state;
                 //std::cout << "'" << line << "'" << std::endl;
                 if (line == "LAND") state = LAND;
-                else if (line == "OBJECTS") state = OBJECTS;
-                else if (line == "LITTLE_GUY_START") {
+                else if (line == "TILES") state = TILES;
+                else if (line == "ITEMS") state = ITEMS;
+                else if (line == "LITTLE_GUYS") state = LITTLE_GUYS;
+                if (prevState != state && object != nullptr) {
+                    switch (prevState) {
+                        case TILES: {
+                            if (getTile(object->tile) == nullptr) {
+                                setTile(object->tile, dynamic_cast<Tile*>(object));
+                            }
+                        }
+                        case ITEMS: items.push_back(dynamic_cast<Item*>(object)); break;
+                        default: break;
+                    }
+                }
+                /*else if (line == "LITTLE_GUY_START") {
                     if (currentObject != nullptr) {
                         objects.emplace_back(currentObject);
                         currentObject = nullptr;
@@ -128,7 +151,7 @@ void FarmingWorld::load() {
                         currentObject = nullptr;
                     }
                 }
-
+                */
                 switch (state) {
                     case LAND: {
                         if (i > TILES_VERT * TILES_HORIZ) continue;
@@ -140,7 +163,49 @@ void FarmingWorld::load() {
                         }
                         break;
                     }
-                    case OBJECTS: {
+                    case TILES: {
+                        if (i == 0) {
+                            bool found = false;
+                            for (auto const& [type, data] : FarmingObject::objectData) {
+                                if (dynamic_cast<Tile::TileData*>(data)) { //check if tile
+                                    if ("="+data->configKey == line) {
+                                        object = createTile(type, ivec2(0));
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!found) std::cout << "UNKNOWN TILE IS BEING LOADED!!" << std::endl << "Tile: '" << line << "'" << std::endl;
+                        } else {
+                            if (object != nullptr) object->loadConfig(line, i);
+                        }
+                        break;
+                    }
+                    case ITEMS: {
+                        if (i == 0) {
+                            bool found = false;
+                            for (auto const& [type, data] : FarmingObject::objectData) {
+                                if (dynamic_cast<Item::ItemData*>(data)) { //check if item
+                                    if ("="+data->configKey == line) {
+                                        object = createItem(type);
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!found) std::cout << "UNKNOWN ITEM IS BEING LOADED!!" << std::endl << "Item: '" << line << "'" << std::endl;
+                        } else {
+                            if (object != nullptr) object->loadConfig(line, i);
+                        }
+                        break;
+                    }
+                    case LITTLE_GUYS: {
+                        if (line == "LITTLE_GUY_START") object = new LittleGuy();
+                        else if (line == "LITTLE_GUY_END") guys.push_back(dynamic_cast<LittleGuy *>(object));
+                        if (object != nullptr) object->loadConfig(line, i);
+                        break;
+                    }
+                    /*case OBJECTS: {
                         if (i == 0) {
                             switch (object) {
                                 case 0: currentObject = new FarmingObject(); break;
@@ -165,17 +230,25 @@ void FarmingWorld::load() {
 
                         i++;
                         break;
-                    }
+                    }*/
                 }
+                i++;
             }
             saveFileData.close();
+
+            for (int j = 0; j < TILES_HORIZ * TILES_VERT; j++) {
+                if (getTile(ivec2(j % TILES_HORIZ, j / TILES_HORIZ)) == nullptr) {
+                    setTile(ivec2(j % TILES_HORIZ, j / TILES_HORIZ), new Tile(ivec2(j % TILES_HORIZ, j / TILES_HORIZ)));
+                }
+            }
+
         } else {
             std::cout << "Failed to open save file at: " << savePath << std::endl;
         }
 
         updateTileTypes();
     }
-    std::cout << "Loaded world from file! (" + std::to_string(objects.size()) + " objects)" << std::endl;
+    std::cout << "Loaded world from file! (" << std::to_string(tiles.size()) + " tiles, " << std::to_string(items.size()) << " items, and " << guys.size() << " guys)" << std::endl;
 
     if (guys.empty()) guys.emplace_back(new LittleGuy());
 }
@@ -193,14 +266,21 @@ void FarmingWorld::save() const {
                 }
                 output += "\n";
             }
-            output += "OBJECTS\n";
-            for (auto object : objects) {
-                output += "="+object->getConfigKey() + "\n";
-                output += object->getConfig();
+            output += "TILES\n";
+            for (auto tile : tiles) {
+                if (tile->exists()) {
+                    output += "="+FarmingObject::getData<FarmingObject::ObjectData>(tile->getType())->configKey + "\n";
+                    output += tile->getConfig();
+                }
             }
+            output += "ITEMS\n";
+            for (auto item : items) {
+                output += "="+FarmingObject::getData<FarmingObject::ObjectData>(item->getType())->configKey + "\n";
+                output += item->getConfig();
+            }
+            output += "LITTLE_GUYS\n";
             for (auto guy : guys) {
                 output += "LITTLE_GUY_START\n";
-                output += "="+guy->getConfigKey() + "\n";
                 output += guy->getConfig();
                 output += "LITTLE_GUY_END\n";
             }
@@ -217,13 +297,26 @@ void FarmingWorld::save() const {
 }
 
 void FarmingWorld::cleanup() {
-    for (auto & object : objects) {
-        if (object != nullptr) {
-            delete object;
-            object = nullptr;
+    for (auto & item : items) {
+        if (item != nullptr) {
+            delete item;
+            item = nullptr;
         }
     }
-    objects.clear();
+    items.clear();
+    for (auto & tile : tiles) {
+        if (tile != nullptr) {
+            delete tile;
+            tile = nullptr;
+        }
+    }
+    tiles.clear();
+    for (auto & guy : guys) {
+        if (guy != nullptr) {
+            delete guy;
+            guy = nullptr;
+        }
+    }
 }
 
 void FarmingWorld::update(float dt) {
@@ -233,14 +326,14 @@ void FarmingWorld::update(float dt) {
 }
 
 void FarmingWorld::tick() {
-    std::cout << "\n==========================================================================\n" << std::endl;
+    //std::cout << "\n==========================================================================\n" << std::endl;
     for (auto & guy : guys) {
-        if (guy->getTask() != nullptr) std::cout << guy->getTask()->getName() << std::endl;
+        //if (guy->getTask() != nullptr) std::cout << guy->getTask()->getName() << std::endl;
         guy->tick();
     }
-    for (auto & object : objects) {
-        if (object != nullptr) {
-            object->tick();
+    for (auto & tile : tiles) {
+        if (tile != nullptr) {
+            tile->tick();
         }
     }
 }
@@ -340,19 +433,29 @@ void FarmingWorld::updateTileTypes() {
 }
 
 void FarmingWorld::clearObjects() {
-    for (auto & object : objects) {
-        if (dynamic_cast<TilePlant*>(object)) {
-            plantData[object->tile.y * TILES_HORIZ + object->tile.x] = 0;
-            delete object;
-            object = nullptr;
+    for (auto & tile : tiles) {
+        if (dynamic_cast<TilePlant*>(tile)) {
+            plantData[tile->tile.y * TILES_HORIZ + tile->tile.x] = 0;
+            delete tile;
+            tile = nullptr;
         }
     }
-    objects.clear();
-    for (const auto & guy : guys) {
-        guy->clearObjects();
+    tiles.clear();
+    for (auto & guy : guys) {
+        if (guy != nullptr) {
+            guy->clearObjects();
+            delete guy;
+            guy = nullptr;
+        }
     }
     guys.clear();
-
+    for (auto & item : items) {
+        if (item != nullptr) {
+            delete item;
+            item = nullptr;
+        }
+    }
+    items.clear();
 }
 
 
@@ -366,15 +469,12 @@ void FarmingWorld::draw() const {
     plantTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y + TILE_HEIGHT * 0.2f, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
 
     Texture2d::setColor(vec4(1));
-    for (int i = 0; i < guys.size(); i++) {
-        guys[i]->draw(true);
+    for (auto guy : guys) {
+        guy->draw(true);
     }
-    bool binded = false;
-    for (int i = 0; i < objects.size(); i++) {
-        if (dynamic_cast<Item*>(objects[i])) {
-            objects[i]->draw(!binded);
-            binded = true;
-        }
+
+    for (int i = 0; i < items.size(); i++) {
+        items[i]->draw(i == 0);
     }
     barnTexture.draw(TILE_OFFSET_X - 2 * TILE_WIDTH + TILE_WIDTH * (4.0f / 18.0f), TILE_OFFSET_Y, TILE_WIDTH * 2, TILE_HEIGHT * 6, true);
 

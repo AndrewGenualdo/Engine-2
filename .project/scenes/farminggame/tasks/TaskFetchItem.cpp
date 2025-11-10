@@ -86,8 +86,8 @@ float TaskFetchItem::getCost() {
     return Task::getCost();
 }
 
-void TaskFetchItem::clear() {
-    if (taskRetrieveItem != nullptr) taskRetrieveItem->clear();
-    if (taskTravel != nullptr) taskTravel->clear();
-    if (taskDepositItem != nullptr) taskDepositItem->clear();
+void TaskFetchItem::setActive(bool active) {
+    if (taskRetrieveItem != nullptr) taskRetrieveItem->setActive(active);
+    if (taskTravel != nullptr) taskTravel->setActive(active);
+    if (taskDepositItem != nullptr) taskDepositItem->setActive(active);
 }

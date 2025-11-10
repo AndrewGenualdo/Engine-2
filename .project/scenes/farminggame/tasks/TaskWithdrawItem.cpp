@@ -18,7 +18,7 @@ bool TaskWithdrawItem::tick() {
         int itemAmt = world->inventory[type];
         if (itemAmt > 0) {
             world->inventory[type]--;
-            guy->giveItem(FarmingWorld::createItem(type));
+            guy->giveItem(type);
             amount--;
         } else return true;
     } else return true;
@@ -31,8 +31,4 @@ std::string TaskWithdrawItem::getName() {
 
 float TaskWithdrawItem::getCost() {
     return amount;
-}
-
-void TaskWithdrawItem::clear() {
-
 }

@@ -20,7 +20,8 @@ class LittleGuy : public FarmingObject {
     static int width, height;
 
     Task *task = nullptr;
-    std::vector<Item*> items;
+    //std::vector<Item*> items;
+    std::vector<TypeID> itemList;
 
     vec2 pos;
     float speed = 300;
@@ -40,7 +41,6 @@ public:
     void tick() override;
     void draw(bool bind) override;
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
 
@@ -57,9 +57,9 @@ public:
     void setSpeed(float speed);
 
     Item* takeItem(TypeID type);
-    void giveItem(Item *item);
+    void giveItem(TypeID type);
 
-    Task* getTask() const;
+    [[nodiscard]] Task* getTask() const;
     void setTask(Task *task);
 };
 

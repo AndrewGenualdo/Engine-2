@@ -15,7 +15,7 @@ public:
         TypeID produces = TypeID::NONE;
 
         SeedData() : ItemData() {}
-        explicit SeedData(const TypeID type, const TypeID parent, const TypeID produces, int textureIndex, bool isItem) : ItemData(type, parent, textureIndex, isItem) {
+        explicit SeedData(const std::string &configKey, const TypeID type, const TypeID parent, const TypeID produces, int textureIndex, bool isItem) : ItemData(configKey, type, parent, textureIndex, isItem) {
             this->produces = produces;
         }
         ~SeedData() override = default;
@@ -34,7 +34,6 @@ public:
     void draw(bool bind) override;
     void draw(float offsetX, float offsetY, bool bind) override;
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
 };

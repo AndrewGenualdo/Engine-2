@@ -26,7 +26,3 @@ std::string TaskWait::getName() {
 float TaskWait::getCost() {
     return ticks;
 }
-
-void TaskWait::clear() {
-
-}

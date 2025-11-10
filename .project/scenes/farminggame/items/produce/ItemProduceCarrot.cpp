@@ -27,10 +27,6 @@ void ItemProduceCarrot::update(float dt) {
 
 }
 
-std::string ItemProduceCarrot::getConfigKey() {
-    return ItemProduce::getConfigKey() + "_CARROT";
-}
-
 std::string ItemProduceCarrot::getConfig() {
     return ItemProduce::getConfig() + "-\n";
 }

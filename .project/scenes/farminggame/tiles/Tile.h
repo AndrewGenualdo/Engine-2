@@ -11,13 +11,17 @@ using namespace glm;
 using namespace cobb;
 
 class Tile : public FarmingObject {
+
+protected:
+    bool tileExists;
+
 public:
 
     class TileData : public ObjectData {
     public:
 
         TileData() : ObjectData() {}
-        explicit TileData(const TypeID type, const TypeID parent) : ObjectData(type, parent) {}
+        explicit TileData(const std::string &configKey, const TypeID type, const TypeID parent) : ObjectData(configKey, type, parent) {}
         ~TileData() override = default;
     };
 
@@ -28,10 +32,12 @@ public:
     void tick() override;
     void draw(bool bind) override;
     [[nodiscard]] TypeID getType() const override;
+    bool destroy() override;
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
+
+    bool exists() const;
 
 };
 

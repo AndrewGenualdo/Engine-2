@@ -103,9 +103,9 @@ float TaskRetrieveItem::getCost() {
     return Task::getCost();
 }
 
-void TaskRetrieveItem::clear() {
-    for (int i = 0; i < tasks.size(); i++) {
-        tasks[i]->clear();
+void TaskRetrieveItem::setActive(bool active) {
+    for (auto & task : tasks) {
+        task->setActive(active);
     }
 }
 
@@ -114,8 +114,7 @@ bool TaskRetrieveItem::getClosestItem() {
     std::vector<std::vector<Task*>> possibleTasks;
 
     Item *closestItem = nullptr;
-    for (auto & object : world->objects) {
-        Item *item = dynamic_cast<Item*>(object);
+    for (auto & item : world->items) {
         if (item && !item->isBeingUsed() && item->getType() == type) {
             if (closestItem == nullptr || length(closestItem->pos - guy->getPos()) > length(item->pos - guy->getPos())) {
                 closestItem = item;
@@ -123,23 +122,24 @@ bool TaskRetrieveItem::getClosestItem() {
         }
     }
     if (closestItem != nullptr) {
-        possibleTasks.push_back(std::vector<Task*>());
+        possibleTasks.emplace_back();
         possibleTasks[possibleTasks.size()-1].push_back(new TaskTravel(guy, closestItem->tile));
         possibleTasks[possibleTasks.size()-1].push_back(new TaskPickupItem(guy, closestItem));
     }
 
     TilePlant *closestPlant = nullptr;
     if (FarmingObject::getData<ItemProduce::ItemData>(type)) { //make sure its a harvestable item
-        for (auto & object : world->objects) {//check if harvestable plant
-            TilePlant *plant = dynamic_cast<TilePlant *>(object);
+        for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
+            auto plant = dynamic_cast<TilePlant*>(world->getTile(i)); //make sure the tile is a plant
             if (plant && !plant->isBeingUsed() && plant->isRipe() && plant->getType() == FarmingObject::getData<ItemProduce::ProduceData>(type)->producedFrom) {
                 if (closestPlant == nullptr || length(FarmingWorld::getTilePos(closestPlant->tile.x, closestPlant->tile.y) - guy->getPos()) > length(FarmingWorld::getTilePos(plant->tile.x, plant->tile.y) - guy->getPos())) {
                     closestPlant = plant;
                 }
             }
         }
+
         if (closestPlant != nullptr) { //harvest a plant for the item
-            possibleTasks.push_back(std::vector<Task*>());
+            possibleTasks.emplace_back();
             possibleTasks[possibleTasks.size()-1].push_back(new TaskTravel(guy, closestPlant->tile));
             possibleTasks[possibleTasks.size()-1].push_back(new TaskHarvestPlant(guy, closestPlant));
             possibleTasks[possibleTasks.size()-1].push_back(new TaskPickupItem(guy, nullptr));
@@ -151,22 +151,16 @@ bool TaskRetrieveItem::getClosestItem() {
             if (world->inventory[plantData->seed] > 0) {
 
                 //REPLACE THIS SHITTY THING WITH A BETTER THING
-                ivec2 tileToPlant = ivec2(-1);
+                auto tileToPlant = ivec2(-1);
 
                 for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
-                    bool isFarmland = true;//FarmingWorld::isFarmland(i);
-                    bool planted = false;
-                    if (isFarmland) {
-                        for (int j = 0; j < world->objects.size(); j++) {
-                            FarmingObject *obj = world->objects[j];
-                            const auto *plant = dynamic_cast<TilePlant*>(obj);
-                            if (plant && plant->tile.y * FarmingWorld::TILES_HORIZ + plant->tile.x == i) {
-                                planted = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!planted) {
+                    //bool isFarmland = true;//FarmingWorld::isFarmland(i);
+
+                    //ADD A CHECK TO MAKE SURE THE TILE IS FARMLAND
+
+                    //ADD A CHECK TO MAKE SURE THERE ISN'T ANOTHER PLANT THERE
+
+                    if (!world->getTile(i)->exists() && !world->getTile(i)->isBeingUsed()) {
                         tileToPlant = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
                         break;
                     }
@@ -176,7 +170,7 @@ bool TaskRetrieveItem::getClosestItem() {
                     return true;
                 }
 
-                possibleTasks.push_back(std::vector<Task*>());
+                possibleTasks.emplace_back();
                 possibleTasks[possibleTasks.size()-1].push_back(new TaskTravel(guy, FarmingWorld::INVENTORY_TILE));
                 possibleTasks[possibleTasks.size()-1].push_back(new TaskWithdrawItem(guy, plantData->seed, 1));
                 possibleTasks[possibleTasks.size()-1].push_back(new TaskTravel(guy, FarmingWorld::INVENTORY_TILE, tileToPlant));//travel to plant spot
@@ -192,7 +186,7 @@ bool TaskRetrieveItem::getClosestItem() {
     float lowestCost = 0.0f;
     for (int i = 0; i < possibleTasks.size(); i++) {
         float cost = 0;
-        for (int j = 0; j < possibleTasks[i].size(); j++) cost += possibleTasks[i][j]->getCost();
+        for (auto & j : possibleTasks[i]) cost += j->getCost();
 
         if (bestIndex == -1 || cost < lowestCost) {
             bestIndex = i;
@@ -201,12 +195,26 @@ bool TaskRetrieveItem::getClosestItem() {
     }
 
     if (bestIndex != -1) {
-        for (int i = 0; i < possibleTasks[bestIndex].size(); i++) {
-            tasks.push_back(possibleTasks[bestIndex][i]);
+        for (auto task : possibleTasks[bestIndex]) {
+            task->setActive(true);
+            tasks.push_back(task);
+        }
+        for (int i = 0; i < possibleTasks.size(); i++) {
+            if (i != bestIndex) {
+                for (auto & task : possibleTasks[i]) {
+                    delete task;
+                    task = nullptr;
+                }
+                possibleTasks[i].clear();
+            }
         }
     }
 
     return bestIndex == -1; //no available options
+}
+
+bool TaskRetrieveItem::getClosestPlant(FarmingObject::TypeID type) {
+    return false;
 }
 
 ivec2 TaskRetrieveItem::getItemTile() const {

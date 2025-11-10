@@ -56,7 +56,7 @@ void LittleGuy::update(float dt) {
 void LittleGuy::tick() {
     if (task != nullptr) {
         if (task->tick()) {
-            task->clear();
+            task->setActive(false);
             delete task;
             task = nullptr;
         }
@@ -65,42 +65,48 @@ void LittleGuy::tick() {
 
 void LittleGuy::draw(const bool bind) {
     int frame = wasLastDirLeft ? 0 : 1;
-    frame += items.empty() ? 0 : 2;
+    frame += itemList.empty() ? 0 : 2;
     texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, frame, bind);
-    for (int i = items.size() - 1; i >= 0; i--) {
-        items[i]->draw(-items[i]->pos.x + pos.x, -items[i]->pos.y + pos.y + (0.722f * 0.772f * height) + (items.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, i == items.size() - 1);
+    for (int i = itemList.size() - 1; i >= 0; i--) {
+        Item::draw(pos.x, -pos.y + (0.722f * 0.772f * height) + (itemList.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, itemList[i], i == itemList.size() - 1);
     }
-}
-
-std::string LittleGuy::getConfigKey() {
-    return "LITTLE_GUY";
 }
 
 std::string LittleGuy::getConfig() {
     std::string output = FarmingObject::getConfig();
     //output += std::to_string(pos.x) + " " + std::to_string(pos.y) + " " + std::to_string(speed) + "\n";
-    for (auto & item : items) {
-        output += "="+item->getConfigKey() + "\n";
-        output += item->getConfig();
+    for (auto & item : itemList) {
+        output += "=+"+getData<ObjectData>(item)->configKey+"\n";
     }
     return output;
 }
 
 void LittleGuy::loadConfig(const std::string &line, const int i) {
-    if (i == 1) {
+    if (i > 1) {
+        for (auto const& [type, data] : objectData) {
+            if (dynamic_cast<Item::ItemData*>(data)) { //check if item
+                if ("=+"+data->configKey == line) {
+                    itemList.push_back(type);
+                    break;
+                }
+            }
+        }
+    }
+    else if (i == 1) {
         std::istringstream iss(line);
         iss >> pos.x >> pos.y >> speed;
     } else FarmingObject::loadConfig(line, i);
 }
 
 void LittleGuy::clearObjects() {
-    for (auto & item : items) {
+    /*for (auto & item : items) {
         if (item != nullptr) {
             delete item;
             item = nullptr;
         }
     }
-    items.clear();
+    items.clear();*/
+    itemList.clear();
 }
 
 vec2 LittleGuy::getPos() const {
@@ -134,18 +140,29 @@ void LittleGuy::setSpeed(const float speed) {
 }
 
 Item* LittleGuy::takeItem(TypeID type) {
-    for (int i = items.size() - 1; i >= 0; i--) {
+    /*for (int i = items.size() - 1; i >= 0; i--) {
         if (items[i]->getType() == type) {
             Item* item = items[i];
             items.erase(items.begin() + i);
             return item;
         }
+    }*/
+    if (getData<Item::ItemData>(type)) {
+        for (int i = 0; i < itemList.size(); i++) {
+            if (itemList[i] == type) {
+                itemList.erase(itemList.begin() + i);
+            }
+        }
+        Item *item = FarmingWorld::createItem(type);
+        item->pos = pos;
+        item->tile = tile;
+        return item;
     }
     return nullptr;
 }
 
-void LittleGuy::giveItem(Item *item) {
-    items.push_back(item);
+void LittleGuy::giveItem(TypeID type) {
+    itemList.push_back(type);
 }
 
 Task * LittleGuy::getTask() const {
@@ -154,7 +171,7 @@ Task * LittleGuy::getTask() const {
 
 void LittleGuy::setTask(Task *task) {
     if (this->task != nullptr) {
-        this->task->clear();
+        this->task->setActive(false);
         delete this->task;
         this->task = nullptr;
     }

@@ -16,7 +16,7 @@ public:
         TypeID producedFrom = TypeID::NONE;
 
         ProduceData() : ItemData() {}
-        explicit ProduceData(const TypeID type, const TypeID parent, const TypeID producedFrom, int textureIndex, bool isItem) : ItemData(type, parent, textureIndex, isItem) {
+        explicit ProduceData(const std::string &configKey, const TypeID type, const TypeID parent, const TypeID producedFrom, int textureIndex, bool isItem) : ItemData(configKey, type, parent, textureIndex, isItem) {
             this->producedFrom = producedFrom;
         }
         ~ProduceData() override = default;
@@ -36,7 +36,6 @@ public:
     void draw(bool bind) override;
     void draw(float offsetX, float offsetY, bool bind) override;
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
 };

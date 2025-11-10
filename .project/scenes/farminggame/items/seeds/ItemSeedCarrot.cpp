@@ -30,10 +30,6 @@ FarmingObject::TypeID ItemSeedCarrot::getType() const {
     return TypeID::ITEM_SEED_CARROT;
 }
 
-std::string ItemSeedCarrot::getConfigKey() {
-    return ItemSeed::getConfigKey() + "_CARROT";
-}
-
 std::string ItemSeedCarrot::getConfig() {
     return ItemSeed::getConfig() + "-\n";
 }

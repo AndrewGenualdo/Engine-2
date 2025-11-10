@@ -3,8 +3,10 @@
 //
 
 #include "Tile.h"
+#include "../farmingWorld.h"
 
 Tile::Tile(const ivec2 tile) : FarmingObject(tile) {
+    tileExists = false;
 }
 
 void Tile::update(float dt) {
@@ -23,8 +25,15 @@ FarmingObject::TypeID Tile::getType() const {
     return TypeID::TILE;
 }
 
-std::string Tile::getConfigKey() {
-    return FarmingObject::getConfigKey() + "TILE";
+bool Tile::destroy() {
+    if (world != nullptr) {
+        if (world->getTile(tile) != nullptr) {
+            delete world->getTile(tile);
+            world->setTile(tile, new Tile(tile));
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string Tile::getConfig() {
@@ -35,4 +44,8 @@ void Tile::loadConfig(const std::string &line, int i) {
     if (i == 1) {
         //load stuff for Tile.h here
     } else FarmingObject::loadConfig(line, i);
+}
+
+bool Tile::exists() const {
+    return tileExists;
 }

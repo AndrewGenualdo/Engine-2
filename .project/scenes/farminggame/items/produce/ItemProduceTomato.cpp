@@ -30,10 +30,6 @@ void ItemProduceTomato::update(const float dt) {
 
 }
 
-std::string ItemProduceTomato::getConfigKey() {
-    return ItemProduce::getConfigKey() + "_TOMATO";
-}
-
 std::string ItemProduceTomato::getConfig() {
     return ItemProduce::getConfig() + "-\n";
 }

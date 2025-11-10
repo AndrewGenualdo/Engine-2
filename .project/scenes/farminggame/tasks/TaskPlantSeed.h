@@ -20,7 +20,7 @@ public:
     bool tick() override;
     std::string getName() override;
     float getCost() override;
-    void clear() override;
+    void setActive(bool active) override;
 
     TilePlant* getResultPlant() const;
 };

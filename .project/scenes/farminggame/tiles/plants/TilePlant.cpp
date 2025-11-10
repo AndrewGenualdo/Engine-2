@@ -9,6 +9,7 @@
 TilePlant::TilePlant(const TypeID type, const ivec2 tile) : Tile(tile) {
     this->stage = 0;
     this->ticksUntilStage = getData<PlantData>(type)->ticksBetweenStage;
+    tileExists = true;
 }
 
 void TilePlant::update(float dt) {
@@ -34,10 +35,6 @@ FarmingObject::TypeID TilePlant::getType() const {
     return TypeID::TILE_PLANT;
 }
 
-std::string TilePlant::getConfigKey() {
-    return Tile::getConfigKey() + "_PLANT";
-}
-
 std::string TilePlant::getConfig() {
     return Tile::getConfig() + std::to_string(stage) + " " + std::to_string(ticksUntilStage) + "\n";
 }
@@ -57,10 +54,9 @@ bool TilePlant::isRipe() const {
 bool TilePlant::destroy() {
     if (world != nullptr) {
         ivec2 t = tile;
-        if (FarmingObject::destroy()) {
-            world->plantData[t.y * FarmingWorld::TILES_HORIZ + t.x] = FarmingWorld::EMPTY;
-            return true;
-        }
+        world->clearTile(tile);
+        world->plantData[t.y * FarmingWorld::TILES_HORIZ + t.x] = FarmingWorld::EMPTY;
+        return true;
     }
     return false;
 }

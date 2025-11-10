@@ -27,7 +27,7 @@ public:
         bool isItem = false;
 
         ItemData() : ObjectData() {}
-        explicit ItemData(const TypeID type, const TypeID parent, const int textureIndex, bool isItem) : ObjectData(type, parent) {
+        explicit ItemData(const std::string &configKey, const TypeID type, const TypeID parent, const int textureIndex, bool isItem) : ObjectData(configKey, type, parent) {
             this->textureIndex = textureIndex;
             this->isItem = isItem;
         }
@@ -45,13 +45,14 @@ public:
     explicit Item(vec2 pos);
     ~Item() override = default;
     [[nodiscard]] TypeID getType() const override;
+    bool destroy() override;
 
     void update(float dt) override;
     void tick() override;
     void draw(bool bind) override;
     void draw(float offsetX, float offsetY, bool bind) override;
+    static void draw(float x, float y, TypeID type, bool bind);
 
-    std::string getConfigKey() override;
     std::string getConfig() override;
     void loadConfig(const std::string &line, int i) override;
 

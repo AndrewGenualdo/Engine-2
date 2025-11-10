@@ -26,8 +26,7 @@ public:
     virtual bool update(float dt);
     virtual bool tick();
     virtual float getCost();
-    virtual void clear();
-
+    virtual void setActive(bool active);
     virtual bool isActive();
 
     virtual std::string getName();

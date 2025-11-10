@@ -25,10 +25,6 @@ FarmingObject::TypeID TilePlantTomato::getType() const {
     return TypeID::TILE_PLANT_TOMATO;
 }
 
-std::string TilePlantTomato::getConfigKey() {
-    return TilePlant::getConfigKey() + "_TOMATO";
-}
-
 std::string TilePlantTomato::getConfig() {
     return TilePlant::getConfig() + "-\n";
 }
