@@ -16,9 +16,13 @@ TaskPlantSeed::TaskPlantSeed(LittleGuy *guy, FarmingObject::TypeID plantType, iv
 TaskPlantSeed::~TaskPlantSeed() = default;
 
 bool TaskPlantSeed::tick() {
-    if (world->getTile(tile) == nullptr || (world->getTile(tile) != nullptr && world->getTile(tile)->isBeingUsed())) {
+
+    bool exists = world->getTile(tile)->exists();
+
+    if(exists) {
         return true;
     }
+
     if (guy->takeItem(FarmingObject::getData<TilePlant::PlantData>(plantType)->seed)) {
         Tile *newPlant = FarmingWorld::createTile(plantType, tile);
         if (newPlant != nullptr) {

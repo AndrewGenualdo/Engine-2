@@ -68,13 +68,13 @@ void LittleGuy::draw(const bool bind) {
     frame += itemList.empty() ? 0 : 2;
     texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, frame, bind);
     for (int i = itemList.size() - 1; i >= 0; i--) {
-        Item::draw(pos.x, -pos.y + (0.722f * 0.772f * height) + (itemList.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, itemList[i], i == itemList.size() - 1);
+        Item::draw(pos.x, pos.y + (0.722f * 0.772f * height) + (itemList.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, itemList[i], i == itemList.size() - 1);
     }
 }
 
 std::string LittleGuy::getConfig() {
     std::string output = FarmingObject::getConfig();
-    //output += std::to_string(pos.x) + " " + std::to_string(pos.y) + " " + std::to_string(speed) + "\n";
+    output += std::to_string(pos.x) + " " + std::to_string(pos.y) + " " + std::to_string(speed) + "\n";
     for (auto & item : itemList) {
         output += "=+"+getData<ObjectData>(item)->configKey+"\n";
     }
@@ -154,6 +154,7 @@ Item* LittleGuy::takeItem(TypeID type) {
             }
         }
         Item *item = FarmingWorld::createItem(type);
+        if (item == nullptr) return nullptr;
         item->pos = pos;
         item->tile = tile;
         return item;

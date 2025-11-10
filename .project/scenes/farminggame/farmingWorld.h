@@ -136,7 +136,9 @@ public:
     }
 
     void clearTile(ivec2 tile) {
-        updateTile(tile, new Tile(tile));
+        Tile *t = new Tile(tile);
+        t->setBeingUsed(false);
+        updateTile(tile, t);
     }
 
     void updateTile(ivec2 tile, Tile* data) {

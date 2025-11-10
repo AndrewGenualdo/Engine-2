@@ -1,0 +1,6 @@
+known bugs:
+- guys position doesn't get loaded from config properly
+
+- when switching off a waiting to grow task, pretty sure the tile itself is deleted but the plantData is never updated (it shouldn't be deleted in the first place, just marked as not being used
+
+- tiles are never marked as “not being used” after harvested (very strange considering the tile *is* deleted I think, double check its not just invisible)
