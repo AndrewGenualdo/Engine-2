@@ -166,6 +166,16 @@ void FarmingScene::draw() {
     if (mx >= FarmingWorld::TILE_OFFSET_X && my >= FarmingWorld::TILE_OFFSET_Y && mouseTile.x < FarmingWorld::TILES_HORIZ && mouseTile.y < FarmingWorld::TILES_VERT) {
         Texture2d::setColor(vec4(1, 1, 1, 0.5f));
         blank.draw(static_cast<float>(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH), static_cast<float>(FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT), FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
+        std::string tileInfo = std::to_string(mouseTile.x) + ", " + std::to_string(mouseTile.y) + "\n";
+        tileInfo += "Type: " + std::to_string(static_cast<int>(world->getTile(mouseTile)->getType())) + "\n";
+        tileInfo += std::string("Exists: ") + (world->getTile(mouseTile)->exists() ? "true" : "false") + "\n";
+        tileInfo += std::string("Being Used: ") + (world->getTile(mouseTile)->isBeingUsed() ? "true" : "false");
+
+        Texture2d::setColor(vec4(0, 0, 0, 0.5f));
+        float tileInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 20;
+        float tileInfoBgY = Window::GAME_HEIGHT - fontRenderer.getHeight() * 5 * fontScale - 20;
+        blank.draw(tileInfoBgX, tileInfoBgY, Window::GAME_WIDTH - tileInfoBgX, Window::GAME_HEIGHT - tileInfoBgY, true);
+        fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
     }
 
 }
