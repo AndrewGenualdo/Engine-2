@@ -68,7 +68,7 @@ void Item::draw(float x, float y, TypeID type, bool bind) {
 }
 
 std::string Item::getConfig() {
-    return FarmingObject::getConfig() + " " + std::to_string(pos.x) + " " + std::to_string(pos.y) + "\n";
+    return FarmingObject::getConfig() + std::to_string(pos.x) + " " + std::to_string(pos.y) + "\n";
 }
 
 void Item::loadConfig(const std::string &line, int i) {

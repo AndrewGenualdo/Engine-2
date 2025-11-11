@@ -106,6 +106,18 @@ void FarmingWorld::load() {
                         default: break;
                     }
                 }
+                for (auto const& [type, data] : FarmingObject::objectData) {
+                    if (line == "="+data->configKey || line == "LITTLE_GUY_START") {
+                        i = 0;
+                        if (object != nullptr) {switch (state) {
+                            case ITEMS: items.push_back(dynamic_cast<Item*>(object)); break;
+                            case TILES: setTile(object->tile, dynamic_cast<Tile*>(object)); break;
+                            default: break;
+                        }
+                        }
+
+                    }
+                }
                 /*else if (line == "LITTLE_GUY_START") {
                     if (currentObject != nullptr) {
                         objects.emplace_back(currentObject);
@@ -152,6 +164,7 @@ void FarmingWorld::load() {
                     }
                 }
                 */
+                std::cout << "["  << i << "] '" << line << "'" << std::endl;
                 switch (state) {
                     case LAND: {
                         if (i > TILES_VERT * TILES_HORIZ) continue;
@@ -182,6 +195,7 @@ void FarmingWorld::load() {
                         break;
                     }
                     case ITEMS: {
+
                         if (i == 0) {
                             bool found = false;
                             for (auto const& [type, data] : FarmingObject::objectData) {
@@ -195,14 +209,15 @@ void FarmingWorld::load() {
                             }
                             if (!found) std::cout << "UNKNOWN ITEM IS BEING LOADED!!" << std::endl << "Item: '" << line << "'" << std::endl;
                         } else {
-                            if (object != nullptr) object->loadConfig(line, i);
+
+                            if (object != nullptr) object->loadConfig(line, i - 1);
                         }
                         break;
                     }
                     case LITTLE_GUYS: {
                         if (line == "LITTLE_GUY_START") object = new LittleGuy();
                         else if (line == "LITTLE_GUY_END") guys.push_back(dynamic_cast<LittleGuy *>(object));
-                        if (object != nullptr) object->loadConfig(line, i);
+                        else if (object != nullptr) object->loadConfig(line, i - 1);
                         break;
                     }
                     /*case OBJECTS: {

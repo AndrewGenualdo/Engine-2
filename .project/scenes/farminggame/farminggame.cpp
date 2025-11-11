@@ -143,7 +143,7 @@ void FarmingScene::draw() {
             default: item = new Item();
         }
 
-        if (length(vec2(mx, my) - world->guys[0]->getPos()) < FarmingWorld::TILE_WIDTH) {
+        if (!world->guys.empty() && length(vec2(mx, my) - world->guys[0]->getPos()) < FarmingWorld::TILE_WIDTH) {
             world->guys[0]->giveItem(item->getType());
             delete item;
         } else {
