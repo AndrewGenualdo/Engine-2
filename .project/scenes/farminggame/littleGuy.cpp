@@ -47,6 +47,7 @@ void LittleGuy::setTexture(const std::string &path,const  int width, const int h
 void LittleGuy::update(float dt) {
     if (task != nullptr) {
         if (task->update(dt)) {
+            task->setActive(false);
             delete task;
             task = nullptr;
         }
@@ -140,24 +141,17 @@ void LittleGuy::setSpeed(const float speed) {
 }
 
 Item* LittleGuy::takeItem(TypeID type) {
-    /*for (int i = items.size() - 1; i >= 0; i--) {
-        if (items[i]->getType() == type) {
-            Item* item = items[i];
-            items.erase(items.begin() + i);
-            return item;
-        }
-    }*/
     if (getData<Item::ItemData>(type)) {
         for (int i = 0; i < itemList.size(); i++) {
             if (itemList[i] == type) {
                 itemList.erase(itemList.begin() + i);
+                Item *item = FarmingWorld::createItem(type);
+                if (item == nullptr) return nullptr;
+                item->pos = pos;
+                item->tile = tile;
+                return item;
             }
         }
-        Item *item = FarmingWorld::createItem(type);
-        if (item == nullptr) return nullptr;
-        item->pos = pos;
-        item->tile = tile;
-        return item;
     }
     return nullptr;
 }

@@ -28,18 +28,8 @@ add_library(core STATIC ${CORE_SRC} ${CORE_INC}
         cobb/shapes/line.cpp
         cobb/misc/texture2d.h
         cobb/misc/texture2d.cpp
-        cobb/shapes/geometry.h
-        cobb/shapes/geometry.cpp
-        cobb/shapes/mesh.h
-        cobb/shapes/mesh.cpp
-        cobb/shapes/torus.h
-        cobb/shapes/torus.cpp
         cobb/misc/textRenderer.h
         cobb/misc/textRenderer.cpp
-        cobb/shapes/model.h
-        cobb/shapes/model.cpp
-        cobb/shapes/cube.hpp
-        cobb/shapes/cube.cpp
         cobb/misc/animation.cpp
         cobb/misc/animation.h
         cobb/core/scene.cpp
@@ -66,7 +56,7 @@ add_custom_target(copyAssetsLine ALL
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(core PUBLIC IMGUI glm assimp enet)
+target_link_libraries(core PUBLIC IMGUI glm)
 
 install (TARGETS core DESTINATION lib)
 install (FILES ${CORE_INC} DESTINATION include/core)

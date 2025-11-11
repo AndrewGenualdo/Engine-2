@@ -63,7 +63,7 @@ public:
 
     std::vector<LittleGuy*> guys;
 private:
-    std::vector<Tile*> tiles;
+    std::vector<Tile*> tiles = std::vector<Tile*>();
 public:
     std::vector<Item*> items;
     std::map<FarmingObject::TypeID, int> inventory;
@@ -137,7 +137,6 @@ public:
 
     void clearTile(ivec2 tile) {
         Tile *t = new Tile(tile);
-        t->setBeingUsed(false);
         updateTile(tile, t);
     }
 

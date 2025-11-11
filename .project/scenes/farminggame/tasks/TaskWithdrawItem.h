@@ -18,6 +18,7 @@ public:
     bool tick() override;
     std::string getName() override;
     float getCost() override;
+    int getAmount() const;
 };
 
 

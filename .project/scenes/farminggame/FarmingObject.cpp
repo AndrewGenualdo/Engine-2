@@ -104,6 +104,7 @@ bool FarmingObject::destroy() {
 }
 
 void FarmingObject::setBeingUsed(const bool isBeingUsed) {
+    //std::cout << tile.x << " " << tile.y << ": " << isBeingUsed << std::endl;
     this->beingUsed = isBeingUsed;
 }
 

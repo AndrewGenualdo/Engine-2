@@ -48,7 +48,9 @@ bool TaskRetrieveItem::tick() {
             if (tasks[0]->tick()) { //if complete, try to find the pickup task so it knows which one to pickup
                 for (int i = 1; i < tasks.size(); i++) {
                     if (dynamic_cast<TaskPickupItem*>(tasks[i])) {
-                        auto item = dynamic_cast<TaskHarvestPlant*>(tasks[0])->getResultItem();
+                        auto task = dynamic_cast<TaskHarvestPlant*>(tasks[0]);
+                        task->setActive(false);
+                        auto item = task->getResultItem();
                         dynamic_cast<TaskPickupItem*>(tasks[i])->setItem(item);
                         break;
                     }
@@ -58,10 +60,17 @@ bool TaskRetrieveItem::tick() {
         } else if (dynamic_cast<TaskPickupItem*>(tasks[0])) {
             if (tasks[0]->tick()) {
                 amount++;
-                getClosestItem();
+                if (amount < goalAmount) getClosestItem();
                 del = true;
             }
-        } else if (dynamic_cast<TaskWithdrawItem*>(tasks[0]) || dynamic_cast<TaskWait*>(tasks[0])) {
+        } else if (dynamic_cast<TaskWithdrawItem*>(tasks[0])) {
+            if (tasks[0]->tick()) {
+                int amountWithdrawn = goalAmount - dynamic_cast<TaskWithdrawItem*>(tasks[0])->getAmount();
+                setActive(false);
+                if (amountWithdrawn < goalAmount) return true; //make some better logic here later.
+                del = true;
+            }
+        } else if (dynamic_cast<TaskWait*>(tasks[0])) {
             if (tasks[0]->tick()) {
                 del = true;
             }
@@ -86,14 +95,13 @@ bool TaskRetrieveItem::tick() {
         }
         return false;
     }
-
     return true;
 }
 
 std::string TaskRetrieveItem::getName() {
     std::string out = "Retrieve Item: {";
-    for (int i = 0; i < tasks.size(); i++) {
-        out += tasks[i]->getName();
+    for (auto & task : tasks) {
+        out += task->getName();
     }
     out += "} ";
     return out;
@@ -157,9 +165,6 @@ bool TaskRetrieveItem::getClosestItem() {
                     //bool isFarmland = true;//FarmingWorld::isFarmland(i);
 
                     //ADD A CHECK TO MAKE SURE THE TILE IS FARMLAND
-
-                    //ADD A CHECK TO MAKE SURE THERE ISN'T ANOTHER PLANT THERE
-
                     if (!world->getTile(i)->exists() && !world->getTile(i)->isBeingUsed()) {
                         tileToPlant = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
                         break;
@@ -195,18 +200,19 @@ bool TaskRetrieveItem::getClosestItem() {
     }
 
     if (bestIndex != -1) {
-        for (auto task : possibleTasks[bestIndex]) {
-            task->setActive(true);
-            tasks.push_back(task);
-        }
         for (int i = 0; i < possibleTasks.size(); i++) {
             if (i != bestIndex) {
                 for (auto & task : possibleTasks[i]) {
+                    task->setActive(false);
                     delete task;
                     task = nullptr;
                 }
                 possibleTasks[i].clear();
             }
+        }
+        for (auto task : possibleTasks[bestIndex]) {
+            task->setActive(true);
+            tasks.push_back(task);
         }
     }
 

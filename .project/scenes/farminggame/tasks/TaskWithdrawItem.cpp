@@ -30,5 +30,9 @@ std::string TaskWithdrawItem::getName() {
 }
 
 float TaskWithdrawItem::getCost() {
+    return static_cast<float>(amount);
+}
+
+int TaskWithdrawItem::getAmount() const {
     return amount;
 }

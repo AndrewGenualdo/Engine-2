@@ -317,6 +317,7 @@ void FarmingWorld::cleanup() {
             guy = nullptr;
         }
     }
+    guys.clear();
 }
 
 void FarmingWorld::update(float dt) {
@@ -330,6 +331,7 @@ void FarmingWorld::tick() {
     for (auto & guy : guys) {
         //if (guy->getTask() != nullptr) std::cout << guy->getTask()->getName() << std::endl;
         guy->tick();
+
     }
     for (auto & tile : tiles) {
         if (tile != nullptr) {
@@ -436,11 +438,11 @@ void FarmingWorld::clearObjects() {
     for (auto & tile : tiles) {
         if (dynamic_cast<TilePlant*>(tile)) {
             plantData[tile->tile.y * TILES_HORIZ + tile->tile.x] = 0;
-            delete tile;
-            tile = nullptr;
         }
+        ivec2 p = tile->tile;
+        delete tile;
+        tile = new Tile(ivec2(p.x, p.y));
     }
-    tiles.clear();
     for (auto & guy : guys) {
         if (guy != nullptr) {
             guy->clearObjects();

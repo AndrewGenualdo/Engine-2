@@ -24,5 +24,5 @@ std::string TaskWait::getName() {
 }
 
 float TaskWait::getCost() {
-    return ticks;
+    return static_cast<float>(ticks);
 }

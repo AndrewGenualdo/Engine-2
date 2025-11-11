@@ -22,18 +22,15 @@ include(external/cpm.cmake)
 include(external/glfw.cmake)
 include(external/imgui.cmake)
 include(external/glm.cmake)
-include(external/assimp.cmake)
-include(external/enet.cmake)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message(STATUS "Sanitizers enabled for Debug build")
 
-# Disable treating warnings as errors for Assimp specifically
-# This allows it to run on CLion
-if(TARGET assimp)
-  target_compile_options(assimp PRIVATE -Wno-error)
-endif()
-if(TARGET enet)
-  target_compile_options(enet PRIVATE -Wno-error)
+  # For memory issues
+  add_compile_options(-fsanitize=address -fsanitize=leak -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address -fsanitize=leak)
 endif()
 
 add_subdirectory(core)
 add_subdirectory(.project)
+

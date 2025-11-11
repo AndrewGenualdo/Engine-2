@@ -10,10 +10,11 @@ TaskPlantSeed::TaskPlantSeed(LittleGuy *guy, FarmingObject::TypeID plantType, iv
     this->plantType = plantType;
     this->tile = tile;
     this->plantProimse = nullptr;
-    world->getTile(tile)->setBeingUsed(true);
 }
 
-TaskPlantSeed::~TaskPlantSeed() = default;
+TaskPlantSeed::~TaskPlantSeed() {
+    //if (world != nullptr) if (guy != nullptr) world->getTile(tile)->setBeingUsed(false);
+}
 
 bool TaskPlantSeed::tick() {
 
@@ -28,7 +29,6 @@ bool TaskPlantSeed::tick() {
         if (newPlant != nullptr) {
             newPlant->setBeingUsed(true);
             plantProimse = dynamic_cast<TilePlant*>(newPlant);
-            //world->setTile(tile, newPlant);
             world->updateTile(tile, newPlant);
             return false;
         }
@@ -45,7 +45,9 @@ float TaskPlantSeed::getCost() {
 }
 
 void TaskPlantSeed::setActive(bool active) {
+    //std::cout << active << std::endl;
 
+    if (world != nullptr) if (guy != nullptr) world->getTile(tile)->setBeingUsed(active);
 }
 
 TilePlant * TaskPlantSeed::getResultPlant() const {

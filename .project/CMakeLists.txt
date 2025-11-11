@@ -69,7 +69,7 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/tasks/TaskPlantSeed.h
 )
 
-target_link_libraries(project PUBLIC core IMGUI glm assimp enet)
+target_link_libraries(project PUBLIC core IMGUI glm)
 target_include_directories(project PUBLIC ${CORE_INC_DIR} ${CMAKE_SOURCE_DIR}/core ${stb_INCLUDE_DIR})
 
 #Trigger asset copy when project is built
