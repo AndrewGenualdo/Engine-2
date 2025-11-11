@@ -1,1 +1,2 @@
-
+something something. If a plant is in use while saving + reloading scene, it dies (unless its on tile 0,0?)
+I think it's somehow re-loading the plants as being on tile 0,0... maybe...

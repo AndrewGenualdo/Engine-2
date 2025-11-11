@@ -37,8 +37,6 @@ void FarmingObject::loadData() {
 
     objectData[TypeID::TILE_PLANT_TOMATO] = new TilePlant::PlantData("TILE_PLANT_TOMATO", TypeID::TILE_PLANT_TOMATO, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_TOMATO, TypeID::ITEM_SEED_TOMATO, 4, 4, 50, 10, 1);
     objectData[TypeID::TILE_PLANT_CARROT] = new TilePlant::PlantData("TILE_PLANT_CARROT", TypeID::TILE_PLANT_CARROT, TypeID::TILE_PLANT, TypeID::ITEM_PRODUCE_CARROT, TypeID::ITEM_SEED_CARROT, 4, 4, 50, 10, 5);
-
-
 }
 
 void FarmingObject::cleanData() {
@@ -55,16 +53,17 @@ void FarmingObject::setWorld(FarmingWorld *world) {
 void FarmingObject::loadInventory() {
     std::cout << "Ignore the following warnings, it's looping through all FarmingObject types" << std::endl;
     for (const auto&[fst, snd] : objectData) {
-        auto *data = getData<Item::ItemData>(fst);
+        auto data = getData<Item::ItemData>(fst);
         if (data) {
             if (data->isItem) {
-                world->inventory[fst] = 0;
+                if (world->inventory.find(fst) == world->inventory.end()) {
+                    world->inventory[fst] = 0;
+                }
             }
         }
     }
 
-    world->inventory[TypeID::ITEM_SEED_TOMATO] = 100;
-    world->inventory[TypeID::ITEM_SEED_CARROT] = 100;
+
 }
 
 FarmingObject::FarmingObject(const ivec2 tile) {

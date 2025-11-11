@@ -47,7 +47,7 @@ void FarmingScene::load() {
     FarmingWorld::barnTexture = Texture2d("assets/farminggame/barn.png", GL_NEAREST, GL_TEXTURE_WRAP_S);
     FarmingWorld::uiTexture = MultiTexture2d("assets/farminggame/ui.png", 64);
     FarmingWorld::fontRenderer = &fontRenderer;
-    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f, FarmingWorld::TILE_HEIGHT, 4);
+    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<int>(static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f), FarmingWorld::TILE_HEIGHT, 4);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
     lastTick = window->getTime();
@@ -102,29 +102,6 @@ void FarmingScene::draw() {
                 break;
             }
         }
-        /*for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
-            bool isFarmland = true;//FarmingWorld::isFarmland(i);
-            bool planted = false;
-            if (isFarmland) {
-                for (int j = 0; j < world->objects.size(); j++) {
-                    FarmingObject *obj = world->objects[j];
-                    const auto *plant = dynamic_cast<TilePlant*>(obj);
-                    if (plant && plant->tile.y * FarmingWorld::TILES_HORIZ + plant->tile.x == i) {
-                        planted = true;
-                        break;
-                    }
-                }
-            }
-            if (!planted) {
-                switch (static_cast<int>(ew::RandomRange(0, 2))) {
-                    FarmingWorld::createTile(FarmingObject::TypeID::TILE_PLANT_TOMATO, ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)); break;
-                    FarmingWorld::createTile(FarmingObject::TypeID::TILE_PLANT_CARROT, ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)); break;
-                    default: break;
-                }
-
-                break;
-            }
-        }*/
     }
     if (window->isInputClicked(GLFW_KEY_O)) {
         FarmingObject::cleanData();
