@@ -7,9 +7,9 @@
 
 
 #include "glm/vec2.hpp"
-#include "farmingWorld.h"
-#include "items/Item.h"
-#include "tasks/Task.h"
+#include "../FarmingWorld.h"
+#include "../items/Item.h"
+#include "../tasks/Task.h"
 
 using namespace glm;
 
@@ -56,6 +56,7 @@ public:
     [[nodiscard]] float getSpeed() const;
     void setSpeed(float speed);
 
+    int hasItem(TypeID type);
     Item* takeItem(TypeID type);
     void giveItem(TypeID type);
 

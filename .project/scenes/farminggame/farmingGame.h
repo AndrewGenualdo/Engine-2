@@ -11,7 +11,7 @@
 #include "cobb/misc/fontRenderer.h"
 #include "cobb/misc/multiTexture2d.h"
 #include "cobb/misc/tiles2d.h"
-#include "farmingWorld.h"
+#include "FarmingWorld.h"
 
 class FarmingScene : public Scene {
 public:

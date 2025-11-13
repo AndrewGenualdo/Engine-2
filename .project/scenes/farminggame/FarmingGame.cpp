@@ -2,8 +2,8 @@
 // Created by cobble on 8/19/2025.
 //
 
-#include "farmingGame.h"
-#include "littleGuy.h"
+#include "FarmingGame.h"
+#include "misc/LittleGuy.h"
 #include "ew/ewMath/ewMath.h"
 #include "items/Item.h"
 #include "items/produce/ItemProduceCarrot.h"

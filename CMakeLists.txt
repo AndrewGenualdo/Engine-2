@@ -27,8 +27,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Sanitizers enabled for Debug build")
 
   # For memory issues
-  add_compile_options(-fsanitize=address -fsanitize=leak -fno-omit-frame-pointer)
-  add_link_options(-fsanitize=address -fsanitize=leak)
+  add_compile_options(-fsanitize=address,leak -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,leak)
 endif()
 
 add_subdirectory(core)

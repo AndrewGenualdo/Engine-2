@@ -21,8 +21,8 @@ install(FILES ${PROJECT_INC} DESTINATION include/project)
 add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/farmingWorld.cpp
         scenes/farminggame/farmingWorld.h
-        scenes/farminggame/littleGuy.cpp
-        scenes/farminggame/littleGuy.h
+        scenes/farminggame/misc/littleGuy.cpp
+        scenes/farminggame/misc/littleGuy.h
         scenes/farminggame/tasks/Task.cpp
         scenes/farminggame/tasks/Task.h
         scenes/farminggame/tasks/TaskTravel.cpp
@@ -67,6 +67,8 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/tasks/TaskWait.h
         scenes/farminggame/tasks/TaskPlantSeed.cpp
         scenes/farminggame/tasks/TaskPlantSeed.h
+        scenes/farminggame/misc/LittleGuyManager.cpp
+        scenes/farminggame/misc/LittleGuyManager.h
 )
 
 target_link_libraries(project PUBLIC core IMGUI glm)

@@ -3,7 +3,7 @@
 //
 
 #include "TilePlantCarrot.h"
-#include "../../farmingWorld.h"
+#include "../../FarmingWorld.h"
 
 TilePlantCarrot::TilePlantCarrot(const ivec2 tile) : TilePlant(TypeID::TILE_PLANT_CARROT, tile) {
     TilePlantCarrot::updatePlantState();

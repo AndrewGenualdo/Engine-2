@@ -3,7 +3,7 @@
 //
 
 #include "TaskPlantSeed.h"
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 
 TaskPlantSeed::TaskPlantSeed(LittleGuy *guy, FarmingObject::TypeID plantType, ivec2 tile) {
     this->guy = guy;

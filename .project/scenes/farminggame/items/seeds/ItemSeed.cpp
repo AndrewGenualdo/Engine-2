@@ -3,7 +3,7 @@
 //
 
 #include "ItemSeed.h"
-#include "../../farmingWorld.h"
+#include "../../FarmingWorld.h"
 
 ItemSeed::ItemSeed(const ivec2 tile) : Item(tile) {
 

@@ -3,7 +3,7 @@
 //
 
 #include "TaskWithdrawItem.h"
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 
 TaskWithdrawItem::TaskWithdrawItem(LittleGuy *guy, FarmingObject::TypeID type, int amount) {
     this->guy = guy;

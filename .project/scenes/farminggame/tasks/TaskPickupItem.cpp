@@ -3,7 +3,7 @@
 //
 
 #include "TaskPickupItem.h"
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 
 TaskPickupItem::TaskPickupItem(LittleGuy *guy, Item *item) : Task(guy) {
     this->item = item;

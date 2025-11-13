@@ -4,7 +4,7 @@
 
 #include "TaskDepositItem.h"
 
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 
 TaskDepositItem::TaskDepositItem(LittleGuy *guy, FarmingObject::TypeID type, int amount) {
     this->guy = guy;

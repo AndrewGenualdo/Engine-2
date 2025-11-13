@@ -3,7 +3,7 @@
 //
 
 #include "Tile.h"
-#include "../farmingWorld.h"
+#include "../FarmingWorld.h"
 
 Tile::Tile(const ivec2 tile) : FarmingObject(tile) {
     tileExists = false;

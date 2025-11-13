@@ -6,7 +6,7 @@
 
 
 
-#include "../farmingWorld.h"
+#include "../FarmingWorld.h"
 
 MultiTexture2d Item::itemsTexture = MultiTexture2d();
 int Item::width = 1;

@@ -2,24 +2,18 @@
 // Created by cobble on 11/3/2025.
 //
 
-#include "farmingWorld.h"
+#include "FarmingWorld.h"
 
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 
-#include "farmingGame.h"
+#include "FarmingGame.h"
 #include "FarmingObject.h"
-#include "littleGuy.h"
 #include "items/Item.h"
-#include "items/produce/ItemProduceCarrot.h"
-#include "items/seeds/ItemSeedCarrot.h"
-#include "items/produce/ItemProduceTomato.h"
-#include "items/seeds/ItemSeedTomato.h"
+#include "misc/LittleGuyManager.h"
 #include "tiles/Tile.h"
 #include "tiles/plants/TilePlant.h"
-#include "tiles/plants/TilePlantCarrot.h"
-#include "tiles/plants/TilePlantTomato.h"
 
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
 Tiles2d FarmingWorld::plantTilemap = Tiles2d();
@@ -33,7 +27,7 @@ FarmingWorld::FarmingWorld() {
 
 FarmingWorld::FarmingWorld(const std::string &savePath) {
     this->savePath = savePath;
-    LittleGuy::setWorld(this);
+    LittleGuyManager::setWorld(this);
     FarmingObject::setWorld(this);
     load();
 }

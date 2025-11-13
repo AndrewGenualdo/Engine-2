@@ -7,7 +7,7 @@
 #include "TaskPlantSeed.h"
 #include "TaskWait.h"
 #include "../items/Item.h"
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 #include "../items/produce/ItemProduce.h"
 #include "../tiles/plants/TilePlant.h"
 

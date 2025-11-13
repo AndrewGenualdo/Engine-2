@@ -3,7 +3,7 @@
 //
 
 #include "TaskHarvestPlant.h"
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 
 TaskHarvestPlant::TaskHarvestPlant(LittleGuy *guy, TilePlant *plant) {
     this->guy = guy;

@@ -2,9 +2,9 @@
 // Created by drewg on 11/4/2025.
 //
 
-#include "littleGuy.h"
+#include "LittleGuy.h"
 
-#include "tasks/Task.h"
+#include "../tasks/Task.h"
 
 FarmingWorld *LittleGuy::world = nullptr;
 MultiTexture2d LittleGuy::texture = MultiTexture2d();
@@ -140,7 +140,19 @@ void LittleGuy::setSpeed(const float speed) {
     this->speed = speed;
 }
 
-Item* LittleGuy::takeItem(TypeID type) {
+int LittleGuy::hasItem(TypeID type) {
+    int amount = 0;
+    if (getData<Item::ItemData>(type)) {
+        for (const auto & item : itemList) {
+            if (item == type) {
+                amount++;
+            }
+        }
+    }
+    return amount;
+}
+
+Item* LittleGuy::takeItem(const TypeID type) {
     if (getData<Item::ItemData>(type)) {
         for (int i = 0; i < itemList.size(); i++) {
             if (itemList[i] == type) {
@@ -156,7 +168,7 @@ Item* LittleGuy::takeItem(TypeID type) {
     return nullptr;
 }
 
-void LittleGuy::giveItem(TypeID type) {
+void LittleGuy::giveItem(const TypeID type) {
     itemList.push_back(type);
 }
 

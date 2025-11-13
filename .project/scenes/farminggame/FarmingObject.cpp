@@ -4,7 +4,7 @@
 
 #include "FarmingObject.h"
 
-#include "farmingWorld.h"
+#include "FarmingWorld.h"
 #include "items/produce/ItemProduce.h"
 #include "items/seeds/ItemSeed.h"
 

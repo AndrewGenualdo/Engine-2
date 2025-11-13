@@ -8,7 +8,7 @@
 #include <queue>
 #include <unordered_map>
 
-#include "../littleGuy.h"
+#include "../misc/LittleGuy.h"
 
 bool TaskTravel::generatePath() {
     pathIndex = 0;
