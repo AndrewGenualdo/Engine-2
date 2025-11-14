@@ -289,6 +289,7 @@ void FarmingWorld::tick() {
         guy->tick();
 
     }
+
     for (auto & tile : tiles) {
         if (tile != nullptr) {
             tile->tick();
@@ -416,6 +417,12 @@ void FarmingWorld::clearObjects() {
     items.clear();
 }
 
+void FarmingWorld::resetEffectiveInventory() {
+    for (auto const& [type, amt] : inventory) {
+        effectiveInventory[type] = amt;
+    }
+}
+
 
 vec2 FarmingWorld::getTilePos(int x, int y) {
     return {TILE_OFFSET_X + (x + 0.5f) * TILE_WIDTH, TILE_OFFSET_Y + (y + 0.5f) * TILE_HEIGHT};
@@ -451,5 +458,29 @@ void FarmingWorld::draw() const {
 
 ivec2 FarmingWorld::getTileFromPos(vec2 pos) {
     return (pos - vec2(TILE_OFFSET_X, TILE_OFFSET_Y)) / vec2(TILE_WIDTH, TILE_HEIGHT);
+}
+
+std::vector<ivec2> FarmingWorld::getFarmland(const int amount) const {
+    //REPLACE THIS FUNCTION WITH BFS
+    std::vector<ivec2> out;
+    for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
+        if (!tiles[i]->isBeingUsed() && !tiles[i]->exists()) {
+            out.push_back(tiles[i]->tile);
+            if (out.size() >= amount) return out;
+        }
+    }
+    return out;
+}
+
+std::vector<ivec2> FarmingWorld::getTiles(const FarmingObject::TypeID type, const int amount) const {
+    //REPLACE THIS FUNCTION WITH BFS WHILE FACTORING IN REMAINING GROWTH TIME
+    std::vector<ivec2> out;
+    for (int i = 0; i < TILES_HORIZ * TILES_VERT; i++) {
+        if (!tiles[i]->isBeingUsed() && tiles[i]->getType() == type) {
+            out.push_back(tiles[i]->tile);
+            if (out.size() >= amount) return out;
+        }
+    }
+    return out;
 }
 

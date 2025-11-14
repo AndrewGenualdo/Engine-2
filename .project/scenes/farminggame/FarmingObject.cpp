@@ -62,7 +62,7 @@ void FarmingObject::loadInventory() {
             }
         }
     }
-
+    world->resetEffectiveInventory();
 
 }
 

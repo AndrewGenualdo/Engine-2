@@ -128,13 +128,12 @@ void FarmingScene::draw() {
         }
     }
 
-
-    world->update(deltaTime);
-
     if (window->getTime() - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
         lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
         world->tick();
     }
+
+    world->update(deltaTime);
 
     world->draw();
     if(!world->guys.empty()) fontRenderer.draw("Pos: " + std::to_string(world->guys[0]->getPos().x) + ", " + std::to_string(world->guys[0]->getPos().y) + "\nTile: " + std::to_string(world->guys[0]->getTile().x) + ", " + std::to_string(world->guys[0]->getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);

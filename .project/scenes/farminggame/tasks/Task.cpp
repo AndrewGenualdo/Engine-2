@@ -28,6 +28,10 @@ float Task::getCost() {
     return 0.0f;
 }
 
+LittleGuy * Task::getGuy() {
+    return guy;
+}
+
 void Task::setActive(bool active) {
 
 }

@@ -11,6 +11,7 @@
 #include "../misc/LittleGuy.h"
 
 bool TaskTravel::generatePath() {
+    if (guy == nullptr) return false;
     pathIndex = 0;
     path.clear();
 

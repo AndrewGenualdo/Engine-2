@@ -45,23 +45,23 @@ void LittleGuy::setTexture(const std::string &path,const  int width, const int h
 }
 
 void LittleGuy::update(float dt) {
-    if (task != nullptr) {
+    /*if (task != nullptr) {
         if (task->update(dt)) {
             task->setActive(false);
             delete task;
             task = nullptr;
         }
-    }
+    }*/
 }
 
 void LittleGuy::tick() {
-    if (task != nullptr) {
+    /*if (task != nullptr) {
         if (task->tick()) {
             task->setActive(false);
             delete task;
             task = nullptr;
         }
-    }
+    }*/
 }
 
 void LittleGuy::draw(const bool bind) {

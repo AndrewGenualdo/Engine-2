@@ -23,7 +23,7 @@
 using namespace cobb;
 using namespace glm;
 
-class LittleGuy;
+class LittleGuyManager;
 
 class FarmingWorld {
 public:
@@ -61,12 +61,14 @@ public:
 
     std::string savePath;
 
-    std::vector<LittleGuy*> guys;
 private:
     std::vector<Tile*> tiles = std::vector<Tile*>();
 public:
     std::vector<Item*> items;
     std::map<FarmingObject::TypeID, int> inventory;
+    std::map<FarmingObject::TypeID, int> effectiveInventory;
+
+    LittleGuyManager *guyManager = nullptr;
 
     FarmingWorld();
     explicit FarmingWorld(const std::string &savePath);
@@ -83,11 +85,16 @@ public:
     void updateTileTypes();
     void clearObjects();
 
+    void resetEffectiveInventory(); //should be called when resetting tasks
+
     static bool isFarmland(int texIndex);
     [[nodiscard]] bool isFarmland(int x, int y) const;
 
     [[nodiscard]] static vec2 getTilePos(int x, int y);
     [[nodiscard]] static ivec2 getTileFromPos(vec2 pos);
+
+    std::vector<ivec2> getFarmland(int amount) const;
+    std::vector<ivec2> getTiles(FarmingObject::TypeID type, int amount) const;
 
     static Item* createItem(FarmingObject::TypeID type) {
         switch (type) {
