@@ -19,7 +19,7 @@ class LittleGuy : public FarmingObject {
     static MultiTexture2d texture;
     static int width, height;
 
-    Task *task = nullptr;
+    //Task *task = nullptr;
     //std::vector<Item*> items;
     std::vector<TypeID> itemList;
 
@@ -60,8 +60,8 @@ public:
     Item* takeItem(TypeID type);
     void giveItem(TypeID type);
 
-    [[nodiscard]] Task* getTask() const;
-    void setTask(Task *task);
+    //[[nodiscard]] Task* getTask() const;
+    //void setTask(Task *task);
 };
 
 

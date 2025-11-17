@@ -11,7 +11,7 @@
 
 class TaskTravel : public Task {
 
-    bool generatePath();
+
 public:
     ivec2 start, goal;
     std::vector<ivec2> path;
@@ -23,6 +23,8 @@ public:
     TaskTravel(LittleGuy *guy, ivec2 start, ivec2 goal);
     bool update(float dt) override;
     float getCost() override;
+    void setGuy(LittleGuy *guy) override;
+    bool generatePath();
 
     std::string getName() override;
 };

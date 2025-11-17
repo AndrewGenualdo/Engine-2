@@ -7,7 +7,7 @@
 
 TaskHarvestPlant::TaskHarvestPlant(LittleGuy *guy, TilePlant *plant) {
     this->guy = guy;
-    this->ticksUntilHarvest = FarmingObject::getData<TilePlant::PlantData>(plant->getType())->ticksToHarvest;
+    if (plant != nullptr) this->ticksUntilHarvest = FarmingObject::getData<TilePlant::PlantData>(plant->getType())->ticksToHarvest;
     this->plant = plant;
     this->itemPromise = nullptr;
 }
@@ -24,20 +24,18 @@ TaskHarvestPlant::~TaskHarvestPlant() {
 };
 
 bool TaskHarvestPlant::tick() {
-    if (plant != nullptr) {
-        ticksUntilHarvest--;
-        if (ticksUntilHarvest <= 0) {
+    if (plant == nullptr) return false;
+    ticksUntilHarvest--;
+    if (ticksUntilHarvest <= 0) {
 
-            itemPromise = world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
-            ivec2 t = plant->tile;
-            plant->destroy();
-            plant = nullptr;
-            world->getTile(t)->setBeingUsed(false);
-            return true;
-        }
-        return false;
+        itemPromise = world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
+        ivec2 t = plant->tile;
+        plant->destroy();
+        plant = nullptr;
+        world->getTile(t)->setBeingUsed(false);
+        return true;
     }
-    return true;
+    return false;
 }
 
 std::string TaskHarvestPlant::getName() {
@@ -55,6 +53,10 @@ float TaskHarvestPlant::getCost() {
 void TaskHarvestPlant::setActive(bool active) {
     if (plant != nullptr) plant->setBeingUsed(active);
     if (itemPromise != nullptr) itemPromise->setBeingUsed(active);
+}
+
+TilePlant * TaskHarvestPlant::getPlant() const {
+    return plant;
 }
 
 void TaskHarvestPlant::setPlant(TilePlant *plant) {

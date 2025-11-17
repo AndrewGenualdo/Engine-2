@@ -28,6 +28,10 @@ float Task::getCost() {
     return 0.0f;
 }
 
+void Task::setGuy(LittleGuy *guy) {
+    this->guy = guy;
+}
+
 LittleGuy * Task::getGuy() {
     return guy;
 }

@@ -27,11 +27,14 @@ public:
     void tick();
     void draw(bool bind) const;
     void cleanup();
+    void clear();
+    std::string getConfig() const;
+
 
     int setGoal(FarmingObject::TypeID goal, int amount);
 
     bool addGuy(LittleGuy* guy);
-    [[nodiscard]] int getCount() const;
+    [[nodiscard]] int count() const;
 
 private:
     int createTasks(FarmingObject::TypeID type, int amount);

@@ -14,7 +14,7 @@ bool TaskTravel::generatePath() {
     if (guy == nullptr) return false;
     pathIndex = 0;
     path.clear();
-
+    start = guy->tile;
     constexpr ivec2 directions[4] = {
         { 0, -1 },
         { 0,  1 },
@@ -74,8 +74,11 @@ bool TaskTravel::generatePath() {
     }
 
 
-    if (cameFrom.find(key(goal)) == cameFrom.end())
+    if (cameFrom.find(key(goal)) == cameFrom.end()) {
+        std::cout << start.x << ", " << start.y << " | " << goal.x << ", " << goal.y << std::endl;
         return false; //no path found
+    }
+
 
     ivec2 current = goal;
     while (current.x != -9999) {
@@ -95,7 +98,7 @@ bool TaskTravel::generatePath() {
 
 TaskTravel::TaskTravel(LittleGuy *guy, ivec2 goal) : Task(guy){
     this->guy = guy;
-    this->start = guy->tile;
+    if (guy != nullptr) this->start = guy->tile;
     this->goal = goal;
     generatePath();
 }
@@ -141,6 +144,12 @@ bool TaskTravel::update(float dt) {
 
 float TaskTravel::getCost() {
     return FarmingWorld::TICKS_PER_SECOND * cost * guy->getSpeed() / FarmingWorld::TILE_WIDTH;
+}
+
+void TaskTravel::setGuy(LittleGuy *guy) {
+    bool newGuy = this->guy == nullptr;
+    Task::setGuy(guy);
+    if (newGuy) generatePath();
 }
 
 std::string TaskTravel::getName() {

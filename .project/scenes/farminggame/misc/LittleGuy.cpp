@@ -27,10 +27,7 @@ LittleGuy::LittleGuy(const vec2 pos) {
 }
 
 LittleGuy::~LittleGuy() {
-    if (task != nullptr) {
-        delete task;
-        task = nullptr;
-    }
+
 }
 
 void LittleGuy::setWorld(FarmingWorld *w) {
@@ -172,7 +169,7 @@ void LittleGuy::giveItem(const TypeID type) {
     itemList.push_back(type);
 }
 
-Task * LittleGuy::getTask() const {
+/*Task * LittleGuy::getTask() const {
     return task;
 }
 
@@ -183,4 +180,4 @@ void LittleGuy::setTask(Task *task) {
         this->task = nullptr;
     }
     this->task = task;
-}
+}*/

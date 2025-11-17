@@ -27,7 +27,7 @@ bool TaskDepositItem::tick() {
 }
 
 std::string TaskDepositItem::getName() {
-    return "Deposit Item: { " + std::to_string(static_cast<int>(this->type)) + " } ";
+    return "Deposit Item: { " + FarmingObject::getData<FarmingObject::ObjectData>(this->type)->configKey + " } ";
 }
 
 float TaskDepositItem::getCost() {

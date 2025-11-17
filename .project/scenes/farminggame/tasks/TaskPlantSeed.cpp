@@ -29,6 +29,7 @@ bool TaskPlantSeed::tick() {
         if (newPlant != nullptr) {
             newPlant->setBeingUsed(true);
             plantProimse = dynamic_cast<TilePlant*>(newPlant);
+
             world->updateTile(tile, newPlant);
             return false;
         }
@@ -51,5 +52,6 @@ void TaskPlantSeed::setActive(bool active) {
 }
 
 TilePlant * TaskPlantSeed::getResultPlant() const {
+
     return plantProimse;
 }

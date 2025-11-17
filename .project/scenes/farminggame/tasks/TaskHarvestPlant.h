@@ -27,6 +27,7 @@ public:
     float getCost() override;
     void setActive(bool active) override;
 
+    TilePlant *getPlant() const;
     void setPlant(TilePlant *plant);
     Item* getResultItem() const;
 

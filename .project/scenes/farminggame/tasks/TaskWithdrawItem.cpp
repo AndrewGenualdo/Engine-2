@@ -26,7 +26,7 @@ bool TaskWithdrawItem::tick() {
 }
 
 std::string TaskWithdrawItem::getName() {
-    return "Withdraw Item: { " + std::to_string(static_cast<int>(this->type)) + ": " + std::to_string(this->amount) + "} " ;
+    return "Withdraw Item: { " + FarmingObject::getData<FarmingObject::ObjectData>(type)->configKey + ": " + std::to_string(this->amount) + " } " ;
 }
 
 float TaskWithdrawItem::getCost() {

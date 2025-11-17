@@ -45,6 +45,7 @@ void FarmingWorld::load() {
     items.clear();
     inventory[FarmingObject::TypeID::ITEM_SEED_TOMATO] = 100;
     inventory[FarmingObject::TypeID::ITEM_SEED_CARROT] = 100;
+    guyManager = new LittleGuyManager();
 
     std::map<FarmingObject::TypeID, std::string> itemTypes;
 
@@ -154,7 +155,7 @@ void FarmingWorld::load() {
                     }
                     case LITTLE_GUYS: {
                         if (line == "LITTLE_GUY_START") object = new LittleGuy();
-                        else if (line == "LITTLE_GUY_END") guys.push_back(dynamic_cast<LittleGuy *>(object));
+                        else if (line == "LITTLE_GUY_END") guyManager->addGuy(dynamic_cast<LittleGuy *>(object));
                         else if (object != nullptr) object->loadConfig(line, i - 1);
                         break;
                     }
@@ -200,7 +201,7 @@ void FarmingWorld::load() {
         }
     }
 
-    std::cout << "Loaded world from file! (" << std::to_string(tiles.size()) + " tiles, " << std::to_string(items.size()) << " items, and " << guys.size() << " guys)" << std::endl;
+    std::cout << "Loaded world from file! (" << std::to_string(tiles.size()) + " tiles, " << std::to_string(items.size()) << " items, and " << guyManager->count() << " guys)" << std::endl;
 
     //if (guys.empty()) guys.emplace_back(new LittleGuy());
 }
@@ -230,12 +231,7 @@ void FarmingWorld::save() const {
                 output += "="+FarmingObject::getData<FarmingObject::ObjectData>(item->getType())->configKey + "\n";
                 output += item->getConfig();
             }
-            output += "LITTLE_GUYS\n";
-            for (auto guy : guys) {
-                output += "LITTLE_GUY_START\n";
-                output += guy->getConfig();
-                output += "LITTLE_GUY_END\n";
-            }
+            output += guyManager->getConfig();
             output += "INVENTORY\n";
             for (auto const& [type, amount] : inventory) {
                 output += FarmingObject::getData<FarmingObject::ObjectData>(type)->configKey + ":" + std::to_string(amount) + "\n";
@@ -267,28 +263,20 @@ void FarmingWorld::cleanup() {
         }
     }
     tiles.clear();
-    for (auto & guy : guys) {
-        if (guy != nullptr) {
-            delete guy;
-            guy = nullptr;
-        }
+    if (guyManager != nullptr) {
+        delete guyManager;
+        guyManager = nullptr;
     }
-    guys.clear();
 }
 
 void FarmingWorld::update(float dt) {
-    for (auto & guy : guys) {
-        guy->update(dt);
-    }
+    guyManager->update(dt);
 }
 
 void FarmingWorld::tick() {
-    //std::cout << "\n==========================================================================\n" << std::endl;
-    for (auto & guy : guys) {
-        //if (guy->getTask() != nullptr) std::cout << guy->getTask()->getName() << std::endl;
-        guy->tick();
 
-    }
+
+    guyManager->tick();
 
     for (auto & tile : tiles) {
         if (tile != nullptr) {
@@ -391,7 +379,7 @@ void FarmingWorld::updateTileTypes() {
     }
 }
 
-void FarmingWorld::clearObjects() {
+void FarmingWorld::clear() {
     for (auto & tile : tiles) {
         if (dynamic_cast<TilePlant*>(tile)) {
             plantData[tile->tile.y * TILES_HORIZ + tile->tile.x] = 0;
@@ -400,14 +388,7 @@ void FarmingWorld::clearObjects() {
         delete tile;
         tile = new Tile(ivec2(p.x, p.y));
     }
-    for (auto & guy : guys) {
-        if (guy != nullptr) {
-            guy->clearObjects();
-            delete guy;
-            guy = nullptr;
-        }
-    }
-    guys.clear();
+    guyManager->clear();
     for (auto & item : items) {
         if (item != nullptr) {
             delete item;
@@ -434,9 +415,7 @@ void FarmingWorld::draw() const {
     plantTilemap.draw(TILE_OFFSET_X, TILE_OFFSET_Y + TILE_HEIGHT * 0.2f, TILE_WIDTH * TILES_HORIZ, TILE_HEIGHT * TILES_VERT, true);
 
     Texture2d::setColor(vec4(1));
-    for (auto guy : guys) {
-        guy->draw(true);
-    }
+    guyManager->draw(true);
 
     for (int i = 0; i < items.size(); i++) {
         items[i]->draw(i == 0);

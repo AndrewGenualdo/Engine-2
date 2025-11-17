@@ -83,7 +83,7 @@ public:
     void draw() const;
 
     void updateTileTypes();
-    void clearObjects();
+    void clear();
 
     void resetEffectiveInventory(); //should be called when resetting tasks
 

@@ -26,6 +26,7 @@ public:
     virtual bool update(float dt);
     virtual bool tick();
     virtual float getCost();
+    virtual void setGuy(LittleGuy *guy);
     virtual LittleGuy *getGuy();
     virtual void setActive(bool active);
     virtual bool isActive();
