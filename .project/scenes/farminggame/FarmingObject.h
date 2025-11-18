@@ -88,10 +88,6 @@ public:
             T* out = dynamic_cast<T*>(objectData[type]);
             if (out) return out;
 
-            if (type == TypeID::ITEM_SEED_TOMATO) {
-                std::cout << "temp" << std::endl;
-            }
-
             std::cout << "FAILED TO CAST TO OBJECT TYPE: " << objectData[type]->configKey << std::endl;
             return nullptr;
         }

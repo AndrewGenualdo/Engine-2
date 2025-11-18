@@ -136,10 +136,10 @@ void FarmingScene::draw() {
         FarmingObject::loadInventory();
     }
     if (window->isInputClicked(GLFW_KEY_F)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, 20);
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
     }
     if (window->isInputClicked(GLFW_KEY_G)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, 20);
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
     }
     if (window->isInputClicked(GLFW_KEY_U)) {
         world->guyManager->addGuy(new LittleGuy(mouseTile));
