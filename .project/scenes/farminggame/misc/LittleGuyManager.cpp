@@ -63,14 +63,17 @@ void LittleGuyManager::update(const float dt) {
 }
 
 void LittleGuyManager::tick() {
-    std::cout << "------------------------------------------------------------------------" << std::endl;
-    for (int i = 0; i < tasks.size(); i++) {
-        std::cout << "=====================================" << std::endl;
-        for (int j = 0; j < tasks[i].second.size(); j++) {
-            std::cout << "[" << tasks[i].first << "] [" << (tasks[i].second[j]->getGuy() != nullptr ? "true" : "false") << "] " << tasks[i].second[j]->getName() << std::endl;
+    if (world->logs) {
+        std::cout << "------------------------------------------------------------------------" << std::endl;
+        for (int i = 0; i < tasks.size(); i++) {
+            std::cout << "=====================================" << std::endl;
+            for (int j = 0; j < tasks[i].second.size(); j++) {
+                std::cout << "[" << tasks[i].first << "] [" << (tasks[i].second[j]->getGuy() != nullptr ? "true" : "false") << "] " << tasks[i].second[j]->getName() << std::endl;
+            }
         }
+        std::cout << "=====================================" << std::endl;
     }
-    std::cout << "=====================================" << std::endl;
+
 
     for (auto &[delay, guysTasks] : tasks) {
         if (delay == 0) {
@@ -79,15 +82,22 @@ void LittleGuyManager::tick() {
                 if (dynamic_cast<TaskTravel*> (guysTasks[0])) continue;
                 if (guysTasks[0]->tick()) {
                     if (dynamic_cast<TaskPlantSeed*>(guysTasks[0])) {
+                        TilePlant *plant = dynamic_cast<TaskPlantSeed*>(guysTasks[0])->getResultPlant();
                         //search for harvest task on same tile and set a real delay (rather than indefinite stall)
                         bool found = false;
                         for (auto &[plantGrowthTime, harvestTaskSearch] : tasks) {
-                            for (auto & harvestTask : harvestTaskSearch) {
+                            bool foundTravel = false;
+                            for (const auto & harvestTask : harvestTaskSearch) {
+                                if (!foundTravel) {
+                                    if (dynamic_cast<TaskTravel*>(harvestTask)) {
+                                        foundTravel = true;
+                                        if (dynamic_cast<TaskTravel*>(harvestTask)->goal != plant->tile) break;
+                                        continue;
+                                    }
+                                }
                                 if (dynamic_cast<TaskHarvestPlant*>(harvestTask) && dynamic_cast<TaskHarvestPlant*>(harvestTask)->getPlant() == nullptr) {
-                                    TilePlant *plant = dynamic_cast<TaskPlantSeed*>(guysTasks[0])->getResultPlant();
-
                                     dynamic_cast<TaskHarvestPlant*>(harvestTask)->setPlant(plant);
-                                    auto plantData = FarmingObject::getData<TilePlant::PlantData>(plant->getType());
+                                    const auto plantData = FarmingObject::getData<TilePlant::PlantData>(plant->getType());
                                     plantGrowthTime = plantData->ticksBetweenStage * (plantData->ripeStage);
                                     found = true;
                                     break;
@@ -96,7 +106,7 @@ void LittleGuyManager::tick() {
                             if (found) break;
                         }
                     } else if (dynamic_cast<TaskHarvestPlant*>(guysTasks[0])) {
-                        for (auto & pickupTask : guysTasks) {
+                        for (const auto & pickupTask : guysTasks) {
                             if (dynamic_cast<TaskPickupItem*>(pickupTask)) {
                                 dynamic_cast<TaskPickupItem*>(pickupTask)->setItem(dynamic_cast<TaskHarvestPlant*>(guysTasks[0])->getResultItem());
                                 break;
@@ -141,7 +151,7 @@ void LittleGuyManager::tick() {
         if (tasks[i].first == 0 && tasks[i].second[0]->getGuy() == nullptr) { //check if task needs a guy
             for (auto & guy : guys) {
                 if (!guy->isBeingUsed()) {
-                    for (auto & task : tasks[i].second) {
+                    for (const auto & task : tasks[i].second) {
                         task->setGuy(guy);
                     }
                     if (!tasks[i].second.empty() && dynamic_cast<TaskTravel*>(tasks[i].second[0])) {
@@ -207,7 +217,7 @@ int LittleGuyManager::setGoal(const FarmingObject::TypeID goal, const int amount
     for (auto &[delay, guysTasks] : tasks) {
         for (auto & task : guysTasks) {
             task->setActive(false);
-            task->getGuy()->setBeingUsed(false);
+            if (task->getGuy() != nullptr) task->getGuy()->setBeingUsed(false);
             delete task;
             task = nullptr;
         }
@@ -216,12 +226,16 @@ int LittleGuyManager::setGoal(const FarmingObject::TypeID goal, const int amount
     tasks.clear();
     int out = createTasks(goal, amount);
     for (int i = 0; i < tasks.size(); i++) {
-        std::cout << "=====================================" << std::endl;
-        for (int j = 0; j < tasks[i].second.size(); j++) {
-            std::cout << "[" << tasks[i].first << "] " << tasks[i].second[j]->getName() << std::endl;
+        if (world->logs) {
+
+            std::cout << "=====================================" << std::endl;
+            for (int j = 0; j < tasks[i].second.size(); j++) {
+                std::cout << "[" << tasks[i].first << "] " << tasks[i].second[j]->getName() << std::endl;
+            }
+            std::cout << "=====================================" << std::endl;
         }
-    }
-    std::cout << "=====================================" << std::endl;
+        }
+
     return out;
 }
 
@@ -286,7 +300,7 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
         for (const auto cropTile : cropTiles) {
             std::vector<Task *> harvestTask; //"harvest" task = (travel to plant + harvest + pickup + travel to barn + deposit item) add with delay of plantData->ticksBetweenStage * (plantData->ripeStage - plant->stage) + plant->timeUntilNextStage
             harvestTask.push_back(new TaskTravel(nullptr, cropTile));
-            harvestTask.push_back(new TaskHarvestPlant(nullptr, produceData->producedFrom));
+            harvestTask.push_back(new TaskHarvestPlant(nullptr, dynamic_cast<TilePlant*>(world->getTile(cropTile))));
             //only execute TaskPickupItem as soon as getResultItem() is NOT nullptr
             harvestTask.push_back(new TaskPickupItem(nullptr, dynamic_cast<TaskHarvestPlant *>(harvestTask[harvestTask.size()-1])->getResultItem()));
             harvestTask.push_back(new TaskTravel(nullptr, cropTile, FarmingWorld::INVENTORY_TILE));
@@ -316,14 +330,14 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
                     //tilePromises.push_back(dynamic_cast<TaskPlantSeed*>(plantTask[plantTask.size()-1])->getResultPlant());
                     tasks.emplace_back(0, plantTask); //relies on barn having enough seeds condition
                 }
-                for (int i = 0; i < farmland.size(); i++) {
+                for (const auto tile : farmland) {
                     std::vector<Task *> harvestTask; //"harvest" task = (travel to plant + harvest + pickup + travel to barn + deposit item) add with delay of plantData->ticksBetweenStage * (plantData->ripeStage - plant->stage) + plant->timeUntilNextStage
-                    harvestTask.push_back(new TaskTravel(nullptr, farmland[i]));
+                    harvestTask.push_back(new TaskTravel(nullptr, tile));
                     //harvestTask.push_back(new TaskHarvestPlant(nullptr, tilePromises[i]));
                     harvestTask.push_back(new TaskHarvestPlant(nullptr, produceData->producedFrom));
                     //only execute TaskPickupItem as soon as getResultItem() is NOT nullptr
                     harvestTask.push_back(new TaskPickupItem(nullptr, nullptr /*dynamic_cast<TaskHarvestPlant *>(harvestTask[harvestTask.size()-1])->getResultItem()*/));
-                    harvestTask.push_back(new TaskTravel(nullptr, farmland[i], FarmingWorld::INVENTORY_TILE));
+                    harvestTask.push_back(new TaskTravel(nullptr, tile, FarmingWorld::INVENTORY_TILE));
                     harvestTask.push_back(new TaskDepositItem(nullptr, type, 1));
                     tasks.emplace_back(-1, harvestTask); //gets set to a real value upon seed finished being planted
                 }

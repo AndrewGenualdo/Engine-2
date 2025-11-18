@@ -20,6 +20,7 @@ bool TaskDepositItem::tick() {
         if (item != nullptr) {
             delete item;
             world->inventory[type]++;
+            world->effectiveInventory[type]++;
             amount--;
         } else return true;
     } else return true;

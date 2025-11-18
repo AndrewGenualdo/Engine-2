@@ -460,6 +460,7 @@ std::vector<ivec2> FarmingWorld::getTiles(const FarmingObject::TypeID type, cons
             if (out.size() >= amount) return out;
         }
     }
+
     return out;
 }
 

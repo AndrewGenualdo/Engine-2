@@ -62,6 +62,10 @@ void FarmingObject::loadInventory() {
             }
         }
     }
+    world->inventory[TypeID::ITEM_SEED_TOMATO] = 100;
+    world->inventory[TypeID::ITEM_SEED_CARROT] = 100;
+    world->inventory[TypeID::ITEM_PRODUCE_TOMATO] = 0;
+    world->inventory[TypeID::ITEM_PRODUCE_CARROT] = 0;
     world->resetEffectiveInventory();
 
 }

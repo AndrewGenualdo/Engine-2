@@ -18,6 +18,7 @@ bool TaskWithdrawItem::tick() {
         int itemAmt = world->inventory[type];
         if (itemAmt > 0) {
             world->inventory[type]--;
+            world->effectiveInventory[type]--;
             guy->giveItem(type);
             amount--;
         } else return true;

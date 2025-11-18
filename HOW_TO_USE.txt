@@ -1,0 +1,16 @@
+This isn't completed yet but a lot of the core functionality works so you can play with the debug tools for now.
+Controls:
+D: Plant a new random plant each frame (carrot or tomato for now) on the farm assuming there is space for it
+U: Spawn a little guy on the hovered tile
+F: Set the goal of the little guys to obtain 20 tomatoes (in the barn)
+G: Set the goal of the little guys to obtain 20 carrots (in the barn)
+O: Reset the farm (guys, plants, tasks, etc.)
+L: Toggle bulk logs (causes lag)
+Hold Space: 3x speed
+
+Fun Facts: 
+This is written in raw OpenGL and c++
+Resize the window! It works!
+There is a save system that triggers with Ctrl S or closing the window (save file is in saves/farming.txt)
+  Note: it *mostly* works, has some bugs
+If logging is enabled, check the command line to see all the active tasks for the little guys

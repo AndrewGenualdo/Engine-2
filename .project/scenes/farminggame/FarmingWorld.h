@@ -69,6 +69,7 @@ public:
     std::map<FarmingObject::TypeID, int> effectiveInventory;
 
     LittleGuyManager *guyManager = nullptr;
+    bool logs = false;
 
     FarmingWorld();
     explicit FarmingWorld(const std::string &savePath);

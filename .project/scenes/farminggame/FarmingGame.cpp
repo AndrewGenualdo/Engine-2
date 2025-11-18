@@ -24,6 +24,7 @@ FontRenderer FarmingScene::fontRenderer = FontRenderer();
 Texture2d FarmingScene::blank = Texture2d();
 FarmingWorld *FarmingScene::world = nullptr;
 float FarmingScene::lastTick = 0.0f;
+float FarmingScene::time = 0.0f;
 
 bool FarmingScene::debugMode = false;
 
@@ -55,7 +56,7 @@ void FarmingScene::load() {
 }
 
 void FarmingScene::draw() {
-    const float deltaTime = window->update();
+    float deltaTime = window->update();
     camera.update(window->window, deltaTime);
     float fontScale = 3.0f;
 
@@ -66,6 +67,9 @@ void FarmingScene::draw() {
     Texture2d::gameCamera.reset();
     Texture2d::gameCamera.expandToInclude(0, 0);
     Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
+
+    if (window->isInputPressed(GLFW_KEY_SPACE)) deltaTime *= 3;
+    time += deltaTime;
 
     const float mx = window->mousePos.x;
     const float my = window->mousePos.y;
@@ -124,23 +128,36 @@ void FarmingScene::draw() {
             world->items.push_back(item);
         }
     }*/
+
     if (window->isInputClicked(GLFW_KEY_O)) {
         FarmingObject::cleanData();
         load();
         world->clear();
+        FarmingObject::loadInventory();
     }
     if (window->isInputClicked(GLFW_KEY_F)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, 3);
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, 20);
     }
     if (window->isInputClicked(GLFW_KEY_G)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, 3);
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, 20);
     }
     if (window->isInputClicked(GLFW_KEY_U)) {
         world->guyManager->addGuy(new LittleGuy(mouseTile));
     }
+    if (window->isInputPressed(GLFW_KEY_D)) {
+        for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
+            if (world->getTile(i)->exists()) continue;
+            if (ew::RandomRange(0, 1) > 0.5f) world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+            else world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+            break;
+        }
+    }
+    if (window->isInputClicked(GLFW_KEY_L)) {
+        world->logs = !world->logs;
+    }
 
 
-    if (window->getTime() - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
+    if (time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
         lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
         world->tick();
     }
@@ -157,13 +174,13 @@ void FarmingScene::draw() {
         blank.draw(static_cast<float>(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH), static_cast<float>(FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT), FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
         std::string tileInfo = "Tile: " + std::to_string(mouseTile.x) + ", " + std::to_string(mouseTile.y) + "\n";
         tileInfo += "Type: " + FarmingObject::getData<FarmingObject::ObjectData>(world->getTile(mouseTile)->getType())->configKey + "\n";
-        bool exists = world->getTile(mouseTile)->exists();
+        const bool exists = world->getTile(mouseTile)->exists();
         tileInfo += std::string("Exists: ") + (exists ? "true" : "false") + "\n";
         tileInfo += std::string("Being Used: ") + (world->getTile(mouseTile)->isBeingUsed() ? "true" : "false");
 
         Texture2d::setColor(vec4(0, 0, 0, 0.5f));
-        float tileInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 20;
-        float tileInfoBgY = Window::GAME_HEIGHT - fontRenderer.getHeight() * 5 * fontScale - 20;
+        const float tileInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 20;
+        const float tileInfoBgY = Window::GAME_HEIGHT - fontRenderer.getHeight() * 5 * fontScale - 20;
         blank.draw(tileInfoBgX, tileInfoBgY, Window::GAME_WIDTH - tileInfoBgX, Window::GAME_HEIGHT - tileInfoBgY, true);
         fontRenderer.setColor(vec3(1, 0.5f, 0.5f));
         fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
