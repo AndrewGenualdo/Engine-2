@@ -24,10 +24,13 @@ public:
         ITEM_SEED,
         ITEM_SEED_TOMATO,
         ITEM_SEED_CARROT,
+        ITEM_SEED_BLUEBERRY,
+
 
         ITEM_PRODUCE,
         ITEM_PRODUCE_TOMATO,
         ITEM_PRODUCE_CARROT,
+        ITEM_PRODUCE_BLUEBERRY,
 
 
         TILE,
@@ -35,6 +38,7 @@ public:
         TILE_PLANT,
         TILE_PLANT_TOMATO,
         TILE_PLANT_CARROT,
+        TILE_PLANT_BLUEBERRY,
 
 
         LITTLE_GUY

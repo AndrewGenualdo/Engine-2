@@ -138,8 +138,11 @@ void FarmingScene::draw() {
     if (window->isInputClicked(GLFW_KEY_F)) {
         world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
     }
-    if (window->isInputClicked(GLFW_KEY_G)) {
+    else if (window->isInputClicked(GLFW_KEY_G)) {
         world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
+    }
+    else if (window->isInputClicked(GLFW_KEY_H)) {
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
     }
     if (window->isInputClicked(GLFW_KEY_U)) {
         world->guyManager->addGuy(new LittleGuy(mouseTile));
@@ -147,8 +150,20 @@ void FarmingScene::draw() {
     if (window->isInputPressed(GLFW_KEY_D)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
             if (world->getTile(i)->exists()) continue;
-            if (ew::RandomRange(0, 1) > 0.5f) world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
-            else world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+            float rand = ew::RandomRange(0, 1);
+            std::vector<FarmingObject::TypeID> plants;
+            plants.push_back(FarmingObject::TypeID::TILE_PLANT_TOMATO);
+            plants.push_back(FarmingObject::TypeID::TILE_PLANT_CARROT);
+            plants.push_back(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY);
+            for (float j = 0; j < plants.size(); j++) {
+                if (rand < (j + 1) / plants.size()) {
+                    ivec2 tile = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
+                    world->setTile(tile, FarmingWorld::createTile(plants[static_cast<int>(j)], tile));
+                    break;
+                }
+            }
+            //if (ew::RandomRange(0, 1) > 0.5f) world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+            //else world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
             break;
         }
     }

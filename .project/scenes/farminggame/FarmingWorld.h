@@ -13,10 +13,13 @@
 #include "glm/vec2.hpp"
 #include "cobb/misc/texture2d.h"
 #include "cobb/misc/tiles2d.h"
+#include "items/produce/ItemProduceBlueberry.h"
 #include "items/produce/ItemProduceCarrot.h"
 #include "items/produce/ItemProduceTomato.h"
+#include "items/seeds/ItemSeedBlueberry.h"
 #include "items/seeds/ItemSeedCarrot.h"
 #include "items/seeds/ItemSeedTomato.h"
+#include "tiles/plants/TilePlantBlueberry.h"
 #include "tiles/plants/TilePlantCarrot.h"
 #include "tiles/plants/TilePlantTomato.h"
 
@@ -101,8 +104,10 @@ public:
         switch (type) {
             case FarmingObject::TypeID::ITEM_PRODUCE_TOMATO: return new ItemProduceTomato();
             case FarmingObject::TypeID::ITEM_PRODUCE_CARROT: return new ItemProduceCarrot();
+            case FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY: return new ItemProduceBlueberry();
             case FarmingObject::TypeID::ITEM_SEED_TOMATO: return new ItemSeedTomato();
             case FarmingObject::TypeID::ITEM_SEED_CARROT: return new ItemSeedCarrot();
+            case FarmingObject::TypeID::ITEM_SEED_BLUEBERRY: return new ItemSeedBlueberry();
             default: return nullptr;
         }
     }
@@ -123,6 +128,7 @@ public:
         switch (type) {
             case FarmingObject::TypeID::TILE_PLANT_TOMATO: return new TilePlantTomato(tile);
             case FarmingObject::TypeID::TILE_PLANT_CARROT: return new TilePlantCarrot(tile);
+            case FarmingObject::TypeID::TILE_PLANT_BLUEBERRY: return new TilePlantBlueberry(tile);
             default: return nullptr;
         }
     }
