@@ -3,6 +3,8 @@
 //
 
 #include "FarmingGame.h"
+
+#include "cobb/misc/profiler.h"
 #include "misc/LittleGuy.h"
 #include "ew/ewMath/ewMath.h"
 #include "items/Item.h"
@@ -37,6 +39,8 @@ FarmingScene::~FarmingScene() {
 }
 
 void FarmingScene::load() {
+    Profiler::create("load");
+    Profiler::get("load").start();
     window->setWindowTitle("Farming Sim Scene");
     camera = Camera(vec3(), vec3(), 60.0f, vec2(window->getWidth(), window->getHeight()));
     fontRenderer = FontRenderer("assets/textures/font/font.png");
@@ -53,6 +57,10 @@ void FarmingScene::load() {
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
     lastTick = window->getTime();
+    Profiler::get("load").end();
+    Profiler::create("tick");
+    Profiler::create("update");
+    Profiler::create("draw");
 }
 
 void FarmingScene::draw() {
@@ -176,11 +184,15 @@ void FarmingScene::draw() {
         lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
         isTick = true;
     }
+    Profiler::get("tick").start();
     world->tick(isTick, deltaTime);
-
+    Profiler::get("tick").end();
+    Profiler::get("update").start();
     world->update(deltaTime);
-
+    Profiler::get("update").end();
+    Profiler::get("draw").start();
     world->draw();
+    Profiler::get("draw").end();
     //if(!world->guys.empty()) fontRenderer.draw("Pos: " + std::to_string(world->guys[0]->getPos().x) + ", " + std::to_string(world->guys[0]->getPos().y) + "\nTile: " + std::to_string(world->guys[0]->getTile().x) + ", " + std::to_string(world->guys[0]->getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);
 
 
@@ -203,11 +215,11 @@ void FarmingScene::draw() {
         fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
 
         std::string taskInfo;
-        for (int i = 0; i < world->guyManager->tasks.size(); i++) {
-            if (world->guyManager->tasks[i].second.empty()) continue;
-            if (world->guyManager->tasks[i].second[0]->getGuy() == nullptr) continue;
-            if (world->guyManager->tasks[i].second[0]->getGuy()->tile == mouseTile) {
-                taskInfo += "Task: " + world->guyManager->tasks[i].second[0]->getName();
+        for (const auto &[delay, tasks] : world->guyManager->tasks) {
+            if (tasks.empty()) continue;
+            if (tasks[0]->getGuy() == nullptr) continue;
+            if (tasks[0]->getGuy()->tile == mouseTile) {
+                taskInfo += "Task: " + tasks[0]->getName();
                 break;
             }
         }
@@ -218,10 +230,24 @@ void FarmingScene::draw() {
 
             fontRenderer.setColor(vec3(0.5f, 0.5f, 1.0f));
             fontRenderer.draw(taskInfo, Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 8 * fontScale, fontScale);
-
         }
-
     }
+    std::string profilerInfo;
+    int profilerLines = 2;
+    int total = 0;
+    for (const auto&[fst, snd] : Profiler::getMap()) if (fst != "load") total += static_cast<int>(Profiler::get(fst).duration_micro());
+    profilerInfo += "Load: " + ew::formatValue(static_cast<int>(Profiler::get("load").duration_micro())) + "ns\n";
+    for (const auto&[fst, snd] : Profiler::getMap()) {
+        if (fst == "load") continue;
+        int micro = static_cast<int>(Profiler::get(fst).duration_micro());
+        profilerInfo += fst + ": " + ew::formatValue(micro) + "ns (" + std::to_string(static_cast<int>(static_cast<float>(micro) * 100.0f / static_cast<float>(total))) + "%)\n";
+        profilerLines++;
+    }
+    profilerInfo += "Total: " + ew::formatValue(total) + "ns\n";
+    Texture2d::setColor(vec4(0, 0, 0, 0.5f));
+    blank.draw(Window::GAME_WIDTH - fontRenderer.getWidth(profilerInfo) * fontScale - 20, 0, fontRenderer.getWidth(profilerInfo) * fontScale + 20, fontRenderer.getHeight() * fontScale * static_cast<float>(profilerLines + 1) + 20);
+    fontRenderer.setColor(vec3(0.5f, 1.0f, 0.5f));
+    fontRenderer.draw(profilerInfo, Window::GAME_WIDTH - fontRenderer.getWidth(profilerInfo) * fontScale - 10, 10 + static_cast<float>(profilerLines) * fontScale * fontRenderer.getHeight(), fontScale);
 
 }
 

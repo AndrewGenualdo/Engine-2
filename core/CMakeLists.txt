@@ -46,6 +46,7 @@ add_library(core STATIC ${CORE_SRC} ${CORE_INC}
         cobb/shapes/spline2d.h
         cobb/misc/Tiles2d.cpp
         cobb/misc/Tiles2d.h
+        cobb/misc/profiler.h
 )
 
 add_custom_target(copyAssetsLine ALL

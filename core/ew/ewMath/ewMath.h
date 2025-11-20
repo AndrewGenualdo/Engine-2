@@ -84,4 +84,16 @@ namespace ew {
 
 		return false;
 	}
+
+	static std::string formatValue(long long value) {
+		std::string s = std::to_string(value);
+		int insertPosition = s.length() - 3;
+
+		while (insertPosition > 0 && s[insertPosition - 1] != '-') {
+			s.insert(insertPosition, ",");
+			insertPosition -= 3;
+		}
+
+		return s;
+	}
 }

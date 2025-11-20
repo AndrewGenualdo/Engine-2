@@ -103,7 +103,7 @@ void FarmingWorld::load() {
 
                     }
                 }
-                std::cout << "["  << i << "] '" << line << "'" << std::endl;
+                if (logs) std::cout << "["  << i << "] '" << line << "'" << std::endl;
                 switch (state) {
                     case LAND: {
                         if (i > TILES_VERT * TILES_HORIZ) continue;

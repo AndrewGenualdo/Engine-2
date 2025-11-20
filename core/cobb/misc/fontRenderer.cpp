@@ -135,14 +135,14 @@ void FontRenderer::draw(const std::string &text, float x, float y, float scale) 
             yOffset -= (height + characterSpacing * 2.5f) * scale;
             xOffset = 0;
             continue;
-        } else if(text[i] == '%') {
+        }/* else if(text[i] == '%') {
             if(i != text.length() - 1) { //make sure its not the last character
                 int c = std::stoi(&text[i+1]);
                 fontShader->setVec4("color", colors[c]);
                 skip = true;
                 continue;
             }
-        }
+        }*/
         int index = getIndex(text[i]);
         if (index == -1) index = 69; //unknown character
         fontShader->setInt("index", index);
