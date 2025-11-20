@@ -100,7 +100,7 @@ void LittleGuyManager::tick() {
                                     const auto plantData = FarmingObject::getData<TilePlant::PlantData>(plant->getType());
                                     plantGrowthTime = plantData->ticksBetweenStage * (plantData->ripeStage);
                                     found = true;
-                                    break;
+                                    //break;
                                 }
                             }
                             if (found) break;
@@ -296,15 +296,27 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
         const ItemProduce::ProduceData *produceData = FarmingObject::getData<ItemProduce::ProduceData>(type);
         //search for unused crops (sort by travel time + time until fertile for priority)
         const std::vector<ivec2> cropTiles = world->getTiles(produceData->producedFrom, amountNeeded);
-        const int amountToHarvest = static_cast<int>(cropTiles.size());
+        int amountToHarvest = 0;//static_cast<int>(cropTiles.size());
+        for (int i = 0; i < cropTiles.size(); i++) {
+            amountToHarvest += dynamic_cast<TilePlant*>(world->getTile(cropTiles[i]))->amount;
+            if (amountToHarvest > amountNeeded) amountToHarvest = amountNeeded;
+        }
+        int harvested = 0;
         for (const auto cropTile : cropTiles) {
             std::vector<Task *> harvestTask; //"harvest" task = (travel to plant + harvest + pickup + travel to barn + deposit item) add with delay of plantData->ticksBetweenStage * (plantData->ripeStage - plant->stage) + plant->timeUntilNextStage
             harvestTask.push_back(new TaskTravel(nullptr, cropTile));
-            harvestTask.push_back(new TaskHarvestPlant(nullptr, dynamic_cast<TilePlant*>(world->getTile(cropTile))));
-            //only execute TaskPickupItem as soon as getResultItem() is NOT nullptr
-            harvestTask.push_back(new TaskPickupItem(nullptr, dynamic_cast<TaskHarvestPlant *>(harvestTask[harvestTask.size()-1])->getResultItem()));
+            TilePlant* plantTile = dynamic_cast<TilePlant*>(world->getTile(cropTile));
+            int thisHarvested = 0;
+            for (int i = 0; i < plantTile->amount; i++) {
+                if (harvested >= amountToHarvest) break;
+                harvestTask.push_back(new TaskHarvestPlant(nullptr, plantTile));
+                //only execute TaskPickupItem as soon as getResultItem() is NOT nullptr
+                harvestTask.push_back(new TaskPickupItem(nullptr, dynamic_cast<TaskHarvestPlant *>(harvestTask[harvestTask.size()-1])->getResultItem()));
+                harvested++;
+                thisHarvested++;
+            }
             harvestTask.push_back(new TaskTravel(nullptr, cropTile, FarmingWorld::INVENTORY_TILE));
-            harvestTask.push_back(new TaskDepositItem(nullptr, type, 1));
+            harvestTask.push_back(new TaskDepositItem(nullptr, type, thisHarvested));
             tasks.emplace_back(0, harvestTask);
         }
         amountNeeded -= amountToHarvest;
@@ -313,13 +325,16 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
 
 
         if (amountNeeded > 0) { //not enough crops available
-            const TilePlant::PlantData *plantData = FarmingObject::getData<TilePlant::PlantData>(produceData->producedFrom);
-            const int seedsAvailable = createTasks(plantData->seed, amountNeeded);
 
-            if (seedsAvailable < amountNeeded) return amount - amountNeeded; //not enough available seeds
+            const TilePlant::PlantData *plantData = FarmingObject::getData<TilePlant::PlantData>(produceData->producedFrom);
+            const int seedsAvailable = createTasks(plantData->seed, static_cast<int>(ceil(static_cast<float>(amountNeeded) / static_cast<float>(plantData->amountProduces))));
+            amountToHarvest = seedsAvailable * plantData->amountProduces;
+            if (amountToHarvest > amountNeeded) amountToHarvest = amountNeeded;
+            if (amountToHarvest < amountNeeded) return amount - amountNeeded; //not enough available seeds
+
             if (amountNeeded > 0) { //leaving this in case I refactor and forget
                 const std::vector<ivec2> farmland = world->getFarmland(seedsAvailable);
-                if (farmland.size() < amountNeeded) return amount - amountNeeded; //not enough available farmland
+                if (farmland.size() * plantData->amountProduces < amountNeeded) return amount - amountNeeded; //not enough available farmland
                 //std::vector<TilePlant*> tilePromises;
                 for(const auto tile : farmland) {
                     std::vector<Task *> plantTask; //"plant" task = (travel to barn + withdraw seed + travel to farmland tile + plant seed)
@@ -330,15 +345,21 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
                     //tilePromises.push_back(dynamic_cast<TaskPlantSeed*>(plantTask[plantTask.size()-1])->getResultPlant());
                     tasks.emplace_back(0, plantTask); //relies on barn having enough seeds condition
                 }
+                harvested = 0;
                 for (const auto tile : farmland) {
                     std::vector<Task *> harvestTask; //"harvest" task = (travel to plant + harvest + pickup + travel to barn + deposit item) add with delay of plantData->ticksBetweenStage * (plantData->ripeStage - plant->stage) + plant->timeUntilNextStage
                     harvestTask.push_back(new TaskTravel(nullptr, tile));
-                    //harvestTask.push_back(new TaskHarvestPlant(nullptr, tilePromises[i]));
-                    harvestTask.push_back(new TaskHarvestPlant(nullptr, produceData->producedFrom));
-                    //only execute TaskPickupItem as soon as getResultItem() is NOT nullptr
-                    harvestTask.push_back(new TaskPickupItem(nullptr, nullptr /*dynamic_cast<TaskHarvestPlant *>(harvestTask[harvestTask.size()-1])->getResultItem()*/));
+                    int thisHarvested = 0;
+                    for (int i = 0; i < plantData->amountProduces; i++) {
+                        if (harvested >= amountToHarvest) break;
+                        harvestTask.push_back(new TaskHarvestPlant(nullptr, produceData->producedFrom));
+                        //only execute TaskPickupItem as soon as getResultItem() is NOT nullptr
+                        harvestTask.push_back(new TaskPickupItem(nullptr, nullptr /*dynamic_cast<TaskHarvestPlant *>(harvestTask[harvestTask.size()-1])->getResultItem()*/));
+                        harvested++;
+                        thisHarvested++;
+                    }
                     harvestTask.push_back(new TaskTravel(nullptr, tile, FarmingWorld::INVENTORY_TILE));
-                    harvestTask.push_back(new TaskDepositItem(nullptr, type, 1));
+                    harvestTask.push_back(new TaskDepositItem(nullptr, type, thisHarvested));
                     tasks.emplace_back(-1, harvestTask); //gets set to a real value upon seed finished being planted
                 }
                 for (const auto tile : farmland) {

@@ -68,7 +68,7 @@ void FarmingScene::draw() {
     Texture2d::gameCamera.expandToInclude(0, 0);
     Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
 
-    if (window->isInputPressed(GLFW_KEY_SPACE)) deltaTime *= 3;
+    if (window->isInputPressed(GLFW_KEY_SPACE)) { if (window->isInputPressed(GLFW_KEY_LEFT_CONTROL)) { deltaTime *= 9; } else {deltaTime *= 3;} }
     time += deltaTime;
 
     const float mx = window->mousePos.x;
@@ -142,7 +142,7 @@ void FarmingScene::draw() {
         world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
     }
     else if (window->isInputClicked(GLFW_KEY_H)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * FarmingObject::getData<TilePlant::PlantData>(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY)->amountProduces);
     }
     if (window->isInputClicked(GLFW_KEY_U)) {
         world->guyManager->addGuy(new LittleGuy(mouseTile));
@@ -187,6 +187,7 @@ void FarmingScene::draw() {
     if (mx >= FarmingWorld::TILE_OFFSET_X && my >= FarmingWorld::TILE_OFFSET_Y && mouseTile.x < FarmingWorld::TILES_HORIZ && mouseTile.y < FarmingWorld::TILES_VERT) {
         Texture2d::setColor(vec4(1, 1, 1, 0.5f));
         blank.draw(static_cast<float>(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH), static_cast<float>(FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT), FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
+
         std::string tileInfo = "Tile: " + std::to_string(mouseTile.x) + ", " + std::to_string(mouseTile.y) + "\n";
         tileInfo += "Type: " + FarmingObject::getData<FarmingObject::ObjectData>(world->getTile(mouseTile)->getType())->configKey + "\n";
         const bool exists = world->getTile(mouseTile)->exists();
@@ -199,6 +200,26 @@ void FarmingScene::draw() {
         blank.draw(tileInfoBgX, tileInfoBgY, Window::GAME_WIDTH - tileInfoBgX, Window::GAME_HEIGHT - tileInfoBgY, true);
         fontRenderer.setColor(vec3(1, 0.5f, 0.5f));
         fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
+
+        std::string taskInfo;
+        for (int i = 0; i < world->guyManager->tasks.size(); i++) {
+            if (world->guyManager->tasks[i].second.empty()) continue;
+            if (world->guyManager->tasks[i].second[0]->getGuy() == nullptr) continue;
+            if (world->guyManager->tasks[i].second[0]->getGuy()->tile == mouseTile) {
+                taskInfo += "Task: " + world->guyManager->tasks[i].second[0]->getName();
+                break;
+            }
+        }
+        if (!taskInfo.empty()) {
+            const float taskInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 20;
+            const float taskInfoBgY = Window::GAME_HEIGHT - 20 - fontRenderer.getHeight() * 8 * fontScale;
+            blank.draw(taskInfoBgX, taskInfoBgY, Window::GAME_WIDTH - taskInfoBgX, fontRenderer.getHeight() * fontScale + 20, true);
+
+            fontRenderer.setColor(vec3(0.5f, 0.5f, 1.0f));
+            fontRenderer.draw(taskInfo, Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 8 * fontScale, fontScale);
+
+        }
+
     }
 
 }

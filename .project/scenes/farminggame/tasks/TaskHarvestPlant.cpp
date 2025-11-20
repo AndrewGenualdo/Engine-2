@@ -27,9 +27,8 @@ bool TaskHarvestPlant::tick() {
     if (plant == nullptr) return false;
     ticksUntilHarvest--;
     if (ticksUntilHarvest <= 0) {
-
         itemPromise = plant->harvest();//world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
-        ivec2 t = plant->tile;
+        const ivec2 t = plant->tile;
         if (plant->amount <= 0) {
             plant->destroy();
             plant = nullptr;

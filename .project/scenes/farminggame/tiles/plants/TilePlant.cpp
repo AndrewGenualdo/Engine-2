@@ -19,7 +19,7 @@ void TilePlant::update(float dt) {
 
 void TilePlant::tick() {
     auto* data = getData<PlantData>(getType());
-    if (stage == data->stageCount - 1) return;
+    if (stage >= data->stageCount - 1) return;
     ticksUntilStage--;
     if (ticksUntilStage == 0) {
         stage++;
