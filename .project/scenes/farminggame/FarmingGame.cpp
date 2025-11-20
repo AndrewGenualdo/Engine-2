@@ -171,11 +171,12 @@ void FarmingScene::draw() {
         world->logs = !world->logs;
     }
 
-
+    bool isTick = false;
     if (time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
         lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
-        world->tick();
+        isTick = true;
     }
+    world->tick(isTick, deltaTime);
 
     world->update(deltaTime);
 

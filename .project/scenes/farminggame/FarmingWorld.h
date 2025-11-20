@@ -83,7 +83,7 @@ public:
     void cleanup();
 
     void update(float dt);
-    void tick();
+    void tick(bool isTick, float dt);
     void draw() const;
 
     void updateTileTypes();

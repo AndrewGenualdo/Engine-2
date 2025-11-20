@@ -273,10 +273,10 @@ void FarmingWorld::update(float dt) {
     guyManager->update(dt);
 }
 
-void FarmingWorld::tick() {
+void FarmingWorld::tick(const bool isTick, const float dt) {
 
 
-    guyManager->tick();
+    guyManager->tick(isTick, dt);
 
     for (auto & tile : tiles) {
         if (tile != nullptr) {

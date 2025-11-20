@@ -62,8 +62,8 @@ void LittleGuyManager::update(const float dt) {
     }
 }
 
-void LittleGuyManager::tick() {
-    if (world->logs) {
+void LittleGuyManager::tick(const bool isTick, const float dt) {
+    if (world->logs && isTick) {
         std::cout << "------------------------------------------------------------------------" << std::endl;
         for (int i = 0; i < tasks.size(); i++) {
             std::cout << "=====================================" << std::endl;
@@ -75,14 +75,15 @@ void LittleGuyManager::tick() {
     }
 
 
-    for (auto &[delay, guysTasks] : tasks) {
-        if (delay == 0) {
-            if (!guysTasks.empty()) {
-                if (guysTasks[0]->getGuy() == nullptr) continue;
-                if (dynamic_cast<TaskTravel*> (guysTasks[0])) continue;
-                if (guysTasks[0]->tick()) {
-                    if (dynamic_cast<TaskPlantSeed*>(guysTasks[0])) {
-                        TilePlant *plant = dynamic_cast<TaskPlantSeed*>(guysTasks[0])->getResultPlant();
+    const int tasksToTick = static_cast<int>(0.1f / dt);
+    for (int i = tickCounter; i < (isTick ? tasks.size() : min(tickCounter + tasksToTick, static_cast<int>(tasks.size()))); i++) {
+        if (tasks[i].first == 0) {
+            if (!tasks[i].second.empty()) {
+                if (tasks[i].second[0]->getGuy() == nullptr) continue;
+                if (dynamic_cast<TaskTravel*> (tasks[i].second[0])) continue;
+                if (tasks[i].second[0]->tick()) {
+                    if (dynamic_cast<TaskPlantSeed*>(tasks[i].second[0])) {
+                        TilePlant *plant = dynamic_cast<TaskPlantSeed*>(tasks[i].second[0])->getResultPlant();
                         //search for harvest task on same tile and set a real delay (rather than indefinite stall)
                         bool found = false;
                         for (auto &[plantGrowthTime, harvestTaskSearch] : tasks) {
@@ -105,28 +106,31 @@ void LittleGuyManager::tick() {
                             }
                             if (found) break;
                         }
-                    } else if (dynamic_cast<TaskHarvestPlant*>(guysTasks[0])) {
-                        for (const auto & pickupTask : guysTasks) {
+                    } else if (dynamic_cast<TaskHarvestPlant*>(tasks[i].second[0])) {
+                        for (const auto & pickupTask : tasks[i].second) {
                             if (dynamic_cast<TaskPickupItem*>(pickupTask)) {
-                                dynamic_cast<TaskPickupItem*>(pickupTask)->setItem(dynamic_cast<TaskHarvestPlant*>(guysTasks[0])->getResultItem());
+                                dynamic_cast<TaskPickupItem*>(pickupTask)->setItem(dynamic_cast<TaskHarvestPlant*>(tasks[i].second[0])->getResultItem());
                                 break;
                             }
                         }
                     }
 
-                    guysTasks[0]->setActive(false);
-                    if (guysTasks.size() == 1) guysTasks[0]->getGuy()->setBeingUsed(false);
-                    delete guysTasks[0];  //delete completed task
-                    guysTasks.erase(guysTasks.begin()); //remove from task list for this guy
+                    tasks[i].second[0]->setActive(false);
+                    if (tasks[i].second.size() == 1) tasks[i].second[0]->getGuy()->setBeingUsed(false);
+                    delete tasks[i].second[0];  //delete completed task
+                    tasks[i].second.erase(tasks[i].second.begin()); //remove from task list for this guy
                     //if (!guysTasks.empty()) guysTasks[0]->getGuy()->setTask(guysTasks[0]); //set guys next task if there is one available
-                    if (!guysTasks.empty() && dynamic_cast<TaskTravel*>(guysTasks[0])) {
-                        dynamic_cast<TaskTravel*>(guysTasks[0])->generatePath();
+                    if (!tasks[i].second.empty() && dynamic_cast<TaskTravel*>(tasks[i].second[0])) {
+                        dynamic_cast<TaskTravel*>(tasks[i].second[0])->generatePath();
                     }
                     break;
                 }
             }
         }
     }
+
+    if (isTick) tickCounter = 0;
+    else tickCounter += tasksToTick;
 
     /*for (const auto guy : guys) {
         guy->tick();
@@ -142,29 +146,31 @@ void LittleGuyManager::tick() {
         }
 
     }*/
-    for (int i = tasks.size() - 1; i >= 0; i--) {
-        if (tasks[i].second.empty()) {
-            tasks.erase(tasks.begin() + i);
-            continue;
-        }
-        //std::cout << tasks.size() << std::endl;
-        if (tasks[i].first == 0 && tasks[i].second[0]->getGuy() == nullptr) { //check if task needs a guy
-            for (auto & guy : guys) {
-                if (!guy->isBeingUsed()) {
-                    for (const auto & task : tasks[i].second) {
-                        task->setGuy(guy);
+    if (isTick) {
+        for (int i = tasks.size() - 1; i >= 0; i--) {
+            if (tasks[i].second.empty()) {
+                tasks.erase(tasks.begin() + i);
+                continue;
+            }
+            //std::cout << tasks.size() << std::endl;
+            if (tasks[i].first == 0 && tasks[i].second[0]->getGuy() == nullptr) { //check if task needs a guy
+                for (const auto & guy : guys) {
+                    if (!guy->isBeingUsed()) {
+                        for (const auto & task : tasks[i].second) {
+                            task->setGuy(guy);
+                        }
+                        if (!tasks[i].second.empty() && dynamic_cast<TaskTravel*>(tasks[i].second[0])) {
+                            dynamic_cast<TaskTravel*>(tasks[i].second[0])->generatePath();
+                        }
+                        guy->setBeingUsed(true);
+                        break;
                     }
-                    if (!tasks[i].second.empty() && dynamic_cast<TaskTravel*>(tasks[i].second[0])) {
-                        dynamic_cast<TaskTravel*>(tasks[i].second[0])->generatePath();
-                    }
-                    guy->setBeingUsed(true);
-                    break;
                 }
             }
         }
-    }
-    for (auto &[delay, guysTasks] : tasks) {
-        if (delay > 0) delay--;
+        for (auto &[delay, guysTasks] : tasks) {
+            if (delay > 0) delay--;
+        }
     }
 }
 

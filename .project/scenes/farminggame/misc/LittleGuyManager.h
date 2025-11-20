@@ -14,6 +14,7 @@ class LittleGuyManager {
     std::vector<LittleGuy*> guys;
     FarmingObject::TypeID goalType = FarmingObject::TypeID::NONE;
     int goalAmount = 0;
+    int tickCounter = 0;
 
 public:
     std::vector<std::pair<int, std::vector<Task*>>> tasks; //each of the outer layer is a list of tasks for a single guy to complete. The outer tasks can be given out as soon as they are available.
@@ -26,7 +27,7 @@ public:
     ~LittleGuyManager();
 
     void update(float dt);
-    void tick();
+    void tick(bool isTick, float dt);
     void draw(bool bind) const;
     void cleanup();
     void clear();
