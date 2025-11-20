@@ -147,7 +147,7 @@ void LittleGuyManager::tick() {
             tasks.erase(tasks.begin() + i);
             continue;
         }
-
+        //std::cout << tasks.size() << std::endl;
         if (tasks[i].first == 0 && tasks[i].second[0]->getGuy() == nullptr) { //check if task needs a guy
             for (auto & guy : guys) {
                 if (!guy->isBeingUsed()) {

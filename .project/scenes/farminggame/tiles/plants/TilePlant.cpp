@@ -9,7 +9,8 @@
 TilePlant::TilePlant(const TypeID type, const ivec2 tile) : Tile(tile) {
     this->stage = 0;
     this->ticksUntilStage = getData<PlantData>(type)->ticksBetweenStage;
-    tileExists = true;
+    this->amount = getData<PlantData>(type)->amountProduces;
+    this->tileExists = true;
 }
 
 void TilePlant::update(float dt) {
@@ -48,7 +49,14 @@ void TilePlant::loadConfig(const std::string &line, const int i) {
 
 bool TilePlant::isRipe() const {
     //if (stage == getData<PlantData>(getType())->ripeStage) std::cout << "ripe" << std::endl;
-    return stage == getData<PlantData>(getType())->ripeStage;
+    return stage <= getData<PlantData>(getType())->ripeStage;
+}
+
+Item * TilePlant::harvest() {
+    stage++;
+    updatePlantState();
+    amount--;
+    return world->createItem(getData<PlantData>(getType())->produces, tile);
 }
 
 bool TilePlant::destroy() {

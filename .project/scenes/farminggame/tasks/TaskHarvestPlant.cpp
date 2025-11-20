@@ -28,10 +28,12 @@ bool TaskHarvestPlant::tick() {
     ticksUntilHarvest--;
     if (ticksUntilHarvest <= 0) {
 
-        itemPromise = world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
+        itemPromise = plant->harvest();//world->createItem(FarmingObject::getData<TilePlant::PlantData>(plant->getType())->produces, plant->tile);
         ivec2 t = plant->tile;
-        plant->destroy();
-        plant = nullptr;
+        if (plant->amount <= 0) {
+            plant->destroy();
+            plant = nullptr;
+        }
         world->getTile(t)->setBeingUsed(false);
         return true;
     }
