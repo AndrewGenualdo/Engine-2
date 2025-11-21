@@ -17,17 +17,21 @@ void FarmingObject::loadData() {
     objectData[TypeID::ITEM] = new ObjectData("ITEM", TypeID::ITEM, TypeID::NONE);
 
 
-    objectData[TypeID::ITEM_PRODUCE] = new Item::ItemData("ITEM_PRODUCE", TypeID::ITEM_PRODUCE, TypeID::ITEM, 63, false);
+    objectData[TypeID::ITEM_GOLD] = new Item::ItemData("ITEM_GOLD", TypeID::ITEM_GOLD, TypeID::ITEM, 255, true);
 
-    objectData[TypeID::ITEM_PRODUCE_TOMATO] = new ItemProduce::ProduceData("ITEM_PRODUCE_TOMATO", TypeID::ITEM_PRODUCE_TOMATO, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_TOMATO, 1, true);
-    objectData[TypeID::ITEM_PRODUCE_CARROT] = new ItemProduce::ProduceData("ITEM_PRODUCE_CARROT", TypeID::ITEM_PRODUCE_CARROT, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_CARROT, 3, true);
-    objectData[TypeID::ITEM_PRODUCE_BLUEBERRY] = new ItemProduce::ProduceData("ITEM_PRODUCE_BLUEBERRY", TypeID::ITEM_PRODUCE_BLUEBERRY, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_BLUEBERRY, 5, true);
 
     objectData[TypeID::ITEM_SEED] = new Item::ItemData("ITEM_SEED", TypeID::ITEM_SEED, TypeID::ITEM, 63, false);
 
     objectData[TypeID::ITEM_SEED_TOMATO] = new ItemSeed::SeedData("ITEM_SEED_TOMATO", TypeID::ITEM_SEED_TOMATO, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_TOMATO, 0, true);
     objectData[TypeID::ITEM_SEED_CARROT] = new ItemSeed::SeedData("ITEM_SEED_CARROT", TypeID::ITEM_SEED_CARROT, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_CARROT, 2, true);
     objectData[TypeID::ITEM_SEED_BLUEBERRY] = new ItemSeed::SeedData("ITEM_SEED_BLUEBERRY", TypeID::ITEM_SEED_BLUEBERRY, TypeID::ITEM_SEED, TypeID::ITEM_PRODUCE_BLUEBERRY, 4, true);
+
+
+    objectData[TypeID::ITEM_PRODUCE] = new Item::ItemData("ITEM_PRODUCE", TypeID::ITEM_PRODUCE, TypeID::ITEM, 63, false);
+
+    objectData[TypeID::ITEM_PRODUCE_TOMATO] = new ItemProduce::ProduceData("ITEM_PRODUCE_TOMATO", TypeID::ITEM_PRODUCE_TOMATO, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_TOMATO, 1, true);
+    objectData[TypeID::ITEM_PRODUCE_CARROT] = new ItemProduce::ProduceData("ITEM_PRODUCE_CARROT", TypeID::ITEM_PRODUCE_CARROT, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_CARROT, 3, true);
+    objectData[TypeID::ITEM_PRODUCE_BLUEBERRY] = new ItemProduce::ProduceData("ITEM_PRODUCE_BLUEBERRY", TypeID::ITEM_PRODUCE_BLUEBERRY, TypeID::ITEM_PRODUCE, TypeID::TILE_PLANT_BLUEBERRY, 5, true);
 
 
     objectData[TypeID::TILE] = new ObjectData("TILE", TypeID::TILE, TypeID::NONE);

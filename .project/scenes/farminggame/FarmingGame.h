@@ -34,7 +34,6 @@ public:
     static FarmingWorld *world;
 
     static bool debugMode;
-    static float time;
 
 };
 

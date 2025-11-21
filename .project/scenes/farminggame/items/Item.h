@@ -27,7 +27,7 @@ public:
         bool isItem = false;
 
         ItemData() : ObjectData() {}
-        explicit ItemData(const std::string &configKey, const TypeID type, const TypeID parent, const int textureIndex, bool isItem) : ObjectData(configKey, type, parent) {
+        explicit ItemData(const std::string &configKey, const TypeID type, const TypeID parent, const int textureIndex, const bool isItem) : ObjectData(configKey, type, parent) {
             this->textureIndex = textureIndex;
             this->isItem = isItem;
         }

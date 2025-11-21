@@ -21,6 +21,10 @@ public:
 
         ITEM,
 
+
+        ITEM_GOLD,
+
+
         ITEM_SEED,
         ITEM_SEED_TOMATO,
         ITEM_SEED_CARROT,

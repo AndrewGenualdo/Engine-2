@@ -13,6 +13,7 @@
 #include "glm/vec2.hpp"
 #include "cobb/misc/texture2d.h"
 #include "cobb/misc/tiles2d.h"
+#include "items/misc/ItemGold.h"
 #include "items/produce/ItemProduceBlueberry.h"
 #include "items/produce/ItemProduceCarrot.h"
 #include "items/produce/ItemProduceTomato.h"
@@ -76,6 +77,7 @@ public:
     LittleGuyManager *guyManager = nullptr;
     Truck truck;
     bool logs = false;
+    float time = 0.0f;
 
     FarmingWorld();
     explicit FarmingWorld(const std::string &savePath);
@@ -100,8 +102,8 @@ public:
     [[nodiscard]] static vec2 getTilePos(int x, int y);
     [[nodiscard]] static ivec2 getTileFromPos(vec2 pos);
 
-    std::vector<ivec2> getFarmland(int amount) const;
-    std::vector<ivec2> getTiles(FarmingObject::TypeID type, int amount) const;
+    [[nodiscard]] std::vector<ivec2> getFarmland(int amount) const;
+    [[nodiscard]] std::vector<ivec2> getTiles(FarmingObject::TypeID type, int amount) const;
 
     static Item* createItem(FarmingObject::TypeID type) {
         switch (type) {
@@ -111,6 +113,9 @@ public:
             case FarmingObject::TypeID::ITEM_SEED_TOMATO: return new ItemSeedTomato();
             case FarmingObject::TypeID::ITEM_SEED_CARROT: return new ItemSeedCarrot();
             case FarmingObject::TypeID::ITEM_SEED_BLUEBERRY: return new ItemSeedBlueberry();
+
+
+            case FarmingObject::TypeID::ITEM_GOLD: return new ItemGold();
             default: return nullptr;
         }
     }

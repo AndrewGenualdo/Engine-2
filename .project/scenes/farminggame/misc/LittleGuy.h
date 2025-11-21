@@ -19,13 +19,11 @@ class LittleGuy : public FarmingObject {
     static MultiTexture2d texture;
     static int width, height;
 
-    //Task *task = nullptr;
-    //std::vector<Item*> items;
     std::vector<TypeID> itemList;
-
     vec2 pos;
     float speed = 300;
     bool wasLastDirLeft = true;
+    bool moving = false;
 
 public:
 
@@ -55,6 +53,8 @@ public:
 
     [[nodiscard]] float getSpeed() const;
     void setSpeed(float speed);
+
+    void setMoving(bool moving);
 
     int hasItem(TypeID type);
     Item* takeItem(TypeID type);

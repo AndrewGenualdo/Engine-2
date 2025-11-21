@@ -62,9 +62,16 @@ void LittleGuy::tick() {
 }
 
 void LittleGuy::draw(const bool bind) {
-    int frame = wasLastDirLeft ? 0 : 1;
+    /*int frame = wasLastDirLeft ? 0 : 1;
     frame += itemList.empty() ? 0 : 2;
     texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, frame, bind);
+    for (int i = itemList.size() - 1; i >= 0; i--) {
+        Item::draw(pos.x, pos.y + (0.722f * 0.772f * height) + (itemList.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, itemList[i], i == itemList.size() - 1);
+    }*/
+    const int carryingOffset = itemList.empty() ? 0 : 6;
+    const int dirOffset = wasLastDirLeft ? 0 : 3;
+    const int movingOffset = moving ? static_cast<int>(world->time * speed / 75.0f) % 2 + 1 : 0;
+    texture.draw(pos.x - width * 0.5f, pos.y - height * 0.5f, width, height, carryingOffset + dirOffset + movingOffset, bind);
     for (int i = itemList.size() - 1; i >= 0; i--) {
         Item::draw(pos.x, pos.y + (0.722f * 0.772f * height) + (itemList.size() - i - 1) * FarmingWorld::TILE_HEIGHT * 0.5f, itemList[i], i == itemList.size() - 1);
     }
@@ -135,6 +142,10 @@ float LittleGuy::getSpeed() const {
 
 void LittleGuy::setSpeed(const float speed) {
     this->speed = speed;
+}
+
+void LittleGuy::setMoving(bool moving) {
+    this->moving = moving;
 }
 
 int LittleGuy::hasItem(TypeID type) {

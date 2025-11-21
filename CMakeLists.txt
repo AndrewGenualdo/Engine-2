@@ -22,6 +22,8 @@ include(external/cpm.cmake)
 include(external/glfw.cmake)
 include(external/imgui.cmake)
 include(external/glm.cmake)
+include(external/glew.cmake)
+include(external/sdl.cmake)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Sanitizers enabled for Debug build")

@@ -18,7 +18,6 @@ FontRenderer FarmingScene::fontRenderer = FontRenderer();
 Texture2d FarmingScene::blank = Texture2d();
 FarmingWorld *FarmingScene::world = nullptr;
 float FarmingScene::lastTick = 0.0f;
-float FarmingScene::time = 0.0f;
 
 bool FarmingScene::debugMode = false;
 
@@ -46,7 +45,7 @@ void FarmingScene::load() {
     Truck::texture = MultiTexture2d("assets/farminggame/truck.png", 5);
     FarmingWorld::uiTexture = MultiTexture2d("assets/farminggame/ui.png", 64);
     FarmingWorld::fontRenderer = &fontRenderer;
-    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<int>(static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f), FarmingWorld::TILE_HEIGHT, 4);
+    LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<int>(static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f), FarmingWorld::TILE_HEIGHT, 12);
     Item::setTexture("assets/farminggame/items.png", FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, 64);
     Window::setVsync(true);
     lastTick = window->getTime();
@@ -70,65 +69,12 @@ void FarmingScene::draw() {
     Texture2d::gameCamera.expandToInclude(Window::GAME_WIDTH, Window::GAME_HEIGHT);
 
     if (window->isInputPressed(GLFW_KEY_SPACE)) { if (window->isInputPressed(GLFW_KEY_LEFT_CONTROL)) { deltaTime *= 9; } else {deltaTime *= 3;} }
-    time += deltaTime;
 
     const float mx = window->mousePos.x;
     const float my = window->mousePos.y;
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
-    /*if (window->isInputClicked(GLFW_KEY_F)) {
-        for (const auto & guy : world->guys) {
-            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, 1, mouseTile));
-            //guy->setTask(new TaskWithdrawItem(guy, FarmingObject::TypeID::ITEM_SEED_TOMATO, 50));
-        }
-    }
-    if (window->isInputClicked(GLFW_KEY_G)) {
-        for (const auto & guy : world->guys) {
-            guy->setTask(new TaskFetchItem(guy, FarmingObject::TypeID::ITEM_PRODUCE_CARROT, 1, mouseTile));
-            //guy->setTask(new TaskWithdrawItem(guy, FarmingObject::TypeID::ITEM_SEED_CARROT, 50));
-        }
-    }
-
-    if (window->isInputClicked(GLFW_KEY_U)) {
-        world->guys.emplace_back(new LittleGuy(mouseTile));
-    }
-    if (window->isInputPressed(GLFW_KEY_P)) {
-
-        auto tileToPlant = ivec2(-1);
-
-        for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
-            //bool isFarmland = true;//FarmingWorld::isFarmland(i);
-
-            //ADD A CHECK TO MAKE SURE THE TILE IS FARMLAND
-
-            //ADD A CHECK TO MAKE SURE THERE ISN'T ANOTHER PLANT THERE
-
-            if (!world->getTile(i)->exists() && !world->getTile(i)->isBeingUsed()) {
-                tileToPlant = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
-                break;
-            }
-        }
-    }
-
-
-    if (window->isInputClicked(GLFW_KEY_I)) {
-        Item *item = nullptr;
-        int random = static_cast<int>(ew::RandomRange(0, 4));
-        switch (random) {
-            case 0: item = new ItemProduceTomato(vec2(mx, my)); break;
-            case 1: item = new ItemSeedTomato(vec2(mx, my)); break;
-            case 2: item = new ItemProduceCarrot(vec2(mx, my)); break;
-            case 3: item = new ItemSeedCarrot(vec2(mx, my)); break;
-            default: item = new Item();
-        }
-
-        if (!world->guys.empty() && length(vec2(mx, my) - world->guys[0]->getPos()) < FarmingWorld::TILE_WIDTH) {
-            world->guys[0]->giveItem(item->getType());
-            delete item;
-        } else {
-            world->items.push_back(item);
-        }
-    }*/
+    //https://emscripten.org/docs/getting_started/downloads.html
 
     if (window->isInputClicked(GLFW_KEY_O)) {
         FarmingObject::cleanData();
@@ -178,7 +124,7 @@ void FarmingScene::draw() {
     }
 
     bool isTick = false;
-    if (time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
+    if (world->time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
         lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
         isTick = true;
     }

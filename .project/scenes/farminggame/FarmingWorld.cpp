@@ -43,6 +43,7 @@ void FarmingWorld::load() {
         plantData[i] = EMPTY;
         tiles.push_back(nullptr);
     }
+    logs = true;
     items.clear();
     inventory[FarmingObject::TypeID::ITEM_SEED_TOMATO] = 100;
     inventory[FarmingObject::TypeID::ITEM_SEED_CARROT] = 100;
@@ -77,19 +78,22 @@ void FarmingWorld::load() {
                 else if (line == "ITEMS") state = ITEMS;
                 else if (line == "LITTLE_GUYS") state = LITTLE_GUYS;
                 else if (line == "INVENTORY") state = INVENTORY;
-                if (prevState != state && object != nullptr) {
-                    switch (prevState) {
-                        case TILES: {
-                            if (getTile(object->tile) == nullptr) {
-                                setTile(object->tile, dynamic_cast<Tile*>(object));
+                if (prevState != state) {
+                    if (object != nullptr) {
+                        switch (prevState) {
+                            case TILES: {
+                                if (getTile(object->tile) == nullptr) {
+                                    setTile(object->tile, dynamic_cast<Tile*>(object));
+                                }
+                                object = nullptr;
+                                break;
                             }
-                            object = nullptr;
-                            break;
-                        }
 
-                        case ITEMS: items.push_back(dynamic_cast<Item*>(object)); break;
-                        default: break;
+                            case ITEMS: items.push_back(dynamic_cast<Item*>(object)); break;
+                            default: break;
+                        }
                     }
+                    continue;
                 }
                 for (auto const& [type, data] : FarmingObject::objectData) {
                     if (line == "="+data->configKey || line == "LITTLE_GUY_START") {
@@ -117,6 +121,7 @@ void FarmingWorld::load() {
                         break;
                     }
                     case TILES: {
+
                         if (i == 0) {
                             bool found = false;
                             for (auto const& [type, data] : FarmingObject::objectData) {
@@ -130,7 +135,8 @@ void FarmingWorld::load() {
                             }
                             if (!found) std::cout << "UNKNOWN TILE IS BEING LOADED!!" << std::endl << "Tile: '" << line << "'" << std::endl;
                         } else {
-                            if (object != nullptr) object->loadConfig(line, i);
+
+                            if (object != nullptr) object->loadConfig(line, i - 1);
                         }
                         break;
                     }
@@ -205,6 +211,7 @@ void FarmingWorld::load() {
     std::cout << "Loaded world from file! (" << std::to_string(tiles.size()) + " tiles, " << std::to_string(items.size()) << " items, and " << guyManager->count() << " guys)" << std::endl;
 
     //if (guys.empty()) guys.emplace_back(new LittleGuy());
+    logs = false;
 }
 
 void FarmingWorld::save() const {
@@ -270,7 +277,8 @@ void FarmingWorld::cleanup() {
     }
 }
 
-void FarmingWorld::update(float dt) {
+void FarmingWorld::update(const float dt) {
+    time += dt;
     guyManager->update(dt);
     truck.update(dt);
 }
@@ -280,7 +288,7 @@ void FarmingWorld::tick(const bool isTick, const float dt) {
 
     guyManager->tick(isTick, dt);
 
-    for (auto & tile : tiles) {
+    for (const auto & tile : tiles) {
         if (tile != nullptr) {
             tile->tick();
         }

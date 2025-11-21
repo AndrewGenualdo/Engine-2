@@ -49,7 +49,9 @@ void LittleGuyManager::update(const float dt) {
         if (delay == 0) {
             if (!guysTasks.empty()) {
                 if (guysTasks[0]->getGuy() == nullptr) continue;
+                guysTasks[0]->getGuy()->setMoving(false);
                 if (!(dynamic_cast<TaskTravel*> (guysTasks[0]))) continue;
+                guysTasks[0]->getGuy()->setMoving(true);
                 if (guysTasks[0]->update(dt)) {
                     guysTasks[0]->setActive(false);
                     delete guysTasks[0];  //delete completed task
