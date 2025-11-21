@@ -81,6 +81,18 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/items/misc/ItemGold.h
 )
 
+if (EMSCRIPTEN)
+    set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/.project/assets")
+    target_link_options(project PRIVATE
+            -sUSE_GLFW=3
+            -sWASM=1
+            -sFULL_ES3=1
+            -sALLOW_MEMORY_GROWTH=1
+            -sDISABLE_EXCEPTION_CATCHING=0
+            --preload-file ${ASSETS_DIR}@/assets
+    )
+endif()
+
 target_link_libraries(project PUBLIC core IMGUI glm)
 target_include_directories(project PUBLIC ${CORE_INC_DIR} ${CMAKE_SOURCE_DIR}/core ${stb_INCLUDE_DIR})
 

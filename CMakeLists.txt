@@ -11,6 +11,31 @@ endif()
 
 project(Engine-2)
 
+message(STATUS ">>> EMSCRIPTEN: ${EMSCRIPTEN}")
+# Detect if building with Emscripten
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+  message(STATUS "Building for WebAssembly")
+
+  set(USE_WEBGL TRUE)
+
+  # Disable platform-specific warnings and definitions
+  add_definitions(-D__EMSCRIPTEN__)
+
+  # Emscripten link settings
+  set(EM_FLAGS
+          "-sUSE_GLFW=3"
+          "-sWASM=1"
+          "-sFULL_ES3=1"
+          "-sALLOW_MEMORY_GROWTH=1"
+          "-sDISABLE_EXCEPTION_CATCHING=0"
+          "--preload-file assets@/assets"
+  )
+
+  # Apply to all targets later
+  string (JOIN " " EM_FLAGS_STR ${EM_FLAGS})
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EM_FLAGS_STR}")
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/libs)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/libs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -18,12 +43,14 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/libs)
 
 include(external/cpm.cmake)
 
+if (EMSCRIPTEN)
+  set(GLFW_BUILD_X11 OFF CACHE BOOL "" FORCE)
+endif()
+
 # add libraries
 include(external/glfw.cmake)
 include(external/imgui.cmake)
 include(external/glm.cmake)
-include(external/glew.cmake)
-include(external/sdl.cmake)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Sanitizers enabled for Debug build")

@@ -55,9 +55,20 @@ add_custom_target(copyAssetsLine ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/core/cobb/misc/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
 )
 
-find_package(OpenGL REQUIRED)
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    find_package(OpenGL REQUIRED)
+    target_link_libraries(core PUBLIC ${OPENGL_gl_LIBRARY})
+endif()
 
 target_link_libraries(core PUBLIC IMGUI glm)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Emscripten")
+    target_link_options(project PRIVATE
+            -sUSE_GLFW=3
+            -sFULL_ES3=1
+            -sALLOW_MEMORY_GROWTH=1
+            -sASYNCIFY
+    )
+endif()
 
 install (TARGETS core DESTINATION lib)
 install (FILES ${CORE_INC} DESTINATION include/core)
