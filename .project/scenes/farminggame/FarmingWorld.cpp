@@ -18,6 +18,7 @@
 Tiles2d FarmingWorld::landTilemap = Tiles2d();
 Tiles2d FarmingWorld::plantTilemap = Tiles2d();
 Texture2d FarmingWorld::barnTexture = Texture2d();
+
 MultiTexture2d FarmingWorld::uiTexture = MultiTexture2d();
 FontRenderer *FarmingWorld::fontRenderer = nullptr;
 
@@ -271,6 +272,7 @@ void FarmingWorld::cleanup() {
 
 void FarmingWorld::update(float dt) {
     guyManager->update(dt);
+    truck.update(dt);
 }
 
 void FarmingWorld::tick(const bool isTick, const float dt) {
@@ -421,7 +423,7 @@ void FarmingWorld::draw() const {
         items[i]->draw(i == 0);
     }
     barnTexture.draw(TILE_OFFSET_X - 2 * TILE_WIDTH + TILE_WIDTH * (4.0f / 18.0f), TILE_OFFSET_Y, TILE_WIDTH * 2, TILE_HEIGHT * 6, true);
-
+    truck.draw();
 
     int inventoryIndex = 0;
     for (const auto&[fst, snd] : inventory) {

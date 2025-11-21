@@ -19,6 +19,7 @@
 #include "items/seeds/ItemSeedBlueberry.h"
 #include "items/seeds/ItemSeedCarrot.h"
 #include "items/seeds/ItemSeedTomato.h"
+#include "misc/Truck.h"
 #include "tiles/plants/TilePlantBlueberry.h"
 #include "tiles/plants/TilePlantCarrot.h"
 #include "tiles/plants/TilePlantTomato.h"
@@ -59,6 +60,7 @@ public:
     static Tiles2d landTilemap;
     static Tiles2d plantTilemap;
     static Texture2d barnTexture;
+
     static MultiTexture2d uiTexture;
     static FontRenderer *fontRenderer;
 
@@ -72,6 +74,7 @@ public:
     std::map<FarmingObject::TypeID, int> effectiveInventory;
 
     LittleGuyManager *guyManager = nullptr;
+    Truck truck;
     bool logs = false;
 
     FarmingWorld();

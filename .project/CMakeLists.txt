@@ -75,6 +75,8 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/items/seeds/ItemSeedBlueberry.h
         scenes/farminggame/tiles/plants/TilePlantBlueberry.cpp
         scenes/farminggame/tiles/plants/TilePlantBlueberry.h
+        scenes/farminggame/misc/Truck.cpp
+        scenes/farminggame/misc/Truck.h
 )
 
 target_link_libraries(project PUBLIC core IMGUI glm)

@@ -8,17 +8,9 @@
 #include "misc/LittleGuy.h"
 #include "ew/ewMath/ewMath.h"
 #include "items/Item.h"
-#include "items/produce/ItemProduceCarrot.h"
-#include "items/seeds/ItemSeedCarrot.h"
-#include "items/produce/ItemProduceTomato.h"
-#include "items/seeds/ItemSeedTomato.h"
 #include "misc/LittleGuyManager.h"
+#include "misc/Truck.h"
 #include "tasks/TaskFetchItem.h"
-#include "tasks/TaskRetrieveItem.h"
-#include "tasks/TaskTravel.h"
-#include "tasks/TaskWithdrawItem.h"
-#include "tiles/plants/TilePlantCarrot.h"
-#include "tiles/plants/TilePlantTomato.h"
 
 Camera FarmingScene::camera = Camera();
 Window *FarmingScene::window = nullptr;
@@ -51,6 +43,7 @@ void FarmingScene::load() {
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
     FarmingWorld::barnTexture = Texture2d("assets/farminggame/barn.png", GL_NEAREST, GL_TEXTURE_WRAP_S);
+    Truck::texture = MultiTexture2d("assets/farminggame/truck.png", 5);
     FarmingWorld::uiTexture = MultiTexture2d("assets/farminggame/ui.png", 64);
     FarmingWorld::fontRenderer = &fontRenderer;
     LittleGuy::setTexture("assets/farminggame/guy.png", static_cast<int>(static_cast<float>(FarmingWorld::TILE_WIDTH) * 0.5f), FarmingWorld::TILE_HEIGHT, 4);
@@ -153,7 +146,9 @@ void FarmingScene::draw() {
         world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * FarmingObject::getData<TilePlant::PlantData>(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY)->amountProduces);
     }
     if (window->isInputClicked(GLFW_KEY_U)) {
-        world->guyManager->addGuy(new LittleGuy(mouseTile));
+        for (int i = 0; i < 5; i++) {
+            world->guyManager->addGuy(new LittleGuy(mouseTile));
+        }
     }
     if (window->isInputPressed(GLFW_KEY_D)) {
         for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
@@ -178,6 +173,9 @@ void FarmingScene::draw() {
     if (window->isInputClicked(GLFW_KEY_L)) {
         world->logs = !world->logs;
     }
+    if (window->isInputClicked(GLFW_KEY_M)) {
+        world->truck.enter();
+    }
 
     bool isTick = false;
     if (time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
@@ -201,53 +199,58 @@ void FarmingScene::draw() {
         Texture2d::setColor(vec4(1, 1, 1, 0.5f));
         blank.draw(static_cast<float>(FarmingWorld::TILE_OFFSET_X + mouseTile.x * FarmingWorld::TILE_WIDTH), static_cast<float>(FarmingWorld::TILE_OFFSET_Y + mouseTile.y * FarmingWorld::TILE_HEIGHT), FarmingWorld::TILE_WIDTH, FarmingWorld::TILE_HEIGHT, true);
 
-        std::string tileInfo = "Tile: " + std::to_string(mouseTile.x) + ", " + std::to_string(mouseTile.y) + "\n";
-        tileInfo += "Type: " + FarmingObject::getData<FarmingObject::ObjectData>(world->getTile(mouseTile)->getType())->configKey + "\n";
-        const bool exists = world->getTile(mouseTile)->exists();
-        tileInfo += std::string("Exists: ") + (exists ? "true" : "false") + "\n";
-        tileInfo += std::string("Being Used: ") + (world->getTile(mouseTile)->isBeingUsed() ? "true" : "false");
+        if (debugMode) {
+            std::string tileInfo = "Tile: " + std::to_string(mouseTile.x) + ", " + std::to_string(mouseTile.y) + "\n";
+            tileInfo += "Type: " + FarmingObject::getData<FarmingObject::ObjectData>(world->getTile(mouseTile)->getType())->configKey + "\n";
+            const bool exists = world->getTile(mouseTile)->exists();
+            tileInfo += std::string("Exists: ") + (exists ? "true" : "false") + "\n";
+            tileInfo += std::string("Being Used: ") + (world->getTile(mouseTile)->isBeingUsed() ? "true" : "false");
 
-        Texture2d::setColor(vec4(0, 0, 0, 0.5f));
-        const float tileInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 20;
-        const float tileInfoBgY = Window::GAME_HEIGHT - fontRenderer.getHeight() * 5 * fontScale - 20;
-        blank.draw(tileInfoBgX, tileInfoBgY, Window::GAME_WIDTH - tileInfoBgX, Window::GAME_HEIGHT - tileInfoBgY, true);
-        fontRenderer.setColor(vec3(1, 0.5f, 0.5f));
-        fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
+            Texture2d::setColor(vec4(0, 0, 0, 0.5f));
+            const float tileInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 20;
+            const float tileInfoBgY = Window::GAME_HEIGHT - fontRenderer.getHeight() * 5 * fontScale - 20;
+            blank.draw(tileInfoBgX, tileInfoBgY, Window::GAME_WIDTH - tileInfoBgX, Window::GAME_HEIGHT - tileInfoBgY, true);
+            fontRenderer.setColor(vec3(1, 0.5f, 0.5f));
+            fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
 
-        std::string taskInfo;
-        for (const auto &[delay, tasks] : world->guyManager->tasks) {
-            if (tasks.empty()) continue;
-            if (tasks[0]->getGuy() == nullptr) continue;
-            if (tasks[0]->getGuy()->tile == mouseTile) {
-                taskInfo += "Task: " + tasks[0]->getName();
-                break;
+            std::string taskInfo;
+            for (const auto &[delay, tasks] : world->guyManager->tasks) {
+                if (tasks.empty()) continue;
+                if (tasks[0]->getGuy() == nullptr) continue;
+                if (tasks[0]->getGuy()->tile == mouseTile) {
+                    taskInfo += "Task: " + tasks[0]->getName();
+                    break;
+                }
+            }
+            if (!taskInfo.empty()) {
+                const float taskInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 20;
+                const float taskInfoBgY = Window::GAME_HEIGHT - 20 - fontRenderer.getHeight() * 8 * fontScale;
+                blank.draw(taskInfoBgX, taskInfoBgY, Window::GAME_WIDTH - taskInfoBgX, fontRenderer.getHeight() * fontScale + 20, true);
+
+                fontRenderer.setColor(vec3(0.5f, 0.5f, 1.0f));
+                fontRenderer.draw(taskInfo, Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 8 * fontScale, fontScale);
             }
         }
-        if (!taskInfo.empty()) {
-            const float taskInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 20;
-            const float taskInfoBgY = Window::GAME_HEIGHT - 20 - fontRenderer.getHeight() * 8 * fontScale;
-            blank.draw(taskInfoBgX, taskInfoBgY, Window::GAME_WIDTH - taskInfoBgX, fontRenderer.getHeight() * fontScale + 20, true);
 
-            fontRenderer.setColor(vec3(0.5f, 0.5f, 1.0f));
-            fontRenderer.draw(taskInfo, Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 10, Window::GAME_HEIGHT - 10 - fontRenderer.getHeight() * 8 * fontScale, fontScale);
+    }
+    if (debugMode) {
+        std::string profilerInfo;
+        int profilerLines = 2;
+        int total = 0;
+        for (const auto&[fst, snd] : Profiler::getMap()) if (fst != "load") total += static_cast<int>(Profiler::get(fst).duration_micro());
+        profilerInfo += "Load: " + ew::formatValue(static_cast<int>(Profiler::get("load").duration_micro())) + "ns\n";
+        for (const auto&[fst, snd] : Profiler::getMap()) {
+            if (fst == "load") continue;
+            int micro = static_cast<int>(Profiler::get(fst).duration_micro());
+            profilerInfo += fst + ": " + ew::formatValue(micro) + "ns (" + std::to_string(static_cast<int>(static_cast<float>(micro) * 100.0f / static_cast<float>(total))) + "%)\n";
+            profilerLines++;
         }
+        profilerInfo += "Total: " + ew::formatValue(total) + "ns\n";
+        Texture2d::setColor(vec4(0, 0, 0, 0.5f));
+        blank.draw(Window::GAME_WIDTH - fontRenderer.getWidth(profilerInfo) * fontScale - 20, 0, fontRenderer.getWidth(profilerInfo) * fontScale + 20, fontRenderer.getHeight() * fontScale * static_cast<float>(profilerLines + 1) + 20);
+        fontRenderer.setColor(vec3(0.5f, 1.0f, 0.5f));
+        fontRenderer.draw(profilerInfo, Window::GAME_WIDTH - fontRenderer.getWidth(profilerInfo) * fontScale - 10, 10 + static_cast<float>(profilerLines) * fontScale * fontRenderer.getHeight(), fontScale);
     }
-    std::string profilerInfo;
-    int profilerLines = 2;
-    int total = 0;
-    for (const auto&[fst, snd] : Profiler::getMap()) if (fst != "load") total += static_cast<int>(Profiler::get(fst).duration_micro());
-    profilerInfo += "Load: " + ew::formatValue(static_cast<int>(Profiler::get("load").duration_micro())) + "ns\n";
-    for (const auto&[fst, snd] : Profiler::getMap()) {
-        if (fst == "load") continue;
-        int micro = static_cast<int>(Profiler::get(fst).duration_micro());
-        profilerInfo += fst + ": " + ew::formatValue(micro) + "ns (" + std::to_string(static_cast<int>(static_cast<float>(micro) * 100.0f / static_cast<float>(total))) + "%)\n";
-        profilerLines++;
-    }
-    profilerInfo += "Total: " + ew::formatValue(total) + "ns\n";
-    Texture2d::setColor(vec4(0, 0, 0, 0.5f));
-    blank.draw(Window::GAME_WIDTH - fontRenderer.getWidth(profilerInfo) * fontScale - 20, 0, fontRenderer.getWidth(profilerInfo) * fontScale + 20, fontRenderer.getHeight() * fontScale * static_cast<float>(profilerLines + 1) + 20);
-    fontRenderer.setColor(vec3(0.5f, 1.0f, 0.5f));
-    fontRenderer.draw(profilerInfo, Window::GAME_WIDTH - fontRenderer.getWidth(profilerInfo) * fontScale - 10, 10 + static_cast<float>(profilerLines) * fontScale * fontRenderer.getHeight(), fontScale);
 
 }
 
@@ -265,7 +268,7 @@ void FarmingScene::keyPress(int key, int action, int mods) {
         if(key == GLFW_KEY_R) {
             cleanup();
             load();
-        } else if(key == GLFW_KEY_F8) {
+        } else if(key == GLFW_KEY_F3) {
             debugMode = !debugMode;
         } else if (key == GLFW_KEY_S && mods & GLFW_MOD_CONTROL) {
             world->save();
