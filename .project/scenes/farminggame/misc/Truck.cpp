@@ -58,15 +58,25 @@ void Truck::enter() {
 
 void Truck::changeState(TruckState newState) {
     if (state == newState) return;
-    if (newState == ENTERING) {
-        pos = vec2(FarmingWorld::TILE_WIDTH * 2, 0);
-        timeLeftInState = 1.0f;
-    } else if (newState == HERE || newState == EXITING || newState == OPENING || newState == CLOSING) {
-        pos = vec2(0, 0);
-        timeLeftInState = 1.0f;
-    } else {
-        pos = vec2(0, 0);
-        timeLeftInState = -1.0f;
+    switch(newState) {
+        case ENTERING: {
+            pos = vec2(FarmingWorld::TILE_WIDTH * 2, 0);
+            timeLeftInState = 1.0f;
+            break;
+        }
+        case HERE:
+        case EXITING:
+        case OPENING:
+        case CLOSING: {
+            pos = vec2(0, 0);
+            timeLeftInState = 1.0f;
+            break;
+        }
+        default: {
+            pos = vec2(0, 0);
+            timeLeftInState = -1.0f;
+            break;
+        }
     }
     state = newState;
 }
