@@ -27,8 +27,6 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/tasks/Task.h
         scenes/farminggame/tasks/TaskTravel.cpp
         scenes/farminggame/tasks/TaskTravel.h
-        scenes/farminggame/tasks/TaskRetrieveItem.cpp
-        scenes/farminggame/tasks/TaskRetrieveItem.h
         scenes/farminggame/items/Item.cpp
         scenes/farminggame/items/Item.h
         scenes/farminggame/tiles/Tile.cpp
@@ -57,8 +55,6 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/tasks/TaskHarvestPlant.h
         scenes/farminggame/tiles/plants/TilePlantCarrot.cpp
         scenes/farminggame/tiles/plants/TilePlantCarrot.h
-        scenes/farminggame/tasks/TaskFetchItem.cpp
-        scenes/farminggame/tasks/TaskFetchItem.h
         scenes/farminggame/tasks/TaskDepositItem.cpp
         scenes/farminggame/tasks/TaskDepositItem.h
         scenes/farminggame/tasks/TaskWithdrawItem.cpp
@@ -79,6 +75,8 @@ add_executable(project ${ASSIGNMENT1_SRC} ${PROJECT_INC}
         scenes/farminggame/misc/Truck.h
         scenes/farminggame/items/misc/ItemGold.cpp
         scenes/farminggame/items/misc/ItemGold.h
+        scenes/farminggame/tasks/TaskSell.cpp
+        scenes/farminggame/tasks/TaskSell.h
 )
 
 if (EMSCRIPTEN)

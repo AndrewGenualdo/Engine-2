@@ -10,6 +10,7 @@
 #include "../tasks/TaskPickupItem.h"
 #include "../tasks/TaskPlantSeed.h"
 #include "../tasks/TaskWithdrawItem.h"
+#include "../tasks/TaskSell.h"
 
 FarmingWorld *LittleGuyManager::world = nullptr;
 
@@ -260,6 +261,7 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
     int amountNeeded = amount;
     if (amountNeeded <= 0) return amount;
 
+
     //if barn has enough of said item
     const int barnToUse = min(world->effectiveInventory[type], amountNeeded);
     if (barnToUse > 0) {
@@ -267,6 +269,30 @@ int LittleGuyManager::createTasks(const FarmingObject::TypeID type, const int am
         if (amountNeeded <= 0) return amount;
     }
 
+    if (type == FarmingObject::TypeID::ITEM_GOLD) {
+
+        for (auto const& [itemType, amt] : world->effectiveInventory) {
+            if (itemType == FarmingObject::TypeID::ITEM_GOLD) continue;
+            if (!FarmingObject::getData<ItemProduce::ProduceData>(itemType)) continue;
+
+            int invToUse = min(world->effectiveInventory[itemType], amountNeeded);
+            const int invToUseConst = invToUse;
+            amountNeeded -= invToUse;
+            for (int i = 0; i < invToUseConst; i+= 5) {
+                int guyToUse = 5;
+                invToUse -= 5;
+                if (invToUse < 0) guyToUse = -invToUse;
+                std::vector<Task *> sellTask;
+                sellTask.push_back(new TaskTravel(nullptr, FarmingWorld::INVENTORY_TILE));
+                sellTask.push_back(new TaskWithdrawItem(nullptr, itemType, guyToUse));
+                sellTask.push_back(new TaskTravel(nullptr, FarmingWorld::STAND_TILE));
+                sellTask.push_back(new TaskSell(nullptr, itemType, guyToUse));
+                sellTask.push_back(new TaskTravel(nullptr, FarmingWorld::INVENTORY_TILE));
+                sellTask.push_back(new TaskDepositItem(nullptr, FarmingObject::TypeID::ITEM_GOLD, guyToUse));
+                tasks.emplace_back(0, sellTask);
+            }
+        }
+    }
 
     //if unused guys have items needed
     for (const auto & guy : guys) {

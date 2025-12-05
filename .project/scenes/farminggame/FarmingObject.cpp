@@ -67,6 +67,7 @@ void FarmingObject::loadInventory() {
             }
         }
     }
+    world->inventory[TypeID::ITEM_GOLD] = 0;
     world->inventory[TypeID::ITEM_SEED_TOMATO] = FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT;
     world->inventory[TypeID::ITEM_SEED_CARROT] = FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT;
     world->inventory[TypeID::ITEM_SEED_BLUEBERRY] = FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT;

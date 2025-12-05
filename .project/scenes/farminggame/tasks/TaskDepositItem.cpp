@@ -6,7 +6,7 @@
 
 #include "../misc/LittleGuy.h"
 
-TaskDepositItem::TaskDepositItem(LittleGuy *guy, FarmingObject::TypeID type, int amount) {
+TaskDepositItem::TaskDepositItem(LittleGuy *guy, const FarmingObject::TypeID type, const int amount) {
     this->guy = guy;
     this->type = type;
     this->amount = amount;
@@ -32,5 +32,5 @@ std::string TaskDepositItem::getName() {
 }
 
 float TaskDepositItem::getCost() {
-    return amount;
+    return static_cast<float>(amount);
 }

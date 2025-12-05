@@ -10,7 +10,6 @@
 #include "items/Item.h"
 #include "misc/LittleGuyManager.h"
 #include "misc/Truck.h"
-#include "tasks/TaskFetchItem.h"
 
 Camera FarmingScene::camera = Camera();
 Window *FarmingScene::window = nullptr;
@@ -42,6 +41,7 @@ void FarmingScene::load() {
     FarmingWorld::landTilemap = Tiles2d("assets/farminggame/spritesheet.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->landData);
     FarmingWorld::plantTilemap = Tiles2d("assets/farminggame/plants.png", FarmingWorld::TILES_HORIZ, FarmingWorld::TILES_VERT, FarmingWorld::TEXTURE_TILE_COUNT, world->plantData);
     FarmingWorld::barnTexture = Texture2d("assets/farminggame/barn.png", GL_NEAREST, GL_TEXTURE_WRAP_S);
+    FarmingWorld::standTexture = Texture2d("assets/farminggame/stand.png", GL_NEAREST, GL_TEXTURE_WRAP_S);
     Truck::texture = MultiTexture2d("assets/farminggame/truck.png", 5);
     FarmingWorld::uiTexture = MultiTexture2d("assets/farminggame/ui.png", 64);
     FarmingWorld::fontRenderer = &fontRenderer;
@@ -91,7 +91,10 @@ void FarmingScene::draw() {
     else if (window->isInputClicked(GLFW_KEY_H)) {
         world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * FarmingObject::getData<TilePlant::PlantData>(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY)->amountProduces);
     }
-    if (window->isInputClicked(GLFW_KEY_U)) {
+    else if (window->isInputClicked(GLFW_KEY_S)) {
+        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_GOLD, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * 5);
+    }
+    else if (window->isInputClicked(GLFW_KEY_U)) {
         for (int i = 0; i < 5; i++) {
             world->guyManager->addGuy(new LittleGuy(mouseTile));
         }

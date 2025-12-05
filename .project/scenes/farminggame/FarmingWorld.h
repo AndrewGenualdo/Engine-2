@@ -54,6 +54,7 @@ public:
     constexpr static int TICKS_PER_SECOND = 10;
 
     constexpr static ivec2 INVENTORY_TILE = ivec2(0,1);
+    constexpr static ivec2 STAND_TILE = ivec2(10, 0);
 
     unsigned int landData[TILES_HORIZ * TILES_VERT];
     unsigned int plantData[TILES_HORIZ * TILES_VERT];
@@ -61,6 +62,7 @@ public:
     static Tiles2d landTilemap;
     static Tiles2d plantTilemap;
     static Texture2d barnTexture;
+    static Texture2d standTexture;
 
     static MultiTexture2d uiTexture;
     static FontRenderer *fontRenderer;
