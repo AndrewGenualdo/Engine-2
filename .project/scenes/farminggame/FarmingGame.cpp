@@ -82,13 +82,21 @@ void FarmingScene::draw() {
     const float my = window->mousePos.y;
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
+    if (!window->isInputPressed(GLFW_KEY_R)) {
+        shouldUpdate = true;
+        this->deltaTime += deltaTime;
+        Profiler::get("draw").start();
+        world->draw();
+        Profiler::get("draw").end();
+    } else if (window->isInputClicked(GLFW_KEY_R)) {
+        FarmingObject::cleanData();
+        load();
+        world->clear();
+        FarmingObject::loadInventory();
+        world->resetInventory();
+        return;
+    }
 
-    shouldUpdate = true;
-    this->deltaTime += deltaTime;
-
-    Profiler::get("draw").start();
-    world->draw();
-    Profiler::get("draw").end();
     //if(!world->guys.empty()) fontRenderer.draw("Pos: " + std::to_string(world->guys[0]->getPos().x) + ", " + std::to_string(world->guys[0]->getPos().y) + "\nTile: " + std::to_string(world->guys[0]->getTile().x) + ", " + std::to_string(world->guys[0]->getTile().y), 10, 10 + fontRenderer.getHeight() * fontScale, fontScale);
 
 
@@ -131,7 +139,7 @@ void FarmingScene::draw() {
 
     }
     if (debugMode) {
-        std::string profilerInfo;
+        std::string profilerInfo = "Guy Count: " + std::to_string(world->guyManager->count()) + "\n";
         int profilerLines = 2;
         int total = 0;
         for (const auto&[fst, snd] : Profiler::getMap()) if (fst != "load") total += static_cast<int>(Profiler::get(fst).duration_micro());
@@ -192,13 +200,9 @@ void FarmingScene::updateThreadFunc() {
             const float my = window->mousePos.y;
             const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
-            if (window->isInputClicked(GLFW_KEY_R)) {
-                FarmingObject::cleanData();
-                load();
-                world->clear();
-                FarmingObject::loadInventory();
-                world->resetInventory();
-            }
+            /*if (window->isInputClicked(GLFW_KEY_R)) {
+
+            }*/
 
             if (window->isInputClicked(GLFW_KEY_F)) {
                 world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
