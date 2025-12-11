@@ -409,6 +409,17 @@ void FarmingWorld::clear() {
     items.clear();
 }
 
+void FarmingWorld::resetInventory() {
+    inventory[FarmingObject::TypeID::ITEM_GOLD] = 0;
+    inventory[FarmingObject::TypeID::ITEM_SEED_TOMATO] = TILES_HORIZ * TILES_VERT;
+    inventory[FarmingObject::TypeID::ITEM_SEED_CARROT] = TILES_HORIZ * TILES_VERT;
+    inventory[FarmingObject::TypeID::ITEM_SEED_BLUEBERRY] = TILES_HORIZ * TILES_VERT;
+    inventory[FarmingObject::TypeID::ITEM_PRODUCE_TOMATO] = 0;
+    inventory[FarmingObject::TypeID::ITEM_PRODUCE_CARROT] = 0;
+    inventory[FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY] = 0;
+    resetEffectiveInventory();
+}
+
 void FarmingWorld::resetEffectiveInventory() {
     for (auto const& [type, amt] : inventory) {
         effectiveInventory[type] = amt;
@@ -440,7 +451,14 @@ void FarmingWorld::draw() const {
         uiTexture.draw(inventoryIndex * TILE_WIDTH, Window::GAME_HEIGHT - TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0);
         Item::draw(inventoryIndex * TILE_WIDTH, Window::GAME_HEIGHT - TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, FarmingObject::getData<Item::ItemData>(fst)->textureIndex);
         fontRenderer->setColor(vec4(1));
-        fontRenderer->draw(std::to_string(snd), inventoryIndex * TILE_WIDTH + (TILE_WIDTH - fontRenderer->getWidth(std::to_string(snd)) * 3) - (TILE_WIDTH / 18.0f), Window::GAME_HEIGHT - TILE_HEIGHT + (TILE_HEIGHT / 18.0f), 3);
+        std::string amt = std::to_string(snd);
+        float fontScale = 3;
+        float width = fontRenderer->getWidth(amt) * fontScale;
+        while (width > TILE_WIDTH * 16.0f / 18.0f) {
+            fontScale *= 0.99f;
+            width = fontRenderer->getWidth(amt) * fontScale;
+        }
+        fontRenderer->draw(amt, inventoryIndex * TILE_WIDTH + (TILE_WIDTH - fontRenderer->getWidth(std::to_string(snd)) * fontScale) - (TILE_WIDTH / 18.0f), Window::GAME_HEIGHT - TILE_HEIGHT + (TILE_HEIGHT / 18.0f), fontScale);
         inventoryIndex++;
     }
 

@@ -53,6 +53,14 @@ void FarmingScene::load() {
     Profiler::create("tick");
     Profiler::create("update");
     Profiler::create("draw");
+    if (updateThread != nullptr) {
+        killThread = true;
+        delete updateThread;
+        updateThread = nullptr;
+    }
+    updateThread = new std::thread(&FarmingScene::updateThreadFunc, this);
+    updateThread->detach();
+
 }
 
 void FarmingScene::draw() {
@@ -74,69 +82,10 @@ void FarmingScene::draw() {
     const float my = window->mousePos.y;
     const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
 
-    //https://emscripten.org/docs/getting_started/downloads.html
 
-    if (window->isInputClicked(GLFW_KEY_O)) {
-        FarmingObject::cleanData();
-        load();
-        world->clear();
-        FarmingObject::loadInventory();
-    }
-    if (window->isInputClicked(GLFW_KEY_F)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
-    }
-    else if (window->isInputClicked(GLFW_KEY_G)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
-    }
-    else if (window->isInputClicked(GLFW_KEY_H)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * FarmingObject::getData<TilePlant::PlantData>(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY)->amountProduces);
-    }
-    else if (window->isInputClicked(GLFW_KEY_S)) {
-        world->guyManager->setGoal(FarmingObject::TypeID::ITEM_GOLD, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * 5);
-    }
-    else if (window->isInputClicked(GLFW_KEY_U)) {
-        for (int i = 0; i < 5; i++) {
-            world->guyManager->addGuy(new LittleGuy(mouseTile));
-        }
-    }
-    if (window->isInputPressed(GLFW_KEY_D)) {
-        for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
-            if (world->getTile(i)->exists()) continue;
-            float rand = ew::RandomRange(0, 1);
-            std::vector<FarmingObject::TypeID> plants;
-            plants.push_back(FarmingObject::TypeID::TILE_PLANT_TOMATO);
-            plants.push_back(FarmingObject::TypeID::TILE_PLANT_CARROT);
-            plants.push_back(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY);
-            for (float j = 0; j < plants.size(); j++) {
-                if (rand < (j + 1) / plants.size()) {
-                    ivec2 tile = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
-                    world->setTile(tile, FarmingWorld::createTile(plants[static_cast<int>(j)], tile));
-                    break;
-                }
-            }
-            //if (ew::RandomRange(0, 1) > 0.5f) world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
-            //else world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
-            break;
-        }
-    }
-    if (window->isInputClicked(GLFW_KEY_L)) {
-        world->logs = !world->logs;
-    }
-    if (window->isInputClicked(GLFW_KEY_M)) {
-        world->truck.enter();
-    }
+    shouldUpdate = true;
+    this->deltaTime += deltaTime;
 
-    bool isTick = false;
-    if (world->time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
-        lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
-        isTick = true;
-    }
-    Profiler::get("tick").start();
-    world->tick(isTick, deltaTime);
-    Profiler::get("tick").end();
-    Profiler::get("update").start();
-    world->update(deltaTime);
-    Profiler::get("update").end();
     Profiler::get("draw").start();
     world->draw();
     Profiler::get("draw").end();
@@ -161,16 +110,15 @@ void FarmingScene::draw() {
             blank.draw(tileInfoBgX, tileInfoBgY, Window::GAME_WIDTH - tileInfoBgX, Window::GAME_HEIGHT - tileInfoBgY, true);
             fontRenderer.setColor(vec3(1, 0.5f, 0.5f));
             fontRenderer.draw(tileInfo, Window::GAME_WIDTH - fontRenderer.getWidth(tileInfo) * fontScale - 10, Window::GAME_HEIGHT - fontRenderer.getHeight() * fontScale - 10, fontScale);
-
             std::string taskInfo;
-            for (const auto &[delay, tasks] : world->guyManager->tasks) {
+            /*for (const auto &[delay, tasks] : world->guyManager->tasks) {
                 if (tasks.empty()) continue;
                 if (tasks[0]->getGuy() == nullptr) continue;
                 if (tasks[0]->getGuy()->tile == mouseTile) {
                     taskInfo += "Task: " + tasks[0]->getName();
                     break;
                 }
-            }
+            }*/
             if (!taskInfo.empty()) {
                 const float taskInfoBgX = Window::GAME_WIDTH - fontRenderer.getWidth(taskInfo) * fontScale - 20;
                 const float taskInfoBgY = Window::GAME_HEIGHT - 20 - fontRenderer.getHeight() * 8 * fontScale;
@@ -209,14 +157,20 @@ void FarmingScene::cleanup() {
         delete world;
         world = nullptr;
     }
+    if (updateThread != nullptr) {
+        delete updateThread;
+        updateThread = nullptr;
+    }
     FarmingObject::cleanData();
 }
 
 void FarmingScene::keyPress(int key, int action, int mods) {
     if (action == GLFW_PRESS) {
-        if(key == GLFW_KEY_R) {
+        if (key == GLFW_KEY_R) {
             cleanup();
             load();
+        } else if (key == GLFW_KEY_ESCAPE) {
+            glfwSetWindowShouldClose(window->window, true);
         } else if(key == GLFW_KEY_F3) {
             debugMode = !debugMode;
         } else if (key == GLFW_KEY_S && mods & GLFW_MOD_CONTROL) {
@@ -228,4 +182,89 @@ void FarmingScene::keyPress(int key, int action, int mods) {
 void FarmingScene::mouseMove(float x, float y) {
     window->mousePos.x = (x - window->gx) * Window::GAME_WIDTH / window->gw;
     window->mousePos.y = Window::GAME_HEIGHT - ((y - window->gy) * Window::GAME_HEIGHT / window->gh);
+}
+
+void FarmingScene::updateThreadFunc() {
+
+    while (!killThread) {
+        if (shouldUpdate) {
+            const float mx = window->mousePos.x;
+            const float my = window->mousePos.y;
+            const ivec2 mouseTile = FarmingWorld::getTileFromPos(vec2(mx, my));
+
+            if (window->isInputClicked(GLFW_KEY_R)) {
+                FarmingObject::cleanData();
+                load();
+                world->clear();
+                FarmingObject::loadInventory();
+                world->resetInventory();
+            }
+
+            if (window->isInputClicked(GLFW_KEY_F)) {
+                world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_TOMATO, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
+            }
+            else if (window->isInputClicked(GLFW_KEY_G)) {
+                world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_CARROT, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT);
+            }
+            else if (window->isInputClicked(GLFW_KEY_H)) {
+                world->guyManager->setGoal(FarmingObject::TypeID::ITEM_PRODUCE_BLUEBERRY, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * FarmingObject::getData<TilePlant::PlantData>(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY)->amountProduces);
+            }
+            else if (window->isInputClicked(GLFW_KEY_S)) {
+                world->guyManager->setGoal(FarmingObject::TypeID::ITEM_GOLD, FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT * 5);
+            }
+            else if (window->isInputClicked(GLFW_KEY_U)) {
+                world->guyManager->addGuy(new LittleGuy(mouseTile));
+                world->guyManager->addGuy(new LittleGuy(mouseTile + ivec2(0, 1)));
+                world->guyManager->addGuy(new LittleGuy(mouseTile + ivec2(0, -1)));
+                world->guyManager->addGuy(new LittleGuy(mouseTile + ivec2(1, 0)));
+                world->guyManager->addGuy(new LittleGuy(mouseTile + ivec2(-1, 0)));
+            }
+            if (window->isInputPressed(GLFW_KEY_D)) {
+                for (int i = 0; i < FarmingWorld::TILES_HORIZ * FarmingWorld::TILES_VERT; i++) {
+                    if (world->getTile(i)->exists()) continue;
+                    float rand = ew::RandomRange(0, 1);
+                    std::vector<FarmingObject::TypeID> plants;
+                    plants.push_back(FarmingObject::TypeID::TILE_PLANT_TOMATO);
+                    plants.push_back(FarmingObject::TypeID::TILE_PLANT_CARROT);
+                    plants.push_back(FarmingObject::TypeID::TILE_PLANT_BLUEBERRY);
+                    for (float j = 0; j < plants.size(); j++) {
+                        if (rand < (j + 1) / plants.size()) {
+                            ivec2 tile = ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ);
+                            world->setTile(tile, FarmingWorld::createTile(plants[static_cast<int>(j)], tile));
+                            break;
+                        }
+                    }
+                    //if (ew::RandomRange(0, 1) > 0.5f) world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantCarrot(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+                    //else world->setTile(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ), new TilePlantTomato(ivec2(i % FarmingWorld::TILES_HORIZ, i / FarmingWorld::TILES_HORIZ)));
+                    break;
+                }
+            }
+            if (window->isInputClicked(GLFW_KEY_L)) {
+                world->logs = !world->logs;
+            }
+            if (window->isInputClicked(GLFW_KEY_T)) {
+                world->truck.enter();
+            }
+
+
+            bool isTick = false;
+            if (world->time - lastTick >= 1.0f / FarmingWorld::TICKS_PER_SECOND) {
+                lastTick += 1.0f / FarmingWorld::TICKS_PER_SECOND;
+                isTick = true;
+            }
+
+            Profiler::get("tick").start();
+            world->tick(isTick, deltaTime);
+            Profiler::get("tick").end();
+
+            Profiler::get("update").start();
+            world->update(deltaTime);
+            Profiler::get("update").end();
+
+            deltaTime = 0.0f;
+            shouldUpdate = false;
+        }
+    }
+
+
 }

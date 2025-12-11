@@ -6,6 +6,8 @@
 #define ENGINE_2_FARMINGGAME_H
 
 
+#include <thread>
+
 #include "cobb/core/camera.h"
 #include "cobb/core/scene.h"
 #include "cobb/misc/fontRenderer.h"
@@ -17,6 +19,10 @@ class FarmingScene : public Scene {
 public:
     static Camera camera;
     static Window *window;
+    bool shouldUpdate = false;
+    float deltaTime = 0.0f;
+    bool killThread = false;
+    std::thread *updateThread = nullptr;
 
     FarmingScene() = default;
     explicit FarmingScene(Window *w);
@@ -27,6 +33,8 @@ public:
     void cleanup() override;
     void keyPress(int key, int action, int mods) override;
     void mouseMove(float x, float y) override;
+
+    void updateThreadFunc();
 
     static FontRenderer fontRenderer;
     static Texture2d blank;

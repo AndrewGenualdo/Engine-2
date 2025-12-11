@@ -126,7 +126,7 @@ void LittleGuyManager::tick(const bool isTick, const float dt) {
                     if (!tasks[i].second.empty() && dynamic_cast<TaskTravel*>(tasks[i].second[0])) {
                         dynamic_cast<TaskTravel*>(tasks[i].second[0])->generatePath();
                     }
-                    break;
+                    //break;
                 }
             }
         }

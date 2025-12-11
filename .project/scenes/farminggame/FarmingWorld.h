@@ -96,6 +96,7 @@ public:
     void updateTileTypes();
     void clear();
 
+    void resetInventory();
     void resetEffectiveInventory(); //should be called when resetting tasks
 
     static bool isFarmland(int texIndex);
