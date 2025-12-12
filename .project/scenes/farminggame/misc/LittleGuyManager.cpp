@@ -182,6 +182,9 @@ void LittleGuyManager::draw(const bool bind) const {
     for (const auto guy : guys) {
         guy->draw(bind);
     }
+    for (int i = 0; i < guyAmount; i++) {
+        guys[i]->draw(bind);
+    }
 }
 
 void LittleGuyManager::cleanup() {
@@ -207,6 +210,7 @@ void LittleGuyManager::clear() {
         guy = nullptr;
     }
     guys.clear();
+    guyAmount = 0;
 }
 
 std::string LittleGuyManager::getConfig() const {
@@ -251,6 +255,7 @@ int LittleGuyManager::setGoal(const FarmingObject::TypeID goal, const int amount
 
 bool LittleGuyManager::addGuy(LittleGuy *guy) {
     guys.push_back(guy);
+    guyAmount++;
     return true;
 }
 

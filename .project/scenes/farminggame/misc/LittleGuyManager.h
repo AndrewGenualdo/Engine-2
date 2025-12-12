@@ -13,6 +13,7 @@ class LittleGuyManager {
 
     std::vector<LittleGuy*> guys;
     FarmingObject::TypeID goalType = FarmingObject::TypeID::NONE;
+    int guyAmount = 0;
     int goalAmount = 0;
     int tickCounter = 0;
 
