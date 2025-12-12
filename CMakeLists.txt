@@ -60,6 +60,12 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_link_options(-fsanitize=address,leak)
 endif()
 
+
+
 add_subdirectory(core)
 add_subdirectory(.project)
 
+#disable command prompt on release build
+if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  target_link_options(project PRIVATE "/ENTRY:mainCRTStartup" "/SUBSYSTEM:WINDOWS")
+endif()

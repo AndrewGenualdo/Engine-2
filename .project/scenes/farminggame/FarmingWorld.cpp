@@ -46,8 +46,7 @@ void FarmingWorld::load() {
     }
     logs = true;
     items.clear();
-    inventory[FarmingObject::TypeID::ITEM_SEED_TOMATO] = 100;
-    inventory[FarmingObject::TypeID::ITEM_SEED_CARROT] = 100;
+    resetInventory();
     guyManager = new LittleGuyManager();
 
     std::map<FarmingObject::TypeID, std::string> itemTypes;
@@ -208,7 +207,7 @@ void FarmingWorld::load() {
             setTile(ivec2(j % TILES_HORIZ, j / TILES_HORIZ), new Tile(ivec2(j % TILES_HORIZ, j / TILES_HORIZ)));
         }
     }
-
+    resetEffectiveInventory();
     std::cout << "Loaded world from file! (" << std::to_string(tiles.size()) + " tiles, " << std::to_string(items.size()) << " items, and " << guyManager->count() << " guys)" << std::endl;
 
     //if (guys.empty()) guys.emplace_back(new LittleGuy());

@@ -58,6 +58,7 @@ void FarmingScene::load() {
         delete updateThread;
         updateThread = nullptr;
     }
+    killThread = false;
     updateThread = new std::thread(&FarmingScene::updateThreadFunc, this);
     updateThread->detach();
 
@@ -195,6 +196,7 @@ void FarmingScene::mouseMove(float x, float y) {
 void FarmingScene::updateThreadFunc() {
 
     while (!killThread) {
+        //std::cout << deltaTime << std::endl;
         if (shouldUpdate) {
             const float mx = window->mousePos.x;
             const float my = window->mousePos.y;

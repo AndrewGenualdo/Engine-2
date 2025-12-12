@@ -55,6 +55,7 @@ void LittleGuyManager::update(const float dt) {
                 guysTasks[0]->getGuy()->setMoving(true);
                 if (guysTasks[0]->update(dt)) {
                     guysTasks[0]->setActive(false);
+                    guysTasks[0]->getGuy()->setMoving(false);
                     delete guysTasks[0];  //delete completed task
                     guysTasks.erase(guysTasks.begin()); //remove from task list for this guy
                     //if (!guysTasks.empty()) guysTasks[0]->getGuy()->setTask(guysTasks[0]); //set guys next task if there is one available

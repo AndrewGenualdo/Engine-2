@@ -8,7 +8,8 @@
 #include "backends/imgui_impl_opengl3.h"
 
 #include "GLFW/glfw3.h"
-
+#include "../../ew/external/glad.h"
+#include "../../ew/external/stb_image.h"
 
 cobb::Window::Window(const std::string &title) {
     window = nullptr;
@@ -31,6 +32,13 @@ cobb::Window::Window(const std::string &title) {
         printf("GLFW failed to create window");
         return;
     }
+
+    GLFWimage icons[3];
+    icons[0].pixels = stbi_load("assets/farminggame/icon_16.png", &icons[0].width, &icons[0].height, nullptr, 4);
+    icons[1].pixels = stbi_load("assets/farminggame/icon_32.png", &icons[1].width, &icons[1].height, nullptr, 4);
+    icons[2].pixels = stbi_load("assets/farminggame/icon_128.png", &icons[2].width, &icons[2].height, nullptr, 4);
+    glfwSetWindowIcon(window, 3, icons);
+
     glfwMakeContextCurrent(window);
     if (!gladLoadGL(glfwGetProcAddress)) {
         printf("GLAD Failed to load GL headers");
